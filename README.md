@@ -18,9 +18,9 @@ src/
 | Module | Design | Validation | 
 |---|---|---|
 | FIFO | | | 
-| Receiver | | | 
-| Transmitter | | | 
-| Patcher | | | 
+| receiver |WIP | | 
+| transmitter | | | 
+| patcher | | | 
 | ms_controller | | | 
 | sl_controller | | | 
 | arbiter_engine | | | 
