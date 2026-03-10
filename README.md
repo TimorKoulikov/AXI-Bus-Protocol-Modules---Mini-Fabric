@@ -15,12 +15,12 @@ src/
 
 ## Progress
 
-| Module | Design | Validation | Owner |
-|---|---|---|---|
-| FIFO | | | |
-| Receiver | | | |
-| Transmitter | | | |
-| Patcher | | | |
-| ms_controller | | | |
-| sl_controller | | | |
-| arbiter_engine | | | |
+| Module | Design | Validation | 
+|---|---|---|
+| FIFO | | | 
+| Receiver | | | 
+| Transmitter | | | 
+| Patcher | | | 
+| ms_controller | | | 
+| sl_controller | | | 
+| arbiter_engine | | | 
