@@ -1,32 +1,44 @@
 
-/*=======================
+/*===============================================================
 module is reciving data from a specific channel of axi component.
 output - the most recent data from axi component
-=========================*/
+=================================================================*/
 
 /*TODO:
-	1.) check how clk works in reciver
-	2.) check if need to add reset
 */
 
 module reciveri(
-clk,		//axi component clk
-data_in. 	//AXI channel that comes from axi component
+aclk,		//axi global clock signal
+aresetn,	//global reset signal. active low
+data_in,	//AXI channel that comes from axi component
 data_out,	//data of entering valid and new data.
-nsp		//new data pulse (width of signal is 1 clk)
+valido		//new data pulse (width of signal is 1 clk)
 );
-//-----imports-----
-import ../resources/*
-//-----Parameters-----
+//----- imports-----
+import ../resources/axi_datatypes::*
+//----- Parameters-----
 
 parameter CHANNEL_TYPE=AW,
-BUS_WIDTH=128
+BUS_WIDTH=128;
 
-//-----Input Ports-----
-input AXI_AWdata_in;
-//-----Output Ports-----
+//----- Input Ports-----
+input aclk;
+input aresetn
+input aw_bus data_in;
+//----- Output Ports -----
+output datao;
+output valido;
 
+//----- logic ------
 
-
+always @(posedge aclk) begin
+	if(valid)
+		data_out <= data_in;
+		valid_out <=1'b1;
+	end
+	else begin
+		valid_out >=1'b0;
+	end
+end
 
 endmodule
