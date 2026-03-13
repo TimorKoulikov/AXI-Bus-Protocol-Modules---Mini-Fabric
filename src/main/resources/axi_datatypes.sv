@@ -8,22 +8,21 @@ localparam W_BUS_WIDTH=32;
 localparam R_BUS_WIDTH=32;
 localparam B_BUS_WIDTH=32;
 
-localparam ADDR_WDITH=32;
+localparam ADDR_WIDTH=32;
 
 struct {
 	logic valid;
 	logic [3:0] qos;
 	logic [ADDR_WIDTH - 1 : 0] awaddr;
-	wire [AW_BUS_WIDTH-1 : 0] data
+	logic [AW_BUS_WIDTH-1 : 0] data;
 } aw_bus;
 
 struct {
 	logic valid;
 	logic [3:0] qos;
 	logic [ADDR_WIDTH - 1:0] araddr;
-	logic araddr;
 
 } ar_bus;
 
 
-endpackage : axi_datatypes
+endpackage
