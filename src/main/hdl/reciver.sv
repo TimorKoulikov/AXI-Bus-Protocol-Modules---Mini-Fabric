@@ -26,15 +26,15 @@ BUS_WIDTH=128;
 //----- Input Ports-----
 input aclk;
 input aresetn;
-input data_in;
+input [BUS_WIDTH:0] data_in;
 //----- Output Ports -----
-output reg data_out;
+output reg [BUS_WIDTH:0] data_out;
 output reg valid_out;
 
 //----- logic ------
 
 always_ff @(posedge aclk) begin
-	if(valid_out) begin
+	if(data_in[0]) begin
 		data_out <= data_in;
 		valid_out <=1'b1;
 	end

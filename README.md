@@ -18,8 +18,8 @@ src/
 | Module | Design | Validation | 
 |---|---|---|
 | FIFO | | | 
-| receiver |WIP | | 
-| transmitter | | | 
+| receiver |WIP | DONE | 
+| transmitter |WIP | | 
 | patcher | | | 
 | ms_controller | | | 
 | sl_controller | | | 

@@ -3,7 +3,7 @@
 -sverilog
 
 // packages 
-./src/main/resources/axi_datatypes.sv
+./src/resources/axi_datatypes.sv
 // rtl source code 
 ./src/main/hdl/reciver.sv
 // test bench
