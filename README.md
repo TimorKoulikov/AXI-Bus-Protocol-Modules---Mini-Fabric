@@ -11,6 +11,7 @@ src/
 └── test/
     ├── hdl/          — SystemVerilog testbench files
     └── resources/    — simulation scripts and supporting files
+sim_exc.sh            - script to run and simulate the test_bench
 ```
 
 ## Progress
