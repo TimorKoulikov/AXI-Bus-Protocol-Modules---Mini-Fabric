@@ -21,8 +21,8 @@ build_config.f        - file list of all units to compile and configuations
 | Module | Design | Validation | 
 |---|---|---|
 | FIFO | | | 
-| receiver |WIP | DONE | 
-| transmitter |WIP | | 
+| receiver |DONE| WIP | 
+| transmitter |DONE | WIP| 
 | patcher | | | 
 | ms_controller | | | 
 | sl_controller | | | 

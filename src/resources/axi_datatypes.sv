@@ -19,7 +19,7 @@ localparam B_BUS_SIZE  = 4  + ID_WIDTH;
 localparam AR_BUS_SIZE = 27 + ID_WIDTH + ADDR_WIDTH;
 localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
 
-struct {
+typedef struct packed {
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     awid;
@@ -34,7 +34,7 @@ struct {
 	logic [AW_BUS_WIDTH-1:0] data;
 } aw_bus;
 
-struct {
+typedef struct packed{
 	logic valid;
 	logic ready;
 	logic [DATA_WIDTH-1:0]   wdata;
@@ -42,14 +42,14 @@ struct {
 	logic                    wlast;
 } w_bus;
 
-struct {
+typedef struct packed {
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     bid;
 	logic [1:0]              bresp;
 } b_bus;
 
-struct {
+typedef struct packed{
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     arid;
@@ -63,7 +63,7 @@ struct {
 	logic [3:0]              arqos;
 } ar_bus;
 
-struct {
+typedef struct packed{
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     rid;
@@ -72,6 +72,23 @@ struct {
 	logic                    rlast;
 } r_bus;
 
-
-
+/*
+function int get_bus_width(input axiChannelTypes t);
+	int width; // Local variable to hold the result
+	
+	case (t)
+		AW: width = AW_BUS_WIDTH;
+		AR: width = AR_BUS_WIDTH;
+		W:  width = W_BUS_WIDTH;
+		R:  width = R_BUS_WIDTH;
+		B:  width = B_BUS_WIDTH;
+		default: begin
+			width = 0;
+			$display("Error: Unknown AXI Channel Type");
+		end
+	endcase
+	
+	return width; // Return the calculated width
+endfunction
+*/
 endpackage

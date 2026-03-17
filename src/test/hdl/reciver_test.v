@@ -14,7 +14,7 @@ logic aclk,aresetn,valid_out;
 logic [31:0] data_in;
 logic [31:0] data_out;
 
-reciver #(.BUS_WIDTH(31)) rc(
+reciver #(aw_bus) rc(
 						.aclk(aclk),
 						.aresetn(aresetn),
 						.data_in(data_in),
