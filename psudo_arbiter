@@ -1,0 +1,47 @@
+ALGORITHM FabricArbiter:
+    INPUTS: MASTERS[5][1..M] 	// an 2d array of masters for each data channel   
+            exec_state		// state of execution (DWRR,URGENT)
+    OUTPUT:
+
+    Cycle exectuion():
+	
+	Q=const;	//token allocation each turn	
+	//check current
+	for bus_channel in [AW,AR,W,R,B]:
+		
+		if(exec_state == DWRR):
+			//round robin
+			if Masters[bus_channel][curr_active[bus_channe]] is active:
+				continue;
+		
+			curr_active[bus_channel]+=1 %M;
+		
+			//urgent call
+				ui=get_urgent_master(bus_channel);	//function return the smallest master_id that is urgent; return -1 if none
+			if(ui!=-1):
+				//need to save the current active so we can return to him
+				hold_index[bus_channel] = curr_active[bus_channel];
+				curr_active[bus_channel] = ui;
+				exec_state=URGENT
+			
+		if(exec_state == URGENT):
+			//if the master of the urgent is not anymore uregent we can return to normal mode
+			if Masterspbus_channel][curr_active[bus_channel]] is not urgent:
+				curr_active[bus_channel] = hold_index[bus_channel];
+				exec_state = DWRR
+		
+		
+	//token allocation
+	foreach master,buschannel in MASTERS,[AW,AR,W,R,B]:
+		//if BW to small
+		if Masters[bus_channel][master].BW < TOO_LOW_BW:		
+			Masters[bus_channel][master].token+=Q*(DESIRES_BW-BW);
+		else 
+			Masters[bus_channel][master].token+=Q;
+
+
+
+'''
+	each master tracking his own BW. if BW is MAX_BW master will stop the transctions.
+	if master BW is saturated but has stream_transaction the MAX_BW will multiply by 1.2
+'''
