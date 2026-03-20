@@ -19,11 +19,13 @@ localparam B_BUS_SIZE  = 4  + ID_WIDTH;
 localparam AR_BUS_SIZE = 27 + ID_WIDTH + ADDR_WIDTH;
 localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
 
+localparam MAX_LEN=1024;
+
 typedef struct packed {
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     awid;
-	logic [ADDR_WIDTH-1:0]   awaddr;
+	logic [ADDR_WIDTH-1:0]   addr;
 	logic [7:0]              awlen;
 	logic [2:0]              awsize;
 	logic [1:0]              awburst;
@@ -53,7 +55,7 @@ typedef struct packed{
 	logic valid;
 	logic ready;
 	logic [ID_WIDTH-1:0]     arid;
-	logic [ADDR_WIDTH-1:0]   araddr;
+	logic [ADDR_WIDTH-1:0]   addr;
 	logic [7:0]              arlen;
 	logic [2:0]              arsize;
 	logic [1:0]              arburst;
@@ -72,7 +74,7 @@ typedef struct packed{
 	logic                    rlast;
 } r_bus;
 
-/*
+
 function int get_bus_width(input axiChannelTypes t);
 	int width; // Local variable to hold the result
 	
@@ -90,5 +92,5 @@ function int get_bus_width(input axiChannelTypes t);
 	
 	return width; // Return the calculated width
 endfunction
-*/
+
 endpackage
