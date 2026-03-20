@@ -7,7 +7,7 @@ module axi_buffer(
 aclk,		//axi global clock signal
 aresetn,	//global reset signal. active low
 data_in,	//AXI channel that comes from axi component
-ready_out,	//ready signal the reciver sends for the data_in
+ready_out,	//valid signal the reciver sends for the data_in
 data_out,	//data of entering valid and new data
 ready_in,	//ready siganl reciver gets for the data_out
 );
