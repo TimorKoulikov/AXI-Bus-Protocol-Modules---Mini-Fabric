@@ -20,7 +20,7 @@ build_config.f        - file list of all units to compile and configuations
 
 | Module | Design | Validation | 
 |---|---|---|
-| FIFO | | | 
+| ROB | | | 
 | receiver |DONE| DONE|
 | transmitter |DONE | DONE| 
 | patcher_ax | WIP |WIP |
