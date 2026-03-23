@@ -1,6 +1,5 @@
 //testbench for axi_buffer
-module axi_buffer_test_test;
-
+module axi_buffer_test;
 
 //-----imports-----
 import axi_datatypes::*;
