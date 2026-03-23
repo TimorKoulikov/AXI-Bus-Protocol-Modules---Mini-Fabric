@@ -33,7 +33,7 @@ input aclk;
 input aresetn;
 input BUS_TYPE data_in;
 input ready_in;
-input [NUM_OF_SLAVES-1:0][1:0][ADDR_WIDTH:1] cfg;
+input [NUM_OF_SLAVES-1:0][1:0][ADDR_WIDTH - 1:0] cfg;
 input cfg_en;
 //----- Output Ports -----
 output BUS_TYPE data_out;

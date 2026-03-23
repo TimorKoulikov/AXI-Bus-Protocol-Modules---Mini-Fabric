@@ -26,14 +26,7 @@ axi_buffer #(BUS_TYPE) axi_buffer_uut(
 
 
 //-----testbanch-----
-
-class Rand;
-	rand  BUS_TYPE random_data;
-	
-	constraint c_data {random_data.valid == 0;}
-endclass
-
-Rand randobj = new();
+Rand_AXI#(BUS_TYPE) random = new();
 
 initial
 begin
@@ -44,8 +37,7 @@ begin
 	data_in={0};
 	#10
 	$display("test_1: check data pass when valid is high");
-	randobj.randomize();
-	data_in=randobj.random_data;
+	data_in=random.get_random();
 	data_in.valid=1'b1;	
 	#10
 	assert(data_in==data_out) begin
@@ -55,8 +47,7 @@ begin
 	end
 	$display("test_2: check data dont pass when valid is low");
 	data_old=data_in;
-	randobj.randomize();
-	data_in=randobj.random_data;
+	data_in=random.get_random();
 	#10
 	assert(data_in!=data_out && data_out == data_old) begin
 		$display("test_2: PASS");

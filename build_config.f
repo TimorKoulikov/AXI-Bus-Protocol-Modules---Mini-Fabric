@@ -4,6 +4,7 @@
 
 // packages 
 ./src/resources/axi_datatypes.sv
+./src/resources/fabric_datatypes.sv
 //$SNPS_SYN/dw/*
 
 //rtl source code 
@@ -12,4 +13,4 @@
 
 // test bench
 ./src/test/axi_buffer_test.sv
-//./src/test/patcher_ax_test.sv
+./src/test/patcher_ax_test.sv

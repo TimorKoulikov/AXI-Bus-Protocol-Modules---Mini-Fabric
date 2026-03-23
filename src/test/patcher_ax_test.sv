@@ -6,14 +6,16 @@ import axi_datatypes::*;
 
 //----parameters-----
 parameter type BUS_TYPE = aw_bus;
+parameter NUM_OF_SLAVES=4;
+parameter master_id=0;
 
 //-----Initiazation-----
 logic aclk;
 logic aresetn;
 logic cfg_en;
+logic [NUM_OF_SLAVES - 1:0][1:0][ADDR_WIDTH - 1:0] cfg;
 
-
-patcher_ax #(BUS_TYPE)
+patcher_ax #(.BUS_TYPE(BUS_TYPE), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES))
 		dut_patcher_ax (
 			.aclk(aclk),
 			.aresetn(aresetn),

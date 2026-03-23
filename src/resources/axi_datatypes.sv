@@ -75,6 +75,7 @@ typedef struct packed{
 } r_bus;
 
 
+
 function int get_bus_width(input axiChannelTypes t);
 	int width; // Local variable to hold the result
 	
@@ -92,5 +93,18 @@ function int get_bus_width(input axiChannelTypes t);
 	
 	return width; // Return the calculated width
 endfunction
+
+
+class Rand_AXI #(type BUS_TYPE = aw_bus);
+	static rand BUS_TYPE random_axi_data;
+	
+	constraint c_axi_data {random_axi_data.valid==1'b0;}
+	
+	function BUS_TYPE get_random();
+		this.randomize();
+		return this.random_axi_data;
+	endfunction
+endclass
+
 
 endpackage
