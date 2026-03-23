@@ -17,13 +17,13 @@ run_verdi.sh          — script to run verdi and display the waveforms
 
 ## Progress
 
-| Module | Design | Validation | 
-|---|---|---|
-| ROB | | | 
-| receiver |DONE| DONE|
-| transmitter |DONE | DONE| 
-| patcher_ax | WIP |WIP |
-| patcher_x | | 
-| ms_controller | | | 
-| sl_controller | | | 
-| arbiter_engine | | | 
+| Module         | Design | Validation | 
+|----------------|--------|------------|
+| ROB            |        |            | 
+| receiver       |  DONE  |    DONE    |
+| transmitter    |  DONE  |    DONE    | 
+| patcher_ax     |  WIP   |    WIP     |
+| patcher_x      |        |            |
+| ms_controller  |        |            | 
+| sl_controller  |        |            | 
+| arbiter_engine |        |            | 
