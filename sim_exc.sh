@@ -6,7 +6,7 @@ OUT_DIR="build"
 #create if doesnt exist
 mkdir -p $OUT_DIR
 
-#run simulation
+#compile
 vcs -kdb -debug_access+all -full64\
 	 -f build_config.f \
 	-Mdir=$OUT_DIR/csrc \
@@ -14,7 +14,7 @@ vcs -kdb -debug_access+all -full64\
 	-l $OUT_DIR/compile.log
 
 
-#open verdi
+#run simulation
 ./$OUT_DIR/simv \
 	-l $OUT_DIR/sim_run.log \
 	+fsdbfile+$OUT_DIR/inter.fsdb \

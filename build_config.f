@@ -4,10 +4,12 @@
 
 // packages 
 ./src/resources/axi_datatypes.sv
-$SNPS_SYN/dw/sim_ver/DW_fifo_s1_sf.v
+//$SNPS_SYN/dw/*
+
 //rtl source code 
-./src/main/hdl/axi_buffer.sv
-./src/main/hdl/patcher_ax.sv
+./src/main/axi_buffer.sv
+./src/main/patcher_ax.sv
+
 // test bench
-./src/test/hdl/axi_buffer_test.sv
-./src/test/hdl/patcher_ax_test.sv
+./src/test/axi_buffer_test.sv
+//./src/test/patcher_ax_test.sv

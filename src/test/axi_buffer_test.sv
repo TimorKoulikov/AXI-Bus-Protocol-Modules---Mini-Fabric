@@ -6,7 +6,7 @@ module axi_buffer_test_test;
 import axi_datatypes::*;
 
 //----parameters-----
-parameter type BUS_TYPE = w_bus;
+parameter type BUS_TYPE = aw_bus;
 
 //-----Initiazation-----
 logic aclk,aresetn;
@@ -14,7 +14,7 @@ logic ready_in,ready_out;
 BUS_TYPE data_in;
 BUS_TYPE data_out;
 BUS_TYPE data_old;
-axi_buffer #(BUS_TYPE) dut_buffer(
+axi_buffer #(BUS_TYPE) axi_buffer_uut(
 						.aclk(aclk),
 						.aresetn(aresetn),
 						.data_in(data_in),
@@ -46,8 +46,7 @@ begin
 	$display("test_1: check data pass when valid is high");
 	randobj.randomize();
 	data_in=randobj.random_data;
-	data_in.valid=1'b1;
-	data_old=data_in;
+	data_in.valid=1'b1;	
 	#10
 	assert(data_in==data_out) begin
 		$display("test_1: PASS");
@@ -55,7 +54,7 @@ begin
 		$error("test_1: FAIL");
 	end
 	$display("test_2: check data dont pass when valid is low");
-	
+	data_old=data_in;
 	randobj.randomize();
 	data_in=randobj.random_data;
 	#10
