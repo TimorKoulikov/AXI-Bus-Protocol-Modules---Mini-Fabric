@@ -15,11 +15,12 @@ run_verdi.sh          — script to run verdi and display the waveforms
 
 ```
 
+
 ## Progress
 
 | Module         | Design | Validation | 
 |----------------|--------|------------|
-| ROB            |        |            | 
+| ROB            |   alex |            | 
 | receiver       |  DONE  |    DONE    |
 | transmitter    |  DONE  |    DONE    | 
 | patcher_ax     |  WIP   |    WIP     |
