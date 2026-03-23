@@ -35,11 +35,19 @@ begin
 	$display("init test patcher_ax");
 	aclk=1'b0;
 	aresetn=1'b1;
+	cfg_en=1'b0;
+	#10
+	$display("test_1:config successfull cfg");
+	cfg={0};
 	cfg_en=1'b1;
 	#10
-	//not implamented 
-	$display("test_1:config successfull cfg");
+	cfg_en=1'b0;
 	#10
+	assert( dut_patcher_ax.cfg_reg == cfg) begin
+		$display("test_1: PASS");
+	end else begin
+		$error("test_1: FAIL");
+	end
 	//not implamented 
 	$display("test_2:pass with valid high");
 	#10

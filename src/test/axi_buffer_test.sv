@@ -7,7 +7,7 @@ import axi_datatypes::*;
 //----parameters-----
 parameter type BUS_TYPE = aw_bus;
 
-//-----Initiazation-----
+//-----Initialization-----
 logic aclk,aresetn;
 logic ready_in,ready_out;
 BUS_TYPE data_in;
@@ -22,9 +22,7 @@ axi_buffer #(BUS_TYPE) axi_buffer_uut(
 						.ready_out(ready_out));
 
 
-
-
-//-----testbanch-----
+//-----testbench-----
 Rand_AXI#(BUS_TYPE) random = new();
 
 initial

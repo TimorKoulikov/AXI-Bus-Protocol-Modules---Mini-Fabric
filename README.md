@@ -5,14 +5,13 @@ this is undargratuate project. we are implementing simple fabric with Arbitratio
 
 ```
 src/
-├── main/
-│   ├── hdl/          — core Verilog/SystemVerilog design files
-│   └── resources/    — build scripts and third-party resources
-└── test/
-    ├── hdl/          — SystemVerilog testbench files
-    └── resources/    — simulation scripts and supporting files
-sim_exc.sh            - script to run and simulate the test_bench
-build_config.f        - file list of all units to compile and configuations
+├── main/             — core SystemVerilog design files 
+├── resources/        — third-party resources
+└── test/             — modules' testbenches 
+
+build_config.f        — file list of all units to compile and configuations
+sim_exc.sh            — script to run and simulate the test_bench
+run_verdi.sh          — script to run verdi and display the waveforms
 
 ```
 
