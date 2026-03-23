@@ -23,7 +23,9 @@ axi_buffer #(BUS_TYPE) axi_buffer_uut(
 
 
 //-----testbench-----
-Rand_AXI#(BUS_TYPE) random = new();
+
+// creating objects for random data
+RAND_AXI#(.BUS_TYPE(BUS_TYPE)) random = new();
 
 initial
 begin

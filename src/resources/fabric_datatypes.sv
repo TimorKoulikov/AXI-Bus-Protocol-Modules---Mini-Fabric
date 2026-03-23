@@ -1,11 +1,32 @@
 package fabric_datatypes;
 	
-	import axi_datatypes::*;
+import axi_datatypes::*;
 	
-	
+localparam NUM_OF_SLAVES=3;	
 	typedef struct packed {
 		logic [ADDR_WIDTH -1 : 0] low_addr ;
 		logic [ADDR_WIDTH -1 : 0] high_addr;		
-	} cfg;
+	} cfg_row;
 	
+typedef cfg_row [NUM_OF_SLAVES-1 : 0] cfg_t ;
+
+
+
+class RAND_CFG;
+	rand cfg_t random_cfg_data;
+	
+	constraint c_cfg_t {
+		random_cfg_data[0].low_addr == '0;
+		random_cfg_data[NUM_OF_SLAVES - 1].high_addr =='1;
+		foreach(random_cfg_data[i]){
+			random_cfg_data[i].low_addr < random_cfg_data[i].high_addr;
+		}
+	}
+	
+	function cfg_t get_random();
+		this.randomize();
+		return this.random_cfg_data;
+	endfunction
+endclass
+
 endpackage

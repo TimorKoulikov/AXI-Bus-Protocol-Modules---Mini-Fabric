@@ -95,8 +95,8 @@ function int get_bus_width(input axiChannelTypes t);
 endfunction
 
 
-class Rand_AXI #(type BUS_TYPE = aw_bus);
-	static rand BUS_TYPE random_axi_data;
+class RAND_AXI #(type BUS_TYPE = aw_bus);
+	rand BUS_TYPE random_axi_data;
 	
 	constraint c_axi_data {random_axi_data.valid==1'b0;}
 	
