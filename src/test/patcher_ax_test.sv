@@ -14,7 +14,8 @@ parameter master_id=0;
 logic aclk;
 logic aresetn;
 logic cfg_en;
-logic [NUM_OF_SLAVES - 1:0][1:0][ADDR_WIDTH - 1:0] cfg;
+cfg_t cfg;
+patch_t patch_out;
 BUS_TYPE data_in;
 BUS_TYPE data_out;
 patcher_ax #(.BUS_TYPE(BUS_TYPE), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES))
@@ -30,11 +31,13 @@ patcher_ax #(.BUS_TYPE(BUS_TYPE), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_S
 			.cfg_en(cfg_en)
 		);
 
+
 //-----testbench-----
 
 // creating objects for random data
 RAND_CFG rand_cfg = new();
 RAND_AXI#(.BUS_TYPE(BUS_TYPE)) rand_axi = new();
+BUS_TYPE data_old;
 initial
 begin
 	$display("init test patcher_ax");
@@ -59,7 +62,8 @@ begin
 	data_in=rand_axi.get_random();
 	data_in.valid=1'b1;
 	#10
-	assert ( data_in == data_out) begin
+	assert ( data_in == data_out &&
+			patch_out == {get_slave(cfg,data_in.addr),master_id,1'b0}) begin
 		$display("test_2: PASS");
 	end else begin
 		$error("test_2: FAIL");
@@ -67,10 +71,30 @@ begin
 	//======================================
 	//not implamented 
 	$display("test_3: pass with valid low ");
+	data_old=data_in;
+	data_in=rand_axi.get_random();
+	#10
+	assert (data_in != data_out && data_out.valid == 1'b0) begin
+		$display("teset_3: PASS");
+	end else begin
+		$display("test_3: FAIL");
+	end
 	$finish;
 end
 
 
-always #10 aclk = ~aclk;
+//----- helper functions
+function int get_slave(input cfg_t cfg,input [31:0] addr);
+	for(int i=0;i<NUM_OF_SLAVES;i=i+1) 
+	begin
+		if(cfg[i].low_addr<data_in.addr && cfg[i].high_addr>data_in.addr) 
+		begin
+			return i;
+		end
+	end
+endfunction
+
+
+always #5 aclk = ~aclk;
 
 endmodule

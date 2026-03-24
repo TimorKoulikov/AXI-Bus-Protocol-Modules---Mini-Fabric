@@ -38,7 +38,7 @@ input cfg_en;
 //----- Output Ports -----
 output BUS_TYPE data_out;
 output logic ready_out;
-output logic [2:0] patch_out;
+output patch_t patch_out;
 //----- logic ------
 
 //cfg file
@@ -52,7 +52,7 @@ always_comb begin
 	slave=0;
 	for(int i=0;i<NUM_OF_SLAVES;i=i+1) 
 	begin
-		if(cfg_reg[i][0]<data_in.addr && cfg_reg[i][1]>data_in.addr) 
+		if(cfg_reg[i].low_addr<data_in.addr && cfg_reg[i].high_addr>data_in.addr) 
 		begin
 			slave=i;
 		end
@@ -72,6 +72,8 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		if(data_in.valid==1'b1) begin
 			data_out<=data_in;
 			patch_out <={slave,master_id,1'b0};
+		end else begin
+			data_out.valid <=1'b0;
 		end
 		
 	end

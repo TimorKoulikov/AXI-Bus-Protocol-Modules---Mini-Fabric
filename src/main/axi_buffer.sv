@@ -40,6 +40,8 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		end
 		if(data_in.valid==1'b1) begin
 			data_out<=data_in;
+		end else begin
+			data_out.valid<=1'b0;
 		end
 		
 	end
