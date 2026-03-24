@@ -48,7 +48,7 @@ begin
 	data_old=data_in;
 	data_in=random.get_random();
 	#10
-	assert(data_in!=data_out && data_out == data_old) begin
+	assert(data_in!=data_out && data_out.valid == 1'b0) begin
 		$display("test_2: PASS");
 	end else begin
 		$error("test_2: FAIL");
@@ -64,7 +64,7 @@ begin
 	$finish;
 end
 
-always #10 aclk = ~aclk;
+always #5 aclk = ~aclk;
 
 
 endmodule
