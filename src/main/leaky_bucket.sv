@@ -10,21 +10,21 @@ module leaky_bucket(
 aclk,		//axi global clk
 aresetn,	//axi global reset
 data,		//how many token to add
-load,		//enable adding tokens
+loadn,		//enable adding tokens
 count,		//output of counter of leaky bucket
 tercent		//the bucket is full
 );
 
 //-----parameters-----
-parameter width=32;
-parameter MAX_TOKEN=100;
+parameter width=30;
+parameter MAX_TOKEN=8;
 parameter rate_leak=1;
 
 //-----inputs-----
 input aclk;
 input aresetn;
 input [width -1 : 0] data;
-input load;
+input loadn;
 
 //-----outputs-----
 output [width -1 : 0] count;
@@ -46,8 +46,8 @@ leak_counter (
 
 );
 
-DW03_bictr_scnto #(width, MAX_TOKEN)
-bucket ( .data(data), .up_dn(tn), .load(load),
+DW03_bictr_scnto #(.width(width), .count_to(MAX_TOKEN))
+bucket ( .data(data), .up_dn(tn), .load(loadn),
 .cen(1'b1), .clk(aclk), .reset(aresetn),
 .count(count), .tercnt(tercent) );
 

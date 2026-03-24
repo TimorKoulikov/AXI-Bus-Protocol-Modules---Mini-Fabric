@@ -58,7 +58,7 @@ do
             +fsdbfile+$OUT_DIR/$TEST_TOP.fsdb 
     fi
     
-    grep -Ei "ERROR" $OUT_DIR/sim_$TEST_TOP.log
+    grep -qEi "ERROR| FAIL" $OUT_DIR/sim_$TEST_TOP.log
 	if [ $? -eq 0 ]; then
     	echo "========================================"
     	echo " TEST FAILED"

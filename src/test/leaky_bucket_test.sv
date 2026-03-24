@@ -9,15 +9,15 @@
 module leaky_bucket_test();
 
 //-----parameters-----
-parameter width=32;
-parameter MAX_TOKEN=100;
-parameter rate_leak=1;
+parameter width=30;
+parameter MAX_TOKEN=8;
+parameter rate_leak=2;
 
 //-----inputs-----
 logic aclk;
 logic aresetn;
 logic [width -1 : 0] data;
-logic load;
+logic loadn;
 
 //-----outputs-----
 logic [width -1 : 0] count;
@@ -26,16 +26,17 @@ logic [width -1 : 0] tercent;
 //-----Initialization-----
 
 leaky_bucket #(.width(width),.MAX_TOKEN(MAX_TOKEN),.rate_leak(rate_leak))
-		bucket_dut (
+		bucket_no_leak_dut (
 		.aclk(aclk),
 		.aresetn(aresetn),
 		.data(data),
-		.load(load),
+		.loadn(loadn),
 		.count(count),
 		.tercent(tercent)
 );
 
-
+int curr;
+int time_to_wait;
 //-----testbanch-----
 initial
 begin
@@ -43,20 +44,49 @@ begin
 	aclk=1'b0;
 	aresetn=1'b1;
 	data='0;
-	load=1'b0;
+	loadn=1'b1;
 	#10
-	
 	//---------------------------------------
 	$display("test_1: adding tokens");
+	aresetn=1'b0;
 	#10
+	aresetn=1'b1;
+	#30
+	assert(count == 3) begin
+		$display("test_1: PASS");
+	end else begin
+		$display("test_1: FAIL %d",count);
+	end
 	
+	#10
 	//---------------------------------------
 	$display("test_2: checking leak rate");
-	#10
+	curr=count;
+	
+	time_to_wait=rate_leak*10;
+	#time_to_wait
+	assert( count == curr + rate_leak -1) begin
+		$display("test_2: PASS %d %d",curr, count);
+	end else begin
+		$display("test_2: FAIL %d %d",curr, count);
+	end
 	
 	//---------------------------------------
 	$display("test_3: check MAX_BW ");
 	
+	fork : wait_with_timeout
+	begin
+		wait(tercent === 1'b1);
+		$display("test_3: PASS");
+	end
+		begin
+			#10000;
+			if(tercent ==1'b0) begin
+				$display("test_3: FAIL");
+			end
+		end
+	join_any
+	disable fork; // Kill the branch that is still running
 	$finish;
 end
 
