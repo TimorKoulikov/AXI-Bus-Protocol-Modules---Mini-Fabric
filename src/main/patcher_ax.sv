@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
- 	module recives axi data and patch additional data
+ 	module recives axi data from AW or AR channel and patch additional data
  *------------------------------------------------------------------------------*/
 
 module patcher_ax(
@@ -22,8 +22,6 @@ import fabric_datatypes::*;
 
 //-----parameters-----
 parameter type BUS_TYPE = aw_bus;
-//parameter width = $bits(BUS_TYPE);
-//parameter depth = 1;
 parameter master_id=1;
 parameter NUM_OF_SLAVES=4;
 
@@ -47,6 +45,7 @@ always @(posedge cfg_en) begin
 	cfg_reg<=cfg;
 end
 
+//calculate slave_id
 integer slave;
 always_comb begin
 	slave=0;
