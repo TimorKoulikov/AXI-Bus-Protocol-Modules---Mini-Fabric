@@ -57,6 +57,13 @@ do
             -l $OUT_DIR/sim_$TEST_TOP.log \
             +fsdbfile+$OUT_DIR/$TEST_TOP.fsdb 
     fi
+    
+    grep -Ei "ERROR" $OUT_DIR/sim_$TEST_TOP.log
+	if [ $? -eq 0 ]; then
+    	echo "========================================"
+    	echo " TEST FAILED"
+    	echo "========================================"
+	fi
 
     mv ./ucli.key $OUT_DIR/ucli_$TEST_TOP.key
 done

@@ -1,11 +1,13 @@
 
 // flags
 -sverilog
-
-// packages 
++incdir+$SYNOPSYS_SYN_ROOT/dw/sim_ver/
++libext+.v 
+// packages
+//flag only for euclide. no need for vcs
+-y $SYNOPSYS_SYN_ROOT/dw/sim_ver/ 
 ./src/resources/axi_datatypes.sv
 ./src/resources/fabric_datatypes.sv
-//$SNPS_SYN/dw/*
 
 //rtl source code
 ./src/main/leaky_bucket.sv 
@@ -16,5 +18,4 @@
 // test bench
 ./src/test/axi_buffer_test.sv
 ./src/test/patcher_ax_test.sv
-./src/test/patcher_w_test.sv
 ./src/test/leaky_bucket_test.sv
