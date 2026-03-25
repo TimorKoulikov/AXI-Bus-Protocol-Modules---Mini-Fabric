@@ -19,8 +19,8 @@ axi_buffer #(BUS_TYPE) axi_buffer_uut(
 						.data_in(data_in),
 						.data_out(data_out),
 						.ready_in(ready_in),
-						.ready_out(ready_out));
-
+						.ready_out(ready_out)
+);
 
 //-----testbench-----
 

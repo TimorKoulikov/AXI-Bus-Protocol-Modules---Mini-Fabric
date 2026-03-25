@@ -1,6 +1,6 @@
-/*------------------------------------------------------------------------------
- 	module recives axi data from AW or AR channel and patch additional data
- *------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------
+ 	module that receives axi data from AW or AR channel and patches additional data
+ *---------------------------------------------------------------------------------*/
 
 module patcher_ax(
 aclk,		//axi global clock signal
@@ -8,9 +8,9 @@ aresetn,	//global reset signal. active low
 data_in,	//AXI channel that comes from axi component
 ready_out,	//valid signal the patcher sends for the data_in
 data_out,	//data of entering valid and new data
-ready_in,	//ready siganl patcher gets foDW_asymfifo_s1_dfr the data_out
+ready_in,	//ready signal patcher gets foDW_asymfifo_s1_dfr the data_out
 patch_out,	//patched data of the patcher add
-cfg,		//cfe from the arbitrer
+cfg,		//config from the arbiter_engine
 cfg_en		//signal rise when new cfg data is in	
 );
 
@@ -33,12 +33,14 @@ input BUS_TYPE data_in;
 input ready_in;
 input cfg_t cfg;
 input cfg_en;
+
 //----- Output Ports -----
 output BUS_TYPE data_out;
 output logic ready_out;
 output patch_t patch_out;
-//----- logic ------
 
+
+//----- logic ------
 //cfg file
 cfg_t cfg_reg;
 always @(posedge cfg_en) begin

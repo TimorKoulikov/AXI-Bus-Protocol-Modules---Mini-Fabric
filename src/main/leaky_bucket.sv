@@ -21,14 +21,14 @@ parameter MAX_TOKEN=8;
 parameter rate_leak=1;
 
 //-----inputs-----
-input aclk;
-input aresetn;
-input [width -1 : 0] data;
-input loadn;
+input logic aclk;
+input logic aresetn;
+input logic [width -1 : 0] data;
+input logic loadn;
 
 //-----outputs-----
-output [width -1 : 0] count;
-output [width -1 : 0] tercent;
+output logic [width -1 : 0] count;
+output logic [width -1 : 0] tercent;
 
 //-----logic-----
 wire t,tn;
