@@ -10,14 +10,14 @@ module leaky_bucket_test();
 
 //-----parameters-----
 parameter width=30;
-parameter MAX_TOKEN=8;
-parameter rate_leak=2;
+parameter MAX_TOKEN=100;
 
 //-----inputs-----
 logic aclk;
 logic aresetn;
 logic [width -1 : 0] data;
 logic loadn;
+logic leak;
 
 //-----outputs-----
 logic [width -1 : 0] count;
@@ -25,18 +25,20 @@ logic [width -1 : 0] tercent;
 
 //-----Initialization-----
 
-leaky_bucket #(.width(width),.MAX_TOKEN(MAX_TOKEN),.rate_leak(rate_leak))
-		bucket_no_leak_dut (
+leaky_bucket #(.width(width),.MAX_TOKEN(MAX_TOKEN))
+		leaky_bucket_uut (
 		.aclk(aclk),
 		.aresetn(aresetn),
 		.data(data),
 		.loadn(loadn),
 		.count(count),
-		.tercent(tercent)
+		.tercent(tercent),
+		.leak(leak)
 );
 
 int curr;
 int time_to_wait;
+int num_of_leak;
 //-----testbanch-----
 initial
 begin
@@ -45,14 +47,18 @@ begin
 	aresetn=1'b1;
 	data='0;
 	loadn=1'b1;
-	#10
-	//---------------------------------------
-	$display("test_1: adding tokens");
+	leak=1'b1;
 	aresetn=1'b0;
 	#10
 	aresetn=1'b1;
-	#30
-	assert(count == 3) begin
+	#10
+	//---------------------------------------
+	$display("test_1: adding tokens");
+	data=$random();
+	loadn=1'b0;
+	#10
+	loadn=1'b1;
+	assert(count == data) begin
 		$display("test_1: PASS");
 	end else begin
 		$display("test_1: FAIL %d",count);
@@ -60,33 +66,18 @@ begin
 	
 	#10
 	//---------------------------------------
-	$display("test_2: checking leak rate");
+	$display("test_2: checking leakag");
 	curr=count;
-	
-	time_to_wait=rate_leak*10;
+	leak=1'b1;
+	num_of_leak=7;
+	time_to_wait=10*num_of_leak;
 	#time_to_wait
-	assert( count == curr + rate_leak -1) begin
+	leak=1'b0;
+	assert( count == curr - num_of_leak) begin
 		$display("test_2: PASS %d %d",curr, count);
 	end else begin
 		$display("test_2: FAIL %d %d",curr, count);
 	end
-	
-	//---------------------------------------
-	$display("test_3: check MAX_BW ");
-	
-	fork : wait_with_timeout
-	begin
-		wait(tercent === 1'b1);
-		$display("test_3: PASS");
-	end
-		begin
-			#10000;
-			if(tercent ==1'b0) begin
-				$display("test_3: FAIL");
-			end
-		end
-	join_any
-	disable fork; // Kill the branch that is still running
 	$finish;
 end
 

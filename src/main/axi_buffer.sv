@@ -2,7 +2,15 @@
 module is receiving data from a specific channel of axi component.
 output - the most recent data from axi component
 =================================================================*/
-module axi_buffer(
+
+//----- imports -----
+import axi_datatypes::*;
+
+module axi_buffer #(
+//----- Parameters -----	
+parameter type BUS_TYPE = aw_bus
+)
+(
 	input  logic    aclk,      // axi global clock signal
 	input  logic    aresetn,   // global reset signal. active low
 	input  BUS_TYPE data_in,   // AXI channel that comes from axi component
@@ -11,15 +19,7 @@ module axi_buffer(
 	input  logic    ready_in   // ready signal receiver gets for the data_out
 );
 
-//----- imports -----
-import axi_datatypes::*;
-
-//----- Parameters -----
-parameter type BUS_TYPE = aw_bus;
-parameter IS_W = 0;
-
 //----- logic ------
-
 always_ff @(posedge aclk or negedge aresetn) begin
 	// reset the module
 	if(!aresetn) begin
