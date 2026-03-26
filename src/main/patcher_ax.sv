@@ -72,7 +72,7 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		end
 		if(data_in.valid==1'b1) begin
 			data_out<=data_in;
-			patch_out <={slave,master_id,1'b0};
+			patch_out <={slave,master_id,1'b0};//TODO: add urgent logic
 		end else begin
 			data_out.valid <=1'b0;
 		end

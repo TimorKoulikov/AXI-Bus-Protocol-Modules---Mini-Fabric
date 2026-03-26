@@ -13,7 +13,7 @@ logic ready_in,ready_out;
 BUS_TYPE data_in;
 BUS_TYPE data_out;
 BUS_TYPE data_old;
-axi_buffer #(BUS_TYPE) axi_buffer_uut(
+axi_buffer #(.BUS_TYPE(BUS_TYPE)) axi_buffer_uut(
 						.aclk(aclk),
 						.aresetn(aresetn),
 						.data_in(data_in),
@@ -46,9 +46,10 @@ begin
 	end
 	$display("test_2: check data dont pass when valid is low");
 	data_old=data_in;
-	data_in=random.get_random();
+	data_in=random.get_random();	//data_in.valid=1'b0;
+	data_old.valid=1'b0;
 	#10
-	assert(data_in!=data_out && data_out.valid == 1'b0) begin
+	assert(data_old == data_out) begin
 		$display("test_2: PASS");
 	end else begin
 		$error("test_2: FAIL");

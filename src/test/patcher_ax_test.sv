@@ -6,7 +6,7 @@ import axi_datatypes::*;
 import fabric_datatypes::*;
 
 //----parameters-----
-parameter type BUS_TYPE = aw_bus;
+parameter type BUS_TYPE = ar_bus;
 parameter NUM_OF_SLAVES=4;
 parameter master_id=0;
 
