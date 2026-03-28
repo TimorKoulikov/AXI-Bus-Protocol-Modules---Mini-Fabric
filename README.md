@@ -26,5 +26,5 @@ run_verdi.sh          — script to run verdi and display the waveforms
 | patcher_ax     |  DONE  |    DONE    |
 | patcher_x      |        |            |
 | router_control |  DONE  |    DONE    | 
-| arbiter_engine |        |            |
+| arbiter_engine |  WIP   |    WIP     |
 | router_ms      |  WIP   |    WIP     |
