@@ -13,10 +13,14 @@
 //./src/main/leaky_bucket.sv 
 ./src/main/axi_buffer.sv
 ./src/main/patcher_ax.sv
-./src/main/patcher_w.sv
+./src/main/patcher_w.sv	// unimplemented
+src/main/rob.sv			// unimplemented 
 ./src/main/router_control.sv
+./src/main/router_ms.sv
 
 // test bench
 ./src/test/axi_buffer_test.sv
 ./src/test/patcher_ax_test.sv
 ./src/test/router_control_test.sv
+
+

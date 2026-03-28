@@ -1,5 +1,6 @@
 /*------------------------------------------------------------------------------
 module that receives axi data from W channel and patches additional data
+UNIMPLEMENTED
 *------------------------------------------------------------------------------*/
 
 module patcher_w (
