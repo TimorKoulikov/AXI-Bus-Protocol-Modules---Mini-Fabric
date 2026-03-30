@@ -24,6 +24,9 @@ logic enable_regular;
 logic enable_urgent;
 logic [grand_index_width -1 : 0 ] grant_index_regular;
 logic [grand_index_width -1 : 0 ] grant_index_urgent;
+logic [NUM_OF_MASTERS -1 : 0] grant_regualr;
+logic [NUM_OF_MASTERS -1 : 0] grant_urgent;
+
 //logic [NUM_OF_MASTERS-1:0] enable_regular_bus;
 typedef enum logic [1:0] {
 	INIT,
@@ -34,34 +37,37 @@ typedef enum logic [1:0] {
 state_t curr_state;
 state_t next_state;
 
-//assign enable_regular_bus ={NUM_OF_MASTERS{enable_regular}};
+assign grant = curr_state == URGENT ? grant_urgent : grant_regualr;
 
 DW_arb_rr #(.n(NUM_OF_MASTERS),
 	.output_mode(1),
-	.index_mode(0))
-	regular_rr ( .clk(aclk),
+	.index_mode(0)
+)regular_rr( 
+	.clk(aclk),
 	.rst_n(aresetn),
 	.init_n(init_rr),
 	.enable('1),
 	.request({NUM_OF_MASTERS{enable_regular}}),
 	.mask('0),
 	.granted(granted_inst),
-	.grant(grant),
+	.grant(grant_regualr),
 	.grant_index(grant_index_regular)
 	);
 
 DW_arb_rr #(.n(NUM_OF_MASTERS),
-	.output_mode(0),
-	.index_mode(2))
-	urgent_rr ( .clk(aclk),
+	.output_mode(1),
+	.index_mode(0)
+)urgent_rr( 
+	.clk(aclk),
 	.rst_n(aresetn),
 	.init_n(init_rr),
-	.enable(enable_urgent),
-	.request('1),
-	.mask('0),
+	.enable('1),
+	.request({NUM_OF_MASTERS{enable_urgent}}),
+	.mask(~is_urgent),
 	.granted(granted_inst),
-	.grant(grant1),
-	.grant_index(grant_index_urgent) );
+	.grant(grant_urgent),
+	.grant_index(grant_index_urgent) 
+	);
 
 
 //FSM
@@ -69,15 +75,16 @@ always_ff @(posedge aclk or negedge aresetn) begin
 	if(!aresetn) begin
 		curr_state<= INIT;
 	end else begin
-		curr_state<= next_state;
-	end		
+		curr_state<= next_state;		
+	end	
+	
 end
 
 always_comb begin
 	next_state = curr_state;
 	init_rr=1'b1;
-	enable_regular=1'b0;
-	enable_urgent=1'b0;
+	enable_regular=1'b1;
+	enable_urgent=1'b1;
 	case(curr_state)
 		
 		INIT: begin
@@ -85,16 +92,16 @@ always_comb begin
 			next_state = REGULAR;
 		end
 		REGULAR : begin
-			if(NUM_OF_MASTERS'(1) << grant_index_regular == end_transaction)//TODO: fix this must
-				enable_regular=1'b1;
+			if(end_transaction !='0 && grant_regualr == end_transaction)//TODO: fix this must
+				enable_regular=1'b0;
 			if(is_urgent !='0) begin
 				next_state=URGENT;
 			end
 		end
 					
 		URGENT : begin
-			if(NUM_OF_MASTERS'(1) << grant_index_urgent == end_transaction)
-				enable_urgent=1'b1;
+			if(end_transaction !='0 && grant_urgent == end_transaction)
+				enable_urgent=1'b0;
 			if(is_urgent =='0) begin
 				next_state=REGULAR;
 			end
