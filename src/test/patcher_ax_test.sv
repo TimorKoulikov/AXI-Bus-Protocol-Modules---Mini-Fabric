@@ -40,6 +40,7 @@ RAND_AXI#(.BUS_TYPE(BUS_TYPE)) rand_axi = new();
 BUS_TYPE data_old;
 initial
 begin
+	$fsdbDumpvars(0, patcher_ax_test);
 	$display("init test patcher_ax");
 	aclk=1'b0;
 	aresetn=1'b1;
@@ -63,13 +64,12 @@ begin
 	data_in.valid=1'b1;
 	#10
 	assert ( data_in == data_out &&
-			patch_out == {get_slave(cfg,data_in.addr),master_id,1'b0}) begin
+			patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos)}) begin
 		$display("test_2: PASS");
 	end else begin
 		$error("test_2: FAIL");
 	end
 	//======================================
-	//not implamented 
 	$display("test_3: pass with valid low ");
 	data_old=data_in;
 	data_in=rand_axi.get_random();
@@ -78,6 +78,17 @@ begin
 		$display("teset_3: PASS");
 	end else begin
 		$display("test_3: FAIL");
+	end
+	
+	$display("test_4: pass with urgent bit");
+	data_in = rand_axi.get_random();
+	data_in.valid=1'b1;
+	data_in.qos=2'b11;
+	#10;
+	assert (patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos)}) begin
+		$display("test_4: PASS");
+	end else begin
+		$display("test_4: FAIL - patch=%d expected= %d|%d|%d|%d",patch_out,get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos));
 	end
 	$finish;
 end
@@ -94,6 +105,19 @@ function int get_slave(input cfg_t cfg,input [31:0] addr);
 	end
 endfunction
 
+function logic is_urgent(input [1:0] qos);
+	
+	if (qos ==2'b11) begin
+		return 1;
+	end
+	return 0;
+endfunction
+
+function logic is_stream(input [1:0] qos);
+	if (qos ==2'b10) 
+		return 1;
+	return 0;
+endfunction
 
 always #5 aclk = ~aclk;
 

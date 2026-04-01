@@ -32,7 +32,7 @@ typedef struct packed {
 	logic                    awlock;
 	logic [3:0]              awcache;
 	logic [2:0]              awprot;
-	logic [3:0]              awqos;
+	logic [1:0]              qos;
 	logic [AW_BUS_WIDTH-1:0] data;
 } aw_bus;
 
@@ -62,7 +62,7 @@ typedef struct packed{
 	logic                    arlock;
 	logic [3:0]              arcache;
 	logic [2:0]              arprot;
-	logic [3:0]              arqos;
+	logic [1:0]              qos;
 } ar_bus;
 
 typedef struct packed{

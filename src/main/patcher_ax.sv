@@ -43,6 +43,9 @@ output patch_t patch_out;
 //----- logic ------
 //cfg file
 cfg_t cfg_reg;
+logic is_urgent;
+logic is_stream;
+
 always @(posedge cfg_en) begin
 	cfg_reg<=cfg;
 end
@@ -50,6 +53,8 @@ end
 //calculate slave_id
 integer slave;
 always_comb begin
+	is_urgent=1'b0;
+	is_stream=1'b0;
 	slave=0;
 	for(int i=0;i<NUM_OF_SLAVES;i=i+1) 
 	begin
@@ -57,6 +62,14 @@ always_comb begin
 		begin
 			slave=i;
 		end
+	end
+	
+	
+	if(data_in.qos == 2'b11) begin
+		is_urgent = 1'b1;
+	end
+	if(data_in.qos == 2'b10) begin
+		is_stream = 1'b1;
 	end
 end
 
@@ -72,7 +85,7 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		end
 		if(data_in.valid==1'b1) begin
 			data_out<=data_in;
-			patch_out <={slave,master_id,1'b0};//TODO: add urgent logic
+			patch_out <={slave,master_id,is_urgent,is_stream};
 		end else begin
 			data_out.valid <=1'b0;
 		end

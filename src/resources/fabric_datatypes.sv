@@ -16,6 +16,7 @@ typedef struct packed {
 	logic [31:0] slave_id;
 	logic [31:0] master_id;
 	logic urgent;
+	logic stream;
 } patch_t;
 	
 
