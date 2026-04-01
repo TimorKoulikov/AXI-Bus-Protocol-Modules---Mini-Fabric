@@ -92,7 +92,7 @@ always_comb begin
 			next_state = REGULAR;
 		end
 		REGULAR : begin
-			if(end_transaction !='0 && grant_regualr == end_transaction)//TODO: fix this must
+			if(end_transaction !='0 && grant_regualr == end_transaction)
 				enable_regular=1'b0;
 			if(is_urgent !='0) begin
 				next_state=URGENT;
