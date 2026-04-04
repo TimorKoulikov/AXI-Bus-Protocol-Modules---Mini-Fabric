@@ -2,112 +2,55 @@
  * File          : arbiter_engine.sv
  * Project       : Fabric
  * Author        : epagtk
- * Creation date : Mar 28, 2026
+ * Creation date : Apr 4, 2026
  * Description   :
  *------------------------------------------------------------------------------*/
 
 module arbiter_engine #(
-parameter NUM_OF_MASTERS=4
-)
+	parameter NUM_OF_MASTERS = 4,
+	localparam NUM_OF_CHANNEL = 5
+) 
 (
-input aclk,
-input aresetn,
-input  [NUM_OF_MASTERS -1 : 0] is_urgent,
-input [NUM_OF_MASTERS -1 : 0 ] end_transaction,
-output [NUM_OF_MASTERS -1 : 0] grant
+	input aclk,
+	input aresetn,
+	// interface for arbitration (arbiter__rr )
+	input [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] is_urgent,
+	input [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] end_transaction,
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] grant,
+	
+	//interface for token_allocation
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][31:0] num_of_tokens
 );
 
-localparam grand_index_width = $clog2(NUM_OF_MASTERS);
 
-logic init_rr;
-logic enable_regular;
-logic enable_urgent;
-logic [grand_index_width -1 : 0 ] grant_index_regular;
-logic [grand_index_width -1 : 0 ] grant_index_urgent;
-logic [NUM_OF_MASTERS -1 : 0] grant_regualr;
-logic [NUM_OF_MASTERS -1 : 0] grant_urgent;
-
-//logic [NUM_OF_MASTERS-1:0] enable_regular_bus;
-typedef enum logic [1:0] {
-	INIT,
-	REGULAR,
-	URGENT
-} state_t;
-
-state_t curr_state;
-state_t next_state;
-
-assign grant = curr_state == URGENT ? grant_urgent : grant_regualr;
-
-DW_arb_rr #(.n(NUM_OF_MASTERS),
-	.output_mode(1),
-	.index_mode(0)
-)regular_rr( 
-	.clk(aclk),
-	.rst_n(aresetn),
-	.init_n(init_rr),
-	.enable('1),
-	.request({NUM_OF_MASTERS{enable_regular}}),
-	.mask('0),
-	.granted(granted_inst),
-	.grant(grant_regualr),
-	.grant_index(grant_index_regular)
-	);
-
-DW_arb_rr #(.n(NUM_OF_MASTERS),
-	.output_mode(1),
-	.index_mode(0)
-)urgent_rr( 
-	.clk(aclk),
-	.rst_n(aresetn),
-	.init_n(init_rr),
-	.enable('1),
-	.request({NUM_OF_MASTERS{enable_urgent}}),
-	.mask(~is_urgent),
-	.granted(granted_inst),
-	.grant(grant_urgent),
-	.grant_index(grant_index_urgent) 
-	);
-
-
-//FSM
-always_ff @(posedge aclk or negedge aresetn) begin
-	if(!aresetn) begin
-		curr_state<= INIT;
-	end else begin
-		curr_state<= next_state;		
-	end	
-	
-end
-
-always_comb begin
-	next_state = curr_state;
-	init_rr=1'b1;
-	enable_regular=1'b1;
-	enable_urgent=1'b1;
-	case(curr_state)
+genvar i;
+genvar j;
+generate 
 		
-		INIT: begin
-			init_rr=1'b0;
-			next_state = REGULAR;
+		
+		for(i=0;i< NUM_OF_CHANNEL; i++) begin: get_block_rr
+		//generating aribter_rr for each channel
+			arbiter_rr #(.NUM_OF_MASTERS(NUM_OF_MASTERS))
+				arbiter_rr_inst (
+					.aclk(aclk),
+					.aresetn(aresetn),
+					.is_urgent(is_urgent[i]),
+					.end_transaction(end_transaction[i]),
+					.grant(grant[i])
+				);
 		end
-		REGULAR : begin
-			if(end_transaction !='0 && grant_regualr == end_transaction)
-				enable_regular=1'b0;
-			if(is_urgent !='0) begin
-				next_state=URGENT;
+		
+		//generation token allocation for each channel
+			for(i=0;i< NUM_OF_MASTERS;i++) begin: gen_block_token_allocation_per_master
+				for(j=0;j<NUM_OF_CHANNEL;j++) begin: gen_block_token_allocation_per_channel
+					assign num_of_tokens[j][i]= 31'd1024;
+				end
 			end
-		end
-					
-		URGENT : begin
-			if(end_transaction !='0 && grant_urgent == end_transaction)
-				enable_urgent=1'b0;
-			if(is_urgent =='0) begin
-				next_state=REGULAR;
-			end
-		end
-	endcase
-end
+		
+		
+		
+endgenerate
+
 
 
 
