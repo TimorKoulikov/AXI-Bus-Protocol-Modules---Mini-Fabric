@@ -10,7 +10,7 @@ parameter type BUS_TYPE = ar_bus;
 parameter NUM_OF_SLAVES=4;
 parameter master_id=0;
 
-//-----Initiazation-----
+//-----Initialization-----
 logic aclk;
 logic aresetn;
 logic cfg_en;

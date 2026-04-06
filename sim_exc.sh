@@ -4,7 +4,7 @@ OUT_DIR="build"
 CONFIG_FILE="build_config.f"
 mkdir -p $OUT_DIR
 
-TESTS=$(grep "_test.sv" $CONFIG_FILE | sed 's/.*\/\(.*\)\.sv/\1/')
+TESTS=$(grep -E "_(test|tb)\.sv" $CONFIG_FILE | sed 's/.*\/\(.*\)\.sv/\1/')
 
 if [ -z "$TESTS" ]; then
     echo "Error: No testbench files (*_test.sv) found in $CONFIG_FILE"

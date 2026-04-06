@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------
 test_banch or arbiter_engine.
-no binary verification. common i dont have time for this. just open wavelog
+no binary verification. common i don't have time for this. just open wavelog
  *------------------------------------------------------------------------------*/
 
 module arbiter_engine_test ();
@@ -8,7 +8,7 @@ module arbiter_engine_test ();
 //----parameters-----
 parameter NUM_OF_MASTERS = 3;
 
-//-----initaliztion-----
+//-----initialization-----
 logic aclk;
 logic aresetn;
 logic [NUM_OF_MASTERS - 1 : 0] is_urgent;

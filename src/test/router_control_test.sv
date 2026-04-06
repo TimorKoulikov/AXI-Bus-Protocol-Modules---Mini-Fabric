@@ -50,7 +50,7 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 
 
 
-//-----testbanch
+//-----testbench
 int i=$urandom_range(NUM_OF_CHANNEL - 1, 0);
 
 initial
