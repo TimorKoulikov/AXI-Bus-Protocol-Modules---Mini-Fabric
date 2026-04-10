@@ -26,10 +26,3 @@ src/test/patcher_ax_test.sv
 src/test/router_control_test.sv
 // arbiter_rr test is only Waveform
 ./src/test/arbiter_rr_test.sv
-
-
-
-
-//Alex: I will delete it when finish learning SV
-drafts/arbiter_2inpt_lowprior.sv
-drafts/arbiter_2inpt_lowprior_tb.sv
