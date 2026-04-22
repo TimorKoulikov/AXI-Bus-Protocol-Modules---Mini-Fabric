@@ -27,10 +27,5 @@ src/main/arbiter_engine.sv
 //src/test/patcher_ax_test.sv
 src/test/router_control_test.sv
 // arbiter_rr test is only Waveform
-<<<<<<< HEAD
 ./src/test/arbiter_rr_test.sv
-=======
-//./src/test/arbiter_rr_test.sv
 
-
->>>>>>> improve router_control
