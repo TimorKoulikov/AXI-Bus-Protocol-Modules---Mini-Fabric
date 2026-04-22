@@ -3,7 +3,7 @@ test_banch or arbiter_engine.
 no binary verification. common i don't have time for this. just open wavelog
  *------------------------------------------------------------------------------*/
 
-module arbiter_engine_test ();
+module arbiter_rr_test ();
 
 //----parameters-----
 parameter NUM_OF_MASTERS = 3;
@@ -73,7 +73,7 @@ endtask
 int interrupt_point = $urandom_range(5, 12); 
 initial
 	begin
-		$fsdbDumpvars(0, arbiter_engine_test);
+		$fsdbDumpvars(0, arbiter_rr_test);
 		$display("init test arbiter_engine");
 		aclk=1'b0;
 		aresetn=1'b1;

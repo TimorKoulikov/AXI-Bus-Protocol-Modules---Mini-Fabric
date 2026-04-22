@@ -75,7 +75,6 @@ typedef struct packed{
 } r_bus;
 
 
-
 function int get_bus_width(input axiChannelTypes t);
 	int width; // Local variable to hold the result
 	

@@ -11,25 +11,22 @@ module router_control_test ();
 //----- parameter
 parameter NUM_OF_CHANNEL=3;
 
-localparam token_width = 30;
+localparam token_width = 31;
 //-----inputs-----
 logic aclk;
 logic aresetn;
 logic [NUM_OF_CHANNEL -1 : 0] start_transaction;
 logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_allocation;
+logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_for_transaction;
+logic [NUM_OF_CHANNEL -1 : 0] ready_for_transaction;
 
 //----- inputs from ROB
-logic [NUM_OF_CHANNEL -1 : 0] push;
 logic [NUM_OF_CHANNEL -1 : 0] empty;
 logic [NUM_OF_CHANNEL -1 : 0] full;
-logic [NUM_OF_CHANNEL -1 : 0] is_urgent_in;
-logic [NUM_OF_CHANNEL -1 : 0] is_stream;
-
+logic [1:0] mode;
 //-----output-----
 logic [NUM_OF_CHANNEL -1 : 0] end_transaction;
 logic [NUM_OF_CHANNEL -1 : 0] pop;
-logic [NUM_OF_CHANNEL -1 : 0] bw;
-logic [NUM_OF_CHANNEL -1 : 0] is_urgent_out;
 
 router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 (
@@ -38,35 +35,37 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 	.start_transaction(start_transaction),
 	.end_transaction(end_transaction),
 	.token_allocation(token_allocation),
-	.bw(bw),
-	.push(push),
 	.pop(pop),
-	.is_urgent_in(is_urgent_in),
 	.full(full),
 	.empty(empty),
-	.is_stream(is_stream),
-	.is_urgent_out(is_urgent_out)
+	.token_for_transaction(token_for_transaction),
+	.ready_for_transaction(ready_for_transaction),
+	.mode(mode)
 	);
 
 
 
+<<<<<<< HEAD
 //-----testbench
 int i=$urandom_range(NUM_OF_CHANNEL - 1, 0);
 
+=======
+//-----testbanch -----
+int i = $urandom_range(NUM_OF_CHANNEL - 1, 0);
+int tokens;
+int old_tokens;
+>>>>>>> improve router_control
 initial
 begin
+		$fsdbDumpvars(0, router_control_test);
 		$display("init rounter_control_test");
 		aclk=1'b0;
-		aresetn=1'b1;
+		aresetn=1'b0;
 		start_transaction='0;
 		token_allocation='0;
-		push='0;
 		empty='0;
 		full='0;
-		is_urgent_in='0;
-		is_stream='0;
-		#10
-		aresetn=1'b0;
+		mode=2'b0;
 		#10
 		aresetn=1'b1;
 		//----------------------------------------------------
@@ -97,24 +96,57 @@ begin
 		#10
 			aresetn=1'b1;
 		//----------------------------------------------------------
-		$display("test_2: leaky counter - add new token");
+		$display("test_2: adding token");
 			start_transaction[i]=1'b1;
-			token_allocation[i]=$random();
+			tokens = $random();
+			token_allocation[i] = tokens;
 		#20
-				assert( router_control_uut.curr_num_of_tokens[i] == token_allocation[i]) begin
+				assert( router_control_uut.curr_num_tokens[i] == token_allocation[i]) begin
 					$display("test_2: PASS");
 				end else begin
-					$display("test_3: FAIL %d",router_control_uut.curr_num_of_tokens[i]);
+					$display("test_2: FAIL");
 				end
 			//--------------------------------------------------
 			
-			$display("test_3: leaky counter - check token leakge");
-		#50
-			assert(router_control_uut.curr_num_of_tokens[i] == token_allocation[i] - 30'd5) begin
-				$display("test_3: PASS");
+			$display("test_3: twice remove tokens");
+		#20;
+			token_for_transaction[i] = tokens / 3;
+			$display("token_for_transaction =%d",token_for_transaction[i]);
+			#10;
+			ready_for_transaction[i]=1'b1;
+			#10;
+			assert(router_control_uut.curr_num_tokens[i] == tokens - token_for_transaction[i]) begin
+				$display("test_3: PASS [1/2]");
 			end else begin
-				$display("test_3: FAIL, result :%d expected: %d",router_control_uut.curr_num_of_tokens[i],token_allocation[i] - 5	);
+				$display("test_3: FAIL [1/2]");
 			end
+			
+			#10;			
+			assert(router_control_uut.curr_num_tokens[i] == tokens - token_for_transaction[i] -token_for_transaction[i]) begin
+				$display("test_3: PASS [2/2]");
+			end else begin
+				$display("test_3: FAIL [2/2]");
+			end
+			//---------------------------
+			$display("test_4: testing mode=LEAKY");
+			mode=2'b01;
+			while(end_transaction[i] == 1'b0) begin
+			#10;
+				if(end_transaction[i] == 1'b1 )
+					break;
+			end
+			old_tokens = router_control_uut.curr_num_tokens[i];
+			ready_for_transaction[i]=1'b0;
+			start_transaction[i]=1'b1;
+			tokens = $random();
+			token_allocation[i] = tokens;
+			#20;
+				assert( router_control_uut.curr_num_tokens[i] == old_tokens + tokens) begin
+					$display("test_4: PASS");
+				end else begin
+					$display("test_4: FAIL. result = %d expected %d",router_control_uut.curr_num_tokens[i],old_tokens + tokens);
+				end
+
 		$finish;
 end
 
