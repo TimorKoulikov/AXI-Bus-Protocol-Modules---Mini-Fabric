@@ -18,8 +18,10 @@
 //------------------------------------------------------------------------------
 
 class axi_env extends uvm_env;
-
-     `uvm_component_utils(axi_env)
+	
+	
+     `uvm_component_utils(axi_env);
+	 
 
      // Optional FIFO: decouples AXI monitor from additional consumers (debug, coverage).
      uvm_tlm_analysis_fifo #(axi_seq_item) axi_mon_fifo;
@@ -72,7 +74,7 @@ class axi_env extends uvm_env;
           // Expose BFM handle globally so sequences can call backdoor functions.
           uvm_config_db#(axi3_slave_bfm)::set(uvm_root::get(), "*", "axi_bfm_h", axi_bfm);
 
-          `uvm_info("ENV", "AXI Environment built successfully.", apb2axi_verbosity)
+          `uvm_info("ENV", "AXI Environment built successfully.", apb2axi_verbosity);
 
      endfunction
 

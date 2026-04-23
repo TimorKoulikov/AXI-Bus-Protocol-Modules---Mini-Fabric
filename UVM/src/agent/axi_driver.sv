@@ -66,7 +66,6 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
           axi_seq_item req;
 
           // Main stimulus loop: get one transaction, drive it, complete it.
-          // Any concurrency (multiple outstanding, reordering, etc.) is NOT handled here.
           forever begin
                seq_item_port.get_next_item(req);
                if (req.write) begin

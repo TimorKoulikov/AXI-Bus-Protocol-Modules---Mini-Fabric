@@ -16,7 +16,7 @@
 
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-import apb2axi_pkg::*;
+//import apb2axi_pkg::*;
 
 
 class axi3_slave_bfm extends uvm_component;

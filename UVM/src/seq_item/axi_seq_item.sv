@@ -47,8 +47,9 @@
 //        If you split read/write items, this field can go away.
 //------------------------------------------------------------------------------
 
-class axi_seq_item extends uvm_sequence_item;
 
+class axi_seq_item extends uvm_sequence_item;
+	 
      `uvm_object_utils(axi_seq_item)
 
      rand bit [`AXI_ADDR_WIDTH-1 : 0]   addr;

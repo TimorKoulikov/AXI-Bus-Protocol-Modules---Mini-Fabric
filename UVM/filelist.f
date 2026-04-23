@@ -15,7 +15,7 @@
 -timescale=1ns/1ps
 
 # === Include Directories ===
-+incdir+$UVM_HOME
++incdir+$UVM_HOME/src
 +incdir+UVM/src
 +incdir+UVM/src/pkg
 +incdir+UVM/src/if
@@ -40,6 +40,7 @@ UVM/src/if/axi_if.sv
 
 # === TB Package (includes all TB classes) ===
 UVM/src/bfm/apb2axi_memory_pkg.sv
+$UVM_HOME/src/uvm_pkg.sv
 UVM/src/pkg/axi_tb_pkg.sv
 
 # === Top ===

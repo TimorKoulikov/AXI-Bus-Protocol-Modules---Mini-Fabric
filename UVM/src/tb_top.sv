@@ -23,7 +23,7 @@
 //------------------------------------------------------------------------------
 
 module tb_top;
-	//`include "uvm_pkg.sv"
+	import uvm_pkg::*;
 	import axi_tb_pkg::*;
     localparam time AXI_CLK_DELAY = 5ns;
 
@@ -61,6 +61,7 @@ module tb_top;
 	      .ARESETn (ARESETn)
 	 );
 	
+	 // TODO : import my block. do it after finished
 	 // -------------------------------------------------------------------------
 	 // DUT instance
 	 // -------------------------------------------------------------------------

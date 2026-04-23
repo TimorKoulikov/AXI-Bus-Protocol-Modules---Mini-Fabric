@@ -16,7 +16,7 @@
 //   - Add address constraints for targeted region testing.
 //------------------------------------------------------------------------------
 
-class axi_read_seq extends uvm_sequence #(axi_seq_item);
+class axi_read_seq extends uvm_sequence;
 
      `uvm_object_utils(axi_read_seq)
 
