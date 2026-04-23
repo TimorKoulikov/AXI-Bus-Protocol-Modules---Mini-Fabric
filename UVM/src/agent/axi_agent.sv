@@ -71,7 +71,7 @@ class axi_agent extends uvm_agent;
           // Allows sequences to control the AXI driver (e.g., responder policy, delays).
           // If you later support passive-only mode, guard this behind is_active==UVM_ACTIVE.
           axi_drv.seq_item_port.connect(axi_seqr.seq_item_export);
-
+		
      endfunction
 
 endclass

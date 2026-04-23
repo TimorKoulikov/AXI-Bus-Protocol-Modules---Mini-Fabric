@@ -45,16 +45,11 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 
 
 
-<<<<<<< HEAD
-//-----testbench
-int i=$urandom_range(NUM_OF_CHANNEL - 1, 0);
 
-=======
 //-----testbanch -----
 int i = $urandom_range(NUM_OF_CHANNEL - 1, 0);
 int tokens;
 int old_tokens;
->>>>>>> improve router_control
 initial
 begin
 		$fsdbDumpvars(0, router_control_test);

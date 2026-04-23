@@ -16,18 +16,18 @@
 
 # === Include Directories ===
 +incdir+$UVM_HOME
-+incdir+$PROJECT_HOME/tb
-+incdir+$PROJECT_HOME/tb/pkg
-+incdir+$PROJECT_HOME/tb/if
-+incdir+$PROJECT_HOME/tb/env
-+incdir+$PROJECT_HOME/tb/agent
-+incdir+$PROJECT_HOME/tb/seq
-+incdir+$PROJECT_HOME/tb/seq_item
-+incdir+$PROJECT_HOME/tb/tests
++incdir+UVM/src
++incdir+UVM/src/pkg
++incdir+UVM/src/if
++incdir+UVM/src/env
++incdir+UVM/src/agent
++incdir+UVM/src/seq
++incdir+UVM/src/seq_item
++incdir+UVM/src/tests
 
 # === DesignWare simulation models (remove if not needed) ===
--y /eda/synopsys/2024-25/RHELx86/SYN_2024.09-SP2/dw/sim_ver
-+libext+.v
+#-y /eda/synopsys/2024-25/RHELx86/SYN_2024.09-SP2/dw/sim_ver
+#+libext+.v
 
 # ============================================================
 # DUT / Design files  (uncomment and fill in for your project)
@@ -36,11 +36,11 @@
 // $PROJECT_HOME/../design/<your_dut>.sv
 
 # === AXI Interface ===
-$PROJECT_HOME/tb/if/axi_if.sv
+UVM/src/if/axi_if.sv
 
 # === TB Package (includes all TB classes) ===
-$PROJECT_HOME/tb/bfm/apb2axi_memory_pkg.sv
-$PROJECT_HOME/tb/pkg/axi_tb_pkg.sv
+UVM/src/bfm/apb2axi_memory_pkg.sv
+UVM/src/pkg/axi_tb_pkg.sv
 
 # === Top ===
-$PROJECT_HOME/tb/tb_top.sv
+UVM/src/tb_top.sv
