@@ -36,18 +36,18 @@ class axi_test extends axi_base_test;
         if (!$value$plusargs("AXI_SEQ=%s", seq_sel)) seq_sel = "READ";
 
         `uvm_info("AXI_TEST", $sformatf("Starting test, seq_sel=%s", seq_sel), UVM_NONE)
-
+		// TODO : add for loop. for know lazy just want to check all work
         if (seq_sel.tolower() == "read") begin
             `uvm_info("AXI_TEST", "Running [READ] sequence", UVM_NONE)
             rd_seq        = axi_read_seq::type_id::create("rd_seq");
             rd_seq.m_env  = env;
-            rd_seq.start(env.axi_ag.axi_seqr);
+            rd_seq.start(env.axi_ag.axi_seqr[0]);
         end
         else if (seq_sel.tolower() == "write") begin
             `uvm_info("AXI_TEST", "Running [WRITE] sequence", UVM_NONE)
             wr_seq        = axi_write_seq::type_id::create("wr_seq");
             wr_seq.m_env  = env;
-            wr_seq.start(env.axi_ag.axi_seqr);
+            wr_seq.start(env.axi_ag.axi_seqr[0]);
         end
 
         // --------------- TEMPLATE FOR NEW SEQUENCES ---------------

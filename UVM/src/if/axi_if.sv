@@ -32,7 +32,7 @@
 //        to apb_if and have the driver/monitor use them.
 //------------------------------------------------------------------------------
 
-interface axi_if #(parameter ADDR_WIDTH = 32,
+interface axi_iif #(parameter ADDR_WIDTH = 32,
                    parameter DATA_WIDTH = 32,
                    parameter ID_WIDTH   = 4)
 (

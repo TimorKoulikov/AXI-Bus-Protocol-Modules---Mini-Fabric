@@ -16,7 +16,7 @@
 
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-//import apb2axi_pkg::*;
+import axi_datatypes::*;
 
 
 class axi3_slave_bfm extends uvm_component;
@@ -29,13 +29,13 @@ class axi3_slave_bfm extends uvm_component;
      // Memory Model
      // ------------------------------------------------------------
      localparam int                MEM_DEPTH = 4096;
-     localparam int                AXI_BYTES = AXI_DATA_W / 8;
-     typedef bit [AXI_DATA_W-1:0]  data_word_t;
+     localparam int                AXI_BYTES = DATA_WIDTH / 8;
+     typedef bit [DATA_WIDTH-1:0]  data_word_t;
      data_word_t                   mem [0:MEM_DEPTH-1];
      bit                           mem_written [0:MEM_DEPTH-1];
 
-     bit [AXI_ID_W-1:0] beat_order_q[$];   // one entry per R beat
-     bit [AXI_ID_W-1:0] burst_order_q[$];  // one entry per completed burst
+     bit [ID_WIDTH-1:0] beat_order_q[$];   // one entry per R beat
+     bit [ID_WIDTH-1:0] burst_order_q[$];  // one entry per completed burst
 
      // ------------------------------------------------------------
      // Read mode
@@ -48,7 +48,9 @@ class axi3_slave_bfm extends uvm_component;
      // ------------------------------------------------------------
      // Error injection tables (DISABLED BY DEFAULT)
      // ------------------------------------------------------------
-     localparam int unsigned     ID_NUM = (1 << AXI_ID_W);
+     // keep it. but we shouldnt handle errors in fabric.
+	 /*
+	 localparam int unsigned     ID_NUM = (1 << AXI_ID_W);
 
      axi_resp_e                  rerr_map       [ID_NUM][256];   // [RID][beat_idx]
      bit                         rerr_map_valid [ID_NUM];        // enable per RID
@@ -56,15 +58,15 @@ class axi3_slave_bfm extends uvm_component;
      axi_resp_e                  berr_map       [ID_NUM];        // [BID] -> BRESP
      bit                         berr_map_valid [ID_NUM];        // enable per BID
      bit                         berr_one_shot  = 1'b1;
-
+	*/
      // ------------------------------------------------------------
      // Read tracking
      // ------------------------------------------------------------
      typedef struct {
-          logic [AXI_ADDR_W-1:0] addr;
+          logic [DATA_WIDTH-1:0] addr;
           logic [3:0]            beats_left;  // remaining beats
           logic [2:0]            size;
-          logic [AXI_ID_W-1:0]   id;
+          logic [DATA_WIDTH-1:0]   id;
           logic [1:0]            burst;
           int unsigned           mem_idx;     // pointer to memory
           int unsigned           beat_idx;
@@ -75,15 +77,15 @@ class axi3_slave_bfm extends uvm_component;
      // Write tracking
      // ------------------------------------------------------------
      typedef struct {
-          logic [AXI_ADDR_W-1:0] addr;
+          logic [DATA_WIDTH-1:0] addr;
           logic [3:0]            beats_left;  // remaining beats
           logic [2:0]            size;
-          logic [AXI_ID_W-1:0]   id;
+          logic [ID_WIDTH-1:0]   id;
           int unsigned           mem_idx;     // pointer to memory
      } active_write_t;
 
      active_write_t active_writes[$];
-     bit [AXI_ID_W-1:0] pending_b_ids[$];
+     bit [ID_WIDTH-1:0] pending_b_ids[$];
 
      // ------------------------------------------------------------
      // Constructor
@@ -114,11 +116,13 @@ class axi3_slave_bfm extends uvm_component;
           end
 
           // initialize error injection (SAFE DEFAULT)
-          foreach (rerr_map[i,j])       rerr_map[i][j]      = AXI_RESP_OKAY;
+		  // keep it. but we shouldnt handle errors in fabric.
+		  /*
+		  foreach (rerr_map[i,j])       rerr_map[i][j]      = AXI_RESP_OKAY;
           foreach (rerr_map_valid[i])   rerr_map_valid[i]   = 1'b0;
           foreach (berr_map[i])         berr_map[i]         = AXI_RESP_OKAY;
           foreach (berr_map_valid[i])   berr_map_valid[i]   = 1'b0;
-
+		 */
      endfunction
 
 
@@ -137,22 +141,26 @@ class axi3_slave_bfm extends uvm_component;
      // ------------------------------------------------------------
      // Public API for tests
      // ------------------------------------------------------------
-     task automatic inject_read_error(
-          input logic [AXI_ID_W-1:0] id,
+	 // keep it. but we shouldnt handle errors in fabric.
+	 /*
+	 task automatic inject_read_error(
+          input logic [ID_WIDTH-1:0] id,
           input int unsigned         beat_idx,
-          input axi_resp_e           resp
+          input [1:0]                resp
      );
+		  
           if (id >= ID_NUM)        `uvm_fatal("AXI3_BFM", $sformatf("inject_read_error: id=%0d out of range (ID_NUM=%0d)", id, ID_NUM))
           if (beat_idx >= 256)     `uvm_fatal("AXI3_BFM", $sformatf("inject_read_error: beat_idx=%0d out of range (max 255)", beat_idx))
-
-          rerr_map[id][beat_idx]     = resp;
-          rerr_map_valid[id]         = 1'b1;
+		  
+		  // keep it. but we shouldnt handle errors in fabric.
+          //rerr_map[id][beat_idx]     = resp;
+          //rerr_map_valid[id]         = 1'b1;
           `uvm_info("AXI3_BFM", $sformatf("Injecting RRESP=%0d for RID=%0d at beat=%0d", resp, id, beat_idx), apb2axi_verbosity)
      endtask
 
      task automatic inject_write_error(
-          input logic [AXI_ID_W-1:0] id,
-          input axi_resp_e           resp
+          input logic [ID_WIDTH-1:0] id,
+          input [1:0]           resp
      );
           if (id >= ID_NUM) begin
                `uvm_fatal("AXI3_BFM", $sformatf("inject_write_error: id=%0d out of range (ID_NUM=%0d)", id, ID_NUM))
@@ -169,11 +177,12 @@ class axi3_slave_bfm extends uvm_component;
           berr_map[id]               = AXI_RESP_OKAY;
           berr_map_valid[id]         = 1'b0;
      endtask
-
+	 */
      // ------------------------------------------------------------
      // R-channel driver when using outstanding modes
      // ------------------------------------------------------------
-     task automatic drive_read_queue();
+	 localparam int unsigned     ID_NUM = (1 << ID_WIDTH);
+	 task automatic drive_read_queue();
           int idx;
           active_read_t ar;
           int unsigned nbytes;
@@ -181,7 +190,7 @@ class axi3_slave_bfm extends uvm_component;
           int unsigned abs_byte;
           int unsigned wi;
           int unsigned li;
-          logic [AXI_DATA_W-1:0] rdata;
+          logic [DATA_WIDTH-1:0] rdata;
           forever begin
                @(posedge vif.ACLK);
                // No active reads -> wait
@@ -224,12 +233,13 @@ class axi3_slave_bfm extends uvm_component;
                end
 
                `uvm_info("AXI3_BFM", $sformatf("TOOK READ: id=%d, idx=0x%0d rdata=%0h", ar.id, wi, rdata), apb2axi_verbosity)
-
+			  
                vif.RID        <= ar.id;
                vif.RDATA      <= rdata;
-               vif.RRESP      <= AXI_RESP_OKAY;
-               if ((ar.id < ID_NUM) && rerr_map_valid[ar.id])
-                    vif.RRESP <= rerr_map[ar.id][ar.beat_idx];        // Error injection
+               vif.RRESP      <= 2'b0;
+			   // keep it. but we shouldnt handle errors in fabric.
+               //if ((ar.id < ID_NUM) && rerr_map_valid[ar.id])
+               //     vif.RRESP <= rerr_map[ar.id][ar.beat_idx];        // Error injection
                vif.RLAST      <= (ar.beats_left == 1);
                vif.RVALID     <= 1'b1;
 
@@ -350,7 +360,7 @@ class axi3_slave_bfm extends uvm_component;
                     foreach (active_writes[i]) begin
                          if (active_writes[i].id == vif.WID) begin
                               int idx = active_writes[i].mem_idx % MEM_DEPTH;
-                              for (int b=0;b<AXI_DATA_W/8;b++)
+                              for (int b=0;b<DATA_WIDTH/8;b++)
                                    if (vif.WSTRB[b])
                                         mem[idx][8*b+:8] = vif.WDATA[8*b+:8];
                               mem_written[idx] = 1'b1;
@@ -368,10 +378,12 @@ class axi3_slave_bfm extends uvm_component;
                end
                // ========= WRITE RESPONSE =========
                if (!vif.BVALID && pending_b_ids.size()!=0) begin
-                    logic [AXI_ID_W-1:0] id;
-                    axi_resp_e br;
+                    logic [ID_WIDTH-1:0] id;
+                    logic [2:0] br;
                     id = pending_b_ids.pop_front();
-                    br = AXI_RESP_OKAY;
+                    br = 2'b00;
+					// keep it. but we shouldnt handle errors in fabric.
+					/*
                     if (id < ID_NUM && berr_map_valid[id]) begin
                          br = berr_map[id];
                          if (berr_one_shot) begin
@@ -379,6 +391,7 @@ class axi3_slave_bfm extends uvm_component;
                               berr_map[id]       = AXI_RESP_OKAY;
                          end
                     end
+                    */
                     vif.BID    <= id;
                     vif.BRESP  <= br;
                     vif.BVALID <= 1'b1;
@@ -395,16 +408,16 @@ class axi3_slave_bfm extends uvm_component;
      // WRITE handler (multi-beat) + WSTRB support
      // ------------------------------------------------------------
      task automatic do_write(
-          logic [AXI_ADDR_W-1:0] awaddr,
+          logic [ADDR_WIDTH-1:0] awaddr,
           logic [3:0]            awlen,
           logic [2:0]            awsize,
-          logic [AXI_ID_W-1:0]   awid
+          logic [ID_WIDTH-1:0]   awid
      );
           int beats = awlen + 1;
-          int base_word = awaddr >> $clog2(AXI_DATA_W/8);
+          int base_word = awaddr >> $clog2(DATA_WIDTH/8);
           int idx; 
 
-          axi_resp_e br;
+          logic [2:0] br;
 
           `uvm_info("AXI3_BFM",
                $sformatf("WRITE: addr=0x%0h beats=%0d size=%0d id=%0d",
@@ -419,7 +432,7 @@ class axi3_slave_bfm extends uvm_component;
                idx = (base_word + i) % MEM_DEPTH;
 
                // ---------- BYTE-WISE write using WSTRB ----------
-               for (int b = 0; b < (AXI_DATA_W/8); b++) begin
+               for (int b = 0; b < (DATA_WIDTH/8); b++) begin
                     if (vif.WSTRB[b])
                          mem[idx][8*b +: 8] = vif.WDATA[8*b +: 8];
                end
@@ -433,7 +446,9 @@ class axi3_slave_bfm extends uvm_component;
 
           // Send BRESP after all beats
           @(posedge vif.ACLK);
-          br = AXI_RESP_OKAY;
+          br = 2'b00;
+		  // keep it. but we shouldnt handle errors in fabric
+		  /*
           if (awid < ID_NUM && berr_map_valid[awid]) begin
                br = berr_map[awid];
                if (berr_one_shot) begin
@@ -441,6 +456,7 @@ class axi3_slave_bfm extends uvm_component;
                     berr_map[awid]       = AXI_RESP_OKAY;
                end
           end
+          */
           vif.BID    <= awid;
           vif.BRESP  <= br[1:0];
           vif.BVALID <= 1;
@@ -467,7 +483,7 @@ class axi3_slave_bfm extends uvm_component;
                $fwrite(fd,
                "IDX %4d  ADDR 0x%016h  DATA 0x%016h  %s\n",
                i,
-               MEM_BASE_ADDR + i*(AXI_DATA_W/8),
+               MEM_BASE_ADDR + i*(DATA_WIDTH/8),
                mem[i],
                mem_written[i] ? "WRITTEN" : "INIT");
           end
@@ -500,7 +516,7 @@ class axi3_slave_bfm extends uvm_component;
 
 
 function automatic bit peek_word64(input logic [63:0] addr,
-                                   output logic [AXI_DATA_W-1:0] data);
+                                   output logic [DATA_WIDTH-1:0] data);
   int unsigned idx;
   idx = addr2idx(addr);
 
@@ -523,7 +539,7 @@ task automatic dump_mem_to_file(string fname);
 
   for (int i = 0; i < MEM_DEPTH; i++) begin
     $fwrite(fd, "IDX %0d ADDR 0x%016h DATA 0x%0h\n",
-            i, (MEM_BASE_ADDR + (i*(AXI_DATA_W/8))), mem[i]);
+            i, (MEM_BASE_ADDR + (i*(DATA_WIDTH/8))), mem[i]);
   end
   $fclose(fd);
   `uvm_info("AXI3_BFM", $sformatf("Dumped memory to %s", fname), UVM_LOW)

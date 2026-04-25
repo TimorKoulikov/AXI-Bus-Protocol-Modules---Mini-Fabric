@@ -2,9 +2,16 @@
 
 OUT_DIR="build"
 CONFIG_FILE="build_config.f"
+FILELIST="src/filelist.f"
 mkdir -p $OUT_DIR
 
-TESTS=$(grep -E "_(test|tb)\.sv" $CONFIG_FILE | sed 's/.*\/\(.*\)\.sv/\1/')
+#check if FILELIST exists
+if [ ! -f "$FILELIST" ]; then
+	echo "ERROR: $FILELIST not found."
+	exit 1
+fi
+
+TESTS=$(grep -E "_(test|tb)\.sv" $FILELIST ) 
 
 if [ -z "$TESTS" ]; then
     echo "Error: No testbench files (*_test.sv) found in $CONFIG_FILE"
@@ -19,9 +26,11 @@ fi
 
 for TEST_TOP in $TESTS
 do
+	TEST_TOP=$(basename "$TEST_TOP" .sv)
+
+    	echo "========================================"
+	echo " STARTING TEST: $TEST_TOP"
 	echo "========================================"
-    echo " STARTING TEST: $TEST_TOP"
-    echo "========================================"
     
     if [ $VERBOSE -eq 1 ]; then
         # Verbose Mode: No -q, output to terminal

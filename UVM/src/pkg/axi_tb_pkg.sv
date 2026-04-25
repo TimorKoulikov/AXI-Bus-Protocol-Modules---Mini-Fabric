@@ -54,6 +54,7 @@ package axi_tb_pkg;
      // ======================================================
      `include "axi_write_seq.sv"
      `include "axi_read_seq.sv"
+	 // maybe add here the urgent and stream sequecnce
      // --------------- ADD YOUR NEW SEQUENCES HERE ---------------
 
      // ======================================================

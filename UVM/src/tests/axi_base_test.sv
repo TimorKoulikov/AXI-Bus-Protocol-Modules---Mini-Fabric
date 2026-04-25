@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 
 class axi_base_test extends uvm_test;
-
+	
     `uvm_component_utils(axi_base_test)
 
     axi_env env;
@@ -36,21 +36,24 @@ class axi_base_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
+		
+		for( int i=0; i < `NUM_OF_SLAVES ; i++) begin
+			`uvm_info("AXI_BASE_TEST",
+				$sformatf("AXI sequencer: %s",env.axi_ag.axi_seqr[i].get_full_name()),
+				apb2axi_verbosity)
 
-        `uvm_info("AXI_BASE_TEST",
-                  $sformatf("AXI sequencer: %s", env.axi_ag.axi_seqr.get_full_name()),
-                  apb2axi_verbosity)
-
-        // Defensive check: verify driver is connected to the sequencer.
-        if (env.axi_ag.axi_drv.seq_item_port != null)
-            `uvm_info("AXI_BASE_TEST", "Driver seq_item_port is valid.", apb2axi_verbosity)
-        else
-            `uvm_error("AXI_BASE_TEST", "Driver seq_item_port is NULL — check agent wiring!")
-
-        // Base test raises/drops an empty objection so derived tests run their own sequences.
-        phase.raise_objection(this);
-        `uvm_info("AXI_BASE_TEST", "Base test run_phase (no default sequence).", apb2axi_verbosity)
-        phase.drop_objection(this);
+		  // Defensive check: verify driver is connected to the sequencer.
+		  if (env.axi_ag.axi_drv[i].seq_item_port != null)
+			  `uvm_info("AXI_BASE_TEST", "Driver seq_item_port is valid.", apb2axi_verbosity)
+		  else
+			  `uvm_error("AXI_BASE_TEST", "Driver seq_item_port is NULL — check agent wiring!")
+	
+		  // Base test raises/drops an empty objection so derived tests run their own sequences.
+		  phase.raise_objection(this);
+		  `uvm_info("AXI_BASE_TEST", "Base test run_phase (no default sequence).", apb2axi_verbosity)
+		  phase.drop_objection(this);
+		end
+        
 
     endtask
 

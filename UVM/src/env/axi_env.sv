@@ -60,7 +60,8 @@ class axi_env extends uvm_env;
           // ------------------------------------------------------------------
           axi_ag  = axi_agent       ::type_id::create("axi_ag",  this);
           axi_bfm = axi3_slave_bfm  ::type_id::create("axi_bfm", this);
-          sb      = axi_scoreboard  ::type_id::create("sb",      this);
+          
+		  sb      = axi_scoreboard  ::type_id::create("sb",      this);
 
           // ------------------------------------------------------------------
           // Propagate interfaces downward
@@ -82,9 +83,11 @@ class axi_env extends uvm_env;
           super.connect_phase(phase);
 
           // AXI monitor (stimulus side) → scoreboard and optional debug FIFO.
-          axi_ag.axi_mon.ap.connect(sb.axi_export);
-          axi_ag.axi_mon.ap.connect(axi_mon_fifo.analysis_export);
-
+          for ( int i=0 ; i < 5 ; i ++) begin
+			//TODO: 
+		  	axi_ag.axi_mon[i].ap.connect(sb.axi_export);
+          	axi_ag.axi_mon[i].ap.connect(axi_mon_fifo.analysis_export);
+		  end
           `uvm_info("ENV", "Scoreboard connections established.", apb2axi_verbosity)
 
      endfunction
