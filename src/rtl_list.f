@@ -17,10 +17,3 @@ src/main/arbiter_rr.sv
 //src/main/router_ms.sv
 src/main/arbiter_engine.sv
 src/top_block.sv
-
-// test bench
-src/test/axi_buffer_test.sv
-src/test/patcher_ax_test.sv
-src/test/router_control_test.sv
-// arbiter_rr test is only Waveform
-src/test/arbiter_rr_test.sv

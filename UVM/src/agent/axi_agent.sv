@@ -39,7 +39,7 @@ class axi_agent extends uvm_agent;
 
      // Virtual interface for the AXI bus BFM.
      // Must be provided by the TB via uvm_config_db under key "axi_vif".
-     virtual axi_if                     vif;
+     virtual axi_if                     vif[5];
 
      function new(string name = "axi_agent", uvm_component parent=null);
           super.new(name, parent);
@@ -54,7 +54,7 @@ class axi_agent extends uvm_agent;
 			
 			// Critical binding point:
 			// Keeps the agent hierarchy-independent. If this fails, the env/top didn’t set axi_vif.
-			if (!uvm_config_db#(virtual axi_if)::get(this, "", $sformatf("axi_vif_%0d", i), vif))
+			if (!uvm_config_db#(virtual axi_if)::get(this, "", $sformatf("axi_vif_%0d", i), vif[i]))
 				`uvm_fatal("AXI_AGENT", "No virtual interface bound to axi_agent")
 			
         	// Create sub-components (behavior is in driver/monitor, not here).
@@ -63,8 +63,8 @@ class axi_agent extends uvm_agent;
         	axi_seqr[i]                       = axi_sequencer  ::type_id::create($sformatf("axi_seqr_%0d", i), this);
 
         	// Pass VIF down so sub-components don’t depend on hierarchical paths.
-        	uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_drv_%0d", i), "axi_vif", vif);
-        	uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_mon_%0d", i), "axi_vif", vif);
+        	uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_drv_%0d", i), "axi_vif", vif[i]);
+        	uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_mon_%0d", i), "axi_vif", vif[i]);
 		end
      endfunction
 

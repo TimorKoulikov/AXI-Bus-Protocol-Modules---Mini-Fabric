@@ -1,4 +1,5 @@
 #!/bin/bash
+# run wave log
 
 # the sim and log output directory
 OUT_DIR="build"
