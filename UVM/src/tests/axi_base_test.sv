@@ -39,11 +39,11 @@ class axi_base_test extends uvm_test;
 		
 		for( int i=0; i < `NUM_OF_SLAVES ; i++) begin
 			`uvm_info("AXI_BASE_TEST",
-				$sformatf("AXI sequencer: %s",env.axi_ag.axi_seqr[i].get_full_name()),
+				$sformatf("AXI sequencer: %s",env.axi_ag[i].axi_seqr.get_full_name()),
 				apb2axi_verbosity)
 
 		  // Defensive check: verify driver is connected to the sequencer.
-		  if (env.axi_ag.axi_drv[i].seq_item_port != null)
+		  if (env.axi_ag[i].axi_drv.seq_item_port != null)
 			  `uvm_info("AXI_BASE_TEST", "Driver seq_item_port is valid.", apb2axi_verbosity)
 		  else
 			  `uvm_error("AXI_BASE_TEST", "Driver seq_item_port is NULL — check agent wiring!")

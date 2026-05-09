@@ -54,6 +54,8 @@ module tb_top;
 	 axi_if axi_mst_if [NUM_OF_MASTERS] (.ACLK(ACLK), .ARESETn(ARESETn));
 	 axi_if axi_slv_if [NUM_OF_SLAVES]  (.ACLK(ACLK), .ARESETn(ARESETn));
 	
+	 virtual axi_if v_slv_ifs[NUM_OF_SLAVES];
+	
 	 // TODO : import my block. do it after finished
 	 // -------------------------------------------------------------------------
 	 // DUT instance
@@ -80,40 +82,40 @@ module tb_top;
 	      $fsdbDumpMDA();
 	 end
 	
+	genvar i;
 	
-	 genvar i;
-	 generate 
+	generate
+		for (i = 0; i < NUM_OF_SLAVES; i++) begin : slv_vif_setup 
+     		initial begin
+				`uvm_info("tb_top",$sformatf("db_set::axi_slv_vif_%0d",i),UVM_DEBUG);
+				uvm_config_db#(virtual axi_if)::set(
+						 null, 
+						 "*", 
+						 $sformatf("axi_slv_vif_%0d", i), 
+						 axi_slv_if[i]
+					  );
+			end
+		 end	
 		 
-		 for (i = 0; i < NUM_OF_SLAVES; i++) begin
-			 initial begin
-				 uvm_config_db#(virtual axi_if)::set(
-					 null, 
-					 "*", 
-					 $sformatf("axi_slv_vif_%0d", i), 
-					 axi_slv_if[i]
-				  );
-			 end
-		 end
-		 
-		 for (i = 0; i < NUM_OF_MASTERS; i++) begin : mst_vif_setup
-			 initial begin
-				 uvm_config_db#(virtual axi_if)::set(
-					 null, 
-					 "*", 
-					 $sformatf("axi_mst_vif_%0d", i), 
-					 axi_mst_if[i]
-				 );
-			 end
-		 end
-	 endgenerate 
-	   
-	 // -------------------------------------------------------------------------
-	 // UVM entry point
-	 // -------------------------------------------------------------------------
-	 initial begin
-	      // Publish the two AXI virtual interfaces.
-	      // Keys must match what axi_env expects.
-		  // Loop through Slave interfaces
-	 run_test("axi_test");
+		for (i = 0; i < NUM_OF_MASTERS; i++) begin : mst_vif_setup
+			initial begin
+				`uvm_info("tb_top",$sformatf("db_set::axi_mst_vif_%0d",i),UVM_DEBUG);
+				uvm_config_db#(virtual axi_if)::set(
+						 null, 
+						 "*", 
+						 $sformatf("axi_mst_vif_%0d", i), 
+						 axi_mst_if[i]
+					 );
+			end
+		end
+	endgenerate
+	
+	// -------------------------------------------------------------------------
+	// UVM entry point
+	// -------------------------------------------------------------------------
+	initial begin
+		#0 //delay to ensure the setup of axi interface was registred
+		run_test("axi_test");
 	end
+	
 endmodule

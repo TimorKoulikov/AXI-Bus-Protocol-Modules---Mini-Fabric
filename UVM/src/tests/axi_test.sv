@@ -41,13 +41,13 @@ class axi_test extends axi_base_test;
             `uvm_info("AXI_TEST", "Running [READ] sequence", UVM_NONE)
             rd_seq        = axi_read_seq::type_id::create("rd_seq");
             rd_seq.m_env  = env;
-            rd_seq.start(env.axi_ag.axi_seqr[0]);
+            rd_seq.start(env.axi_ag[0].axi_seqr);
         end
         else if (seq_sel.tolower() == "write") begin
             `uvm_info("AXI_TEST", "Running [WRITE] sequence", UVM_NONE)
             wr_seq        = axi_write_seq::type_id::create("wr_seq");
             wr_seq.m_env  = env;
-            wr_seq.start(env.axi_ag.axi_seqr[0]);
+            wr_seq.start(env.axi_ag[0].axi_seqr);
         end
 
         // --------------- TEMPLATE FOR NEW SEQUENCES ---------------
