@@ -16,6 +16,7 @@ src/main/patcher_ax.sv
 src/main/patcher_w.sv	// unimplemented
 src/main/rob.sv			// unimplemented 
 src/main/token_counter.sv
+src/main/needy.sv
 src/main/router_control.sv
 src/main/arbiter_rr.sv
 //src/main/router_ms.sv
