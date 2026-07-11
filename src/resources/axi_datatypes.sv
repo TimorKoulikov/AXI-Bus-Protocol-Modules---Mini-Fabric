@@ -2,6 +2,7 @@ package axi_datatypes;
 
 typedef enum {AW,AR,W,R,B} axiChannelTypes;
 
+// TODO: maybe i should remove it
 localparam AW_BUS_WIDTH=32;
 localparam AR_BUS_WIDTH=32;
 localparam W_BUS_WIDTH=32;
