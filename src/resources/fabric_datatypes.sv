@@ -1,8 +1,12 @@
 package fabric_datatypes;
 	
 import axi_datatypes::*;
-	
+
+// types and defines
 localparam NUM_OF_SLAVES=3;	
+localparam NUM_OF_MASTERS = 4;
+
+
 
 typedef struct packed {
 		logic [ADDR_WIDTH -1 : 0] low_addr ;
