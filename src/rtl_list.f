@@ -1,5 +1,8 @@
 // packages
 //flag only for euclide. no need for vcs
+-sverilog
++libext+.v 
+
 -y $SYNOPSYS_SYN_ROOT/dw/sim_ver/ 
 ./src/resources/axi_datatypes.sv
 ./src/resources/axi_if.sv
