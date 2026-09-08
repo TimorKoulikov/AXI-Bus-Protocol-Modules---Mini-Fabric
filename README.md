@@ -1,5 +1,6 @@
 # AXI-Bus-Protocol-Modules---Mini-Fabric
-this is undargratuate project. we are implementing simple fabric with Arbitration and QoS that supports AXI3 protocol
+This is an undergraduate project. 
+We are implementing a simple fabric with Arbitration and QoS that supports AXI3 protocol
 
 ## Repository Structure
 
@@ -14,15 +15,15 @@ UVM/		      — folder with all RTL, scripts for UVM environment
 ├── scripts/
 └── tb_top.sv         — the TOP rtl block with monitors, driver and the FABRIC for testing
 
-build_config.f        — file list of all units to compile and configuations
+build_config.f        — file list of all units to compile and configurations
 sim_exc.sh            — script to run and simulate the test_bench
 run_verdi.sh          — script to run verdi and display the waveforms
 
 ```
 
 ## UVM enviroment
-first of all thanks for @nirmiller31 for sharing with us his uvm setup.
-go to https://github.com/nirmiller31/Project_A_apb2axi for his AXI project and his UVM.
+First of all thanks to @nirmiller31 for sharing with us his uvm setup.
+Go to https://github.com/nirmiller31/Project_A_apb2axi for his AXI project and his UVM.
 
 [PLACE HOLDER IN THE FUTURE FOR HOW TO RUN SCRIPT]
 
@@ -35,7 +36,7 @@ go to https://github.com/nirmiller31/Project_A_apb2axi for his AXI project and h
 | receiver       |  DONE  |    DONE    |
 | transmitter    |  DONE  |    DONE    | 
 | patcher_ax     |  DONE  |    DONE    |
-| patcher_x      |        |            |
+| patcher_x      |  alex  |            |
 | router_control |  DONE  |    DONE    | 
 | arbiter_engine |  DONE  |    DONE    |
 | router_ms      |  WIP   |    WIP     |
