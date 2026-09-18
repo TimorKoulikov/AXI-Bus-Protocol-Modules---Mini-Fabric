@@ -33,23 +33,8 @@ output logic [width -1 : 0] count;
 output logic [width -1 : 0] tercent;
 
 //-----logic-----
-/*
-wire t,tn;
-assign tn=~t;
-DW03_bictr_scnto #(.width(10),.count_to(rate_leak)) 
-leak_counter (
-.data('0),
-.up_dn(1'b1),
-.load(tn),
-.cen(1'b1),
-.clk(aclk),
-.reset(aresetn),
-.count(dbg_count),
-.tercnt(t)
 
-);
-*/
-
+//using counter-module of Synopsis
 DW03_bictr_scnto #(.width(width), .count_to(MAX_TOKEN))
 bucket ( .data(data), .up_dn(~leak), .load(loadn),
 .cen(leak), .clk(aclk), .reset(aresetn),

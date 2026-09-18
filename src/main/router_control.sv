@@ -40,6 +40,7 @@ typedef enum logic [1:0] {
 
 state_t [NUM_OF_CHANNEL -1 : 0] curr_state; 
 state_t [NUM_OF_CHANNEL -1 : 0] next_state;
+
 genvar i;
 generate 
 	
