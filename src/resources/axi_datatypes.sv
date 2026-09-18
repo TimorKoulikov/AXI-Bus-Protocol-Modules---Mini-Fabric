@@ -103,7 +103,7 @@ endfunction
 //defining a new type (BUS_TYPE) which is an inner parameter
 //default: BUS_TYPE = aw_bus 
 class RAND_AXI #(type BUS_TYPE = aw_bus); 
-	rand swa_bus random_axi_data;
+	rand BUS_TYPE random_axi_data;
 	
 	constraint c_axi_data {random_axi_data.valid==1'b0;}
 	

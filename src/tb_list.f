@@ -6,10 +6,10 @@
 // ./src/resources/fabric_datatypes.sv
 
 // test bench
-/*arbiter engine test*/
-src/test/arbiter_rr_test.sv // is only a Waveform
 src/test/axi_buffer_test.sv
-/*leacky_bucket_test  -   do we need it?*/ 
+// leacky_bucket_test  -   do we need it?
 src/test/patcher_ax_test.sv
-/*patcher_w test*/
+// patcher_w test
 src/test/router_control_test.sv
+// arbiter_rr test is only Waveform
+src/test/arbiter_rr_test.sv
