@@ -5,11 +5,16 @@
 // ./src/resources/axi_if.sv
 // ./src/resources/fabric_datatypes.sv
 
-// test bench
+
+
+/*arbiter_engine test*/
+/*arbiter_ms test*/
+// is only a waveform
+src/test/arbiter_rr_test.sv 
+/* arbiter_sl test*/
 src/test/axi_buffer_test.sv
-// leacky_bucket_test  -   do we need it?
+/* leacky_bucket_test  -   do we need it???*/ 
+/* needy test          -   do we need it???*/
 src/test/patcher_ax_test.sv
-// patcher_w test
+/* patcher_w test*/
 src/test/router_control_test.sv
-// arbiter_rr test is only Waveform
-src/test/arbiter_rr_test.sv

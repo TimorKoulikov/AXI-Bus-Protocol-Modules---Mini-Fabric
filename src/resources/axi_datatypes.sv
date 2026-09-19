@@ -2,25 +2,18 @@ package axi_datatypes;
 
 typedef enum {AW,AR,W,R,B} axiChannelTypes;
 
-// TODO: maybe i should remove it
-localparam AW_BUS_WIDTH=32;
-localparam AR_BUS_WIDTH=32;
-localparam W_BUS_WIDTH=32;
-localparam R_BUS_WIDTH=32;
-localparam B_BUS_WIDTH=32;
+localparam ADDR_WIDTH = 32;  
+localparam ID_WIDTH = 4;              // ID of the transaction
+localparam DATA_WIDTH = 32;
+localparam STRB_WIDTH = DATA_WIDTH/8;
 
-localparam ADDR_WIDTH=32;  
-localparam ID_WIDTH=4;
-localparam DATA_WIDTH=32;
-localparam STRB_WIDTH=DATA_WIDTH/8;
-
-localparam AW_BUS_SIZE = 27 + ID_WIDTH + ADDR_WIDTH + AW_BUS_WIDTH;
+localparam AW_BUS_SIZE = 25 + ID_WIDTH + ADDR_WIDTH; // 25 is the sum of all unconfigurable bits (valid, ready, arlen, etc)
 localparam W_BUS_SIZE  = 3  + DATA_WIDTH + STRB_WIDTH;
 localparam B_BUS_SIZE  = 4  + ID_WIDTH;
-localparam AR_BUS_SIZE = 27 + ID_WIDTH + ADDR_WIDTH;
+localparam AR_BUS_SIZE = 25 + ID_WIDTH + ADDR_WIDTH; // 25 is the sum of all unconfigurable bits (valid, ready, arlen, etc)
 localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
 
-localparam MAX_LEN=1024;
+localparam MAX_LEN = 1024;
 
 typedef struct packed{
 	logic 			         valid;
@@ -57,7 +50,6 @@ typedef struct packed {
 	logic [3:0]              awcache;
 	logic [2:0]              awprot;
 	logic [1:0]              qos;
-	logic [AW_BUS_WIDTH-1:0] data;
 } aw_bus;
 
 typedef struct packed{
@@ -81,15 +73,15 @@ typedef struct packed {
  * @params t - is enum axiChannelTypes
  * @returns the width of the channel
  */
-function int get_bus_width(input axiChannelTypes t);
+function int get_bus_size(input axiChannelTypes t);
 	int width; // Local variable to hold the result
 	
 	case (t)
-		AW: width = AW_BUS_WIDTH;
-		AR: width = AR_BUS_WIDTH;
-		W:  width = W_BUS_WIDTH;
-		R:  width = R_BUS_WIDTH;
-		B:  width = B_BUS_WIDTH;
+		AW: width = AW_BUS_SIZE;
+		AR: width = AR_BUS_SIZE;
+		W:  width = W_BUS_SIZE;
+		R:  width = R_BUS_SIZE;
+		B:  width = B_BUS_SIZE;
 		default: begin
 			width = 0;
 			$display("Error: Unknown AXI Channel Type");
@@ -103,12 +95,13 @@ endfunction
 //defining a new type (BUS_TYPE) which is an inner parameter
 //default: BUS_TYPE = aw_bus 
 class RAND_AXI #(type BUS_TYPE = aw_bus); 
-	rand BUS_TYPE random_axi_data;
+	rand BUS_TYPE random_axi_data;        // [remove_basof] rand: declare the random_axi_data is random type
 	
-	constraint c_axi_data {random_axi_data.valid==1'b0;}
+	// defining constraint that after randomization its valid bit will always 0
+	constraint c_axi_data {random_axi_data.valid == 1'b0;}   
 	
 	function BUS_TYPE get_random();
-		this.randomize();
+		this.randomize();                 // 
 		return this.random_axi_data;
 	endfunction
 endclass
