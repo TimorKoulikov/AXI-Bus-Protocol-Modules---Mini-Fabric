@@ -5,21 +5,21 @@
 
 /*	1)  --------------- Instantiation: [Design & Verification] ---------------
 		- instantiation example using existing module
-		- assume library module half_adder has 4 ports:
-		  a,b,hcarry,hsum and has a parameter ha_latency
+      	- assume lib module half_adder has 4 ports:
+      	  a,b,hcarry,hsum and has a parameter ha_latency
 
 */
 // 1.1) lets create a full-adder using two half-adders
 
-module full_adder(
-	input logic  in1,		//regular input1
-	input logic  in2,		//regular input2
-	input logic  c_in,		//carry input
+module full_adder#(
+	parameter fa_latency=5 //default latency of the full-adder, and the outside world can change it
+)(
+	input  logic in1,		//regular input1
+	input  logic in2,	 	//regular input2
+	input  logic c_in,		//carry input
 	output logic fsum,		//sum to output
 	output logic c_out		//carry output
 );
-	//-----parameters-----
-	parameter fa_latency=5;
 
 	//----- helper wires ------
 	// we need them for future connections between the two half-adders
@@ -52,9 +52,9 @@ endmodule
 
 
 /* 1.2) Implicit Port Connections (Shortcuts)
-		If a module's port names exactly match the signal names in your parent module, 
-		you can use implicit connections to save typing. 
-		!!! This only works on user-defined modules, not built-in gates like 'nand' !!!
+        If a module's port names exactly match the signal names in your parent module, 
+        you can use implicit connections to save typing. 
+        !!! This only works on user-defined modules, not built-in gates like 'nand' !!!
 */
 
 // The Wildcard (.*)
@@ -88,7 +88,7 @@ module mux2to1(
 );
 
 	//----- logic ------
-	always_comb begin
+	always_comb begin : mux_logic
 		if(sel==0) begin
 			out=in1;
 		end else begin
@@ -99,16 +99,16 @@ module mux2to1(
 
 /* 2.2.1) 2nd approach "continuous logic assignment" using ternary operator
 		  Note: It's forbidden to use assign inside a procedural block. 
-				We can only use "assign" in the open space of the module.
+		        We can only use "assign" in the open space of the module.
 */
 	assign out = sel ? in2 : in1;
 
 /* 2.2.2) Pro-Tip: We can also use the ternary operator INSIDE a procedural block 
-		  to save space, but we MUST drop the 'assign' keyword as explained before.
+          to save space, but we MUST drop the 'assign' keyword as explained before.
 */
-	always_comb begin
-		out = sel ? in2 : in1; // Valid procedural assignment
-	end
+    always_comb begin : mux_logic
+        out = sel ? in2 : in1; // Valid procedural assignment
+    end
 
 endmodule
 
@@ -129,48 +129,49 @@ endmodule
 */
 
 /*	2.3.1) The "Default Assignment" Trick - Highly Recommended
-		   Instead of trying to make sure every single if, else if, and else has 
+	       Instead of trying to make sure every single if, else if, and else has 
 		   every variable mapped out perfectly, we just assign a "default" value 
 		   to everything at the very top of our always_comb block.
 */
-always_comb begin
-	out = in1; //default assignment
+always_comb begin : mux_logic
+    out = in1; // <-- ADD THIS (default assignment)
 
-	// the logic
-	if (sel == 1'b1) begin
-		out = in2;
-	end
-	// Note: there is no 'else' here! But because 'out' already has a default 
+    // the logic
+    if (sel == 1'b1) begin
+        out = in2;
+    end
+    // Note: there is no 'else' here! But because 'out' already has a default 
 	// assignment, no latches will be created!
 end
 
 
 /* 	2.3.2) The default keyword in Case Statements
-		   If you are building an FSM or a decoder using a case statement, we must 
+	  	   If you are building an FSM or a decoder using a case statement, we must 
 		   explicitly cover every possible binary combination. If we are using a 2-bit 
 		   state machine, there are 4 possible states. If we only write cases for 3 of them, 
 		   the 4th state will infer a latch. To prevent this, you must include the 
 		   default: keyword at the bottom of a case statement.
 */
-always_comb begin
-	case (current_state)
-		STATE_IDLE: next_state = STATE_WORK;
-		STATE_WORK: next_state = STATE_DONE;
-		STATE_DONE: next_state = STATE_IDLE;
-		
-		// CATCH-ALL (Prevents Latches!)
-		default: next_state = STATE_IDLE; 
-	endcase
+always_comb begin : fsm_logic
+    case (current_state)
+        STATE_IDLE: next_state = STATE_WORK;
+        STATE_WORK: next_state = STATE_DONE;
+        STATE_DONE: next_state = STATE_IDLE;
+        
+        // CATCH-ALL (Prevents Latches!)
+        default: next_state = STATE_IDLE; 
+    endcase
 end
 
 
 /* 2.4) - Giving an always_comb block name is a good practice for readability and debugging.
-		- Especially when we have multiple always_comb block within the module, or
+	    - Especially when we have multiple always_comb block within the module, or
 		  when we want to put a block inside another block.
 */
 always_comb begin : adder
 	sum = a + b;
 end
+
 
 
 
@@ -190,8 +191,10 @@ module ff_en_res(
 );
 
 	//----- logic ------
-	always_ff @(posedge clk or negedge rstn) begin : ff_logic
-		if(rstn==0) begin
+	// note: async reset is within the sensitivity list marked with 'a' at the start
+	// marked with 'n' at the end meanning it is active low
+	always_ff @(posedge clk or negedge arstn) begin : ff_logic
+		if(arstn==0) begin
 			q<=0;
 		end 
 		else if(en==1) begin
@@ -199,23 +202,20 @@ module ff_en_res(
 		end
 	end
 endmodule
-/*	Note: If we implement a synchronous reset, it will change the q state to 0
-		when clk posedge rises! 
-		i.e. the sensitivity list of always_ff is "posedge clk" only
+/*	Note: To implement a synchronous reset --> the sensitivity list of always_ff is "posedge clk" only
+		Sync reset - the q state changes to 0 only when clk posedge rises! 
 */
 
 
 // 3.2) e.g.2: synchronous adder with asynchronous reset
-
-always_ff @(posedge clk or negedge rstn) 
+always_ff @(posedge clk or negedge arstn) 
 begin : adder_ff
-	if(rstn==0) begin
+	if(arstn==0) begin
 		sum <= 0;
 		parity_even <= 0;
-		// $display("Reset is active, sum and parity are reset to 0");
-
+		$display("Reset is active, sum and parity are reset to 0"); // TIP: REMOVE IT
 		// the line above "display" is not recommended in RTL writing
-		// it will spam the console as long as the reset is active
+		// it will spam the console as long as the reset is active (arstn==0)
 	end else begin
 		sum <= a + b;
 		parity_even <= ^(a+b); // parity is even if the number of 1's in sum is even
@@ -224,21 +224,20 @@ end
 
 
 
+
+
 /*	4)  --------------- Functions: [Design & Verification] ---------------
 		- Synthesizable if they have no time delays. Heavily used in both.
 		- Are defined inside the module where are also implemented.
-		- Assume we implement a function in "my_func.sv" file and we want to use 
-		  it in "any_module.sv" file.
+		- Assume we implement a function 'my_func' in 'raw_funcs.sv' file and 
+		  we want to use it in "any_module.sv" file.
 */
 // 4.1) definition
+// -------------- raw_funcs.sv --------------
 function logic my_func(input logic a,b,c);
 	return (a+b) & c;
 endfunction
-
-/*  instead of "logic" we can use any type that we want to return
-	e.g.:   bus - "logic [31:0]"    or    "logic [N-1:0]"
-			void, int, struct, class, enum, etc...
-*/
+// ------------ end raw_funcs.sv ------------
 
 // 4.2) calling the function
 module any_module(
@@ -246,20 +245,33 @@ module any_module(
 	output logic out
 );
 	//----- logic ------
-	`include "my_func.sv" 
+	`include "raw_funcs.sv" 
 	assign out = my_func(in1,in2,in3) ? 0 : 1;
 endmodule
 
-//IMPORTANT: we use a Backtick (`) for "include", "define", "timescale"
+/* 	1.  IMPORTANT: we use a Backtick (`) for "include", "define", "timescale"
+    2.  Note1: Function Return Type
+	    Instead of "logic" we can use any other type
+	    e.g.:   void, int, struct A, class B, enum C, etc...
+			   bus - "logic [31:0]"    or    "logic [N-1:0]"
+	3.  Note2: Never include a module file!
+		If you have a function inside module A, and you `include "module_A.sv" inside module B, 
+		you are literally pasting a module inside a module, which is an illegal syntax crash.
+	4.  TIP: Use packages to share functions between modules instead of `include. 
+	    Packages are the proper way to share code in SystemVerilog, and they prevent 
+	    the accidental module-in-module problem.
+*/
 
 
 
-/* 5)  --------------- Tasks: [Strictly Verification] ---------------
+
+
+/* 5)   --------------- Tasks: [Strictly Verification] ---------------
 		- Because they contain time delays like # and @, they cannot be synthesized 
 		  into silicon
-		- Task is a subroutine that can contain timing control statements 
+        - Task is a subroutine that can contain timing control statements 
 		  (like #, @, wait) and can return multiple values through output arguments.
-		- In contrast to functions, tasks do not return a value directly. 
+        - In contrast to functions, tasks do not return a value directly. 
 		  Instead, they can have output arguments that allow them to return multiple values.
 */
 
@@ -268,32 +280,37 @@ endmodule
 
 // 5.1) definition
 task automatic convert_temp(
-	input  logic [7:0] temp_c, // Celsius
-	output logic [7:0] temp_f  // Fahrenheit
+    input  logic [7:0] temp_c, // Celsius
+    output logic [7:0] temp_f  // Fahrenheit
 );
-	//----- logic ------
-	temp_f = (temp_c * 9) / 5 + 32; // convert Celsius to Fahrenheit
+    //----- logic ------
+    temp_f = (temp_c * 9) / 5 + 32; // convert Celsius to Fahrenheit
 endtask
 
 /*
-	By adding the word automatic (task automatic convert_temp), we tell the simulator: 
-	"Every single time this task is called, create a brand new, temporary copy of its 
-	variables in memory, and destroy them when the task finishes." 
-	This makes our tasks 100% "thread-safe" and is a mandatory best practice in modern 
-	verification.
+	The automatic keyword in SystemVerilog forces the simulator to dynamically 
+	allocate fresh, temporary memory on the stack every single time a subroutine 
+	is called, and destroy that memory when it finishes.
+
+	The Golden Rules for automatic:
+	- Modules, Interfaces, and Packages: 
+	  Subroutines here are static by default. We should always explicitly write 
+	  function automatic or task automatic.
+	- Classes (OOP): 
+	  Methods inside a class are automatic by default in SystemVerilog, so you don't need to type it.
 */
 
 // 5.2) Calling the task
 // Tasks are called as standalone statements, not inside assignments!
 module task_caller;
-	logic [7:0] current_c, current_f;
+    logic [7:0] current_c, current_f;
 
-	initial begin
-		current_c = 8'd100; // Set current_c to 100 degrees Celsius
-		// Correct way to call a task and catch its output
-		convert_temp(current_c, current_f);
-		$display("Temperature in F is: %0d", current_f);
-	end
+    initial begin
+        current_c = 8'd100; // Set current_c to 100 degrees Celsius
+        // Correct way to call a task and catch its output
+        convert_temp(current_c, current_f);
+        $display("Temperature in F is: %0d", current_f);
+    end
 endmodule
 
 
@@ -338,6 +355,8 @@ end
 
 
 
+
+
 /*	7)  --------------- fork-join: [Strictly Verification] ---------------
 		- Physical hardware is already naturally parallel; fork-join is a software 
 		  trick to simulate hardware parallelism in your testbench
@@ -345,7 +364,7 @@ end
 				i.e every line after fork and before join, will happen in parallel
 		- "join" - there are 3 kinds: 
 			   - "join" [all] - waits until all lines between the fork-join are
-								procedured and only after we go on for the remain code
+			   					procedured and only after we go on for the remain code
 			   - "join_any"   - wait until any of the lines will finish
 			   - "join_none"  - don't wait, just continue to the remain code
 
@@ -356,23 +375,26 @@ end
 
 // 1. WITHOUT fork-join (Sequential Execution)
 initial begin
-	a=0; b=0;
-	#2 a=1; // 'a' rises at absolute time t=2 
-	#1 b=1; /* 1 time unit after the previous line finishes, 'b' will rise.
-			   So it actually happens at absolute time t=3 */ 
+    a=0; b=0;
+    #2 a=1; // 'a' rises at absolute time t=2 
+    #1 b=1; /* 1 time unit after the previous line finishes, 'b' will rise.
+               So it actually happens at absolute time t=3 */ 
 end
 
 // 2. WITH fork-join (Parallel Execution)
 initial begin
-	a=0; b=0; 
-	fork
-		#2 a=1; // Thread 1: 'a' rises at absolute time t=2
-		#1 b=1; // Thread 2: 'b' rises at absolute time *** t=1 ***
-	join
-	
-	/* Because we used 'join' (all), the compiler waits until t=2 
-	   (when the longest thread finishes) before executing anything down here. */
+    a=0; b=0; 
+    fork
+        #2 a=1; // Thread 1: 'a' rises at absolute time t=2
+        #1 b=1; // Thread 2: 'b' rises at absolute time *** t=1 ***
+    join
+    
+    /* Because we used 'join' (all), the compiler waits until t=2 
+       (when the longest thread finishes) before executing anything down here. */
 end
+
+
+
 
 
 /*	8)  --------------- generate, genvar [Strictly Design] ---------------
@@ -381,8 +403,9 @@ end
 		- "generate" - duplicates all the code we have between generate-endgenerate
 		
 		Note: It's helpful to think of generate not as a loop that runs on the chip, 
-			  but as a script that writes SV code for you
-			  e.g: If the SIZE was 4, the compiler literally reads your generate 
+		      but as a script that writes SV code for you
+			  e.g: assume bin2gray module with SIZE==4 bits.
+			  the compiler literally reads your generate 
 			  block and writes this out behind the scenes on the next way:
 				assign gray[2] = bin[3] ^ bin[2];
 				assign gray[1] = bin[2] ^ bin[1];
@@ -390,21 +413,22 @@ end
 */
 
 module bin2gray #(
-	parameter SIZE=32 //default number of bits
+	parameter SIZE=32 //default number of bits, but the outside world can change it
 )(
 	input  logic [SIZE-1:0] bin,
 	output logic [SIZE-1:0] gray
 );
 
-	//----- logic ------
-	assign gray[SIZE-1] = bin[SIZE-1]; //The MSB bit is the same
+//----- logic ------
+assign gray[SIZE-1] = bin[SIZE-1]; //The MSB bit is the same
 
-	genvar i; //genvar variable exist at compile time only
-	generate 
-		for(i=SIZE-2;i>=0;i--) begin : gen_gray_xor // gen_gray_xor is a block name
-			assign gray[i] = bin[i+1] ^ bin[i];
-		end //for
-	endgenerate 
+genvar i; //genvar variable exist at compile time only
+generate 
+	for(i=SIZE-2;i>=0;i--) begin : gen_gray_xor // gen_gray_xor is a block name
+		assign gray[i] = bin[i+1] ^ bin[i];
+	end //for
+endgenerate 
+
 endmodule
 
 /* Note about "begin : gen_gray_xor" 
@@ -414,6 +438,9 @@ endmodule
 	will automatically assign it a random, ugly name (like genblk_01), 
 	making it a nightmare to find signals in a waveform viewer.
 */
+
+
+
 
 
 /* 9) --------------- testbenches --------------- 
@@ -431,7 +458,7 @@ module alex_module_tb; //Note: no ports, no parameters
 	//signals initialization
 	//instantiation of the module under test (UUT):
 	alex_module #(
-		.<modules_parameter_name>(<value>)
+		.<param_name>(<value>)
 	) alex_module_uut (
 		.in1(in1),
 		.in2(in2),
@@ -453,20 +480,23 @@ endmodule
 //e.g:
 logic clk;
 initial begin
-	clk=0;
+	clk=0; //
 end
 
-//always #5 clk=~clk; //a one-liner is also good practice
+// 1st approach -  a one liner
+// "#5" means to wait for 5 time units before executing the next statement
+always #5 clk=~clk; 
 
+// 2nd approach
 always begin
-	#5 clk=~clk; //generate a clock with period of 10 time units
+	#5 clk=~clk; //generate a clock with a total period of 10 time units
 end
 
 
 /* 9.2) --------------- basic printing ---------------
 		- we can use $display, $monitor, $strobe to print values of signals and variables
 		- $display - prints only once when it is called
-		- $monitor - prints whenever any of the signals in its argument list changes
+		- $monitor - prints whenever any of the signals in its argument list !!!changes!!!
 		- $strobe  - prints at the end of the current time step, after all events have been processed
 	flags:
 		- %t - we can display the current sim_time using $time
@@ -490,7 +520,7 @@ module print_table_test;
 			@(posedge clk) counter++;
 		end
 		
-		// Optional: Stop the simulation after the loop finishes
+		// Stop the simulation after the loop finishes
 		#10 $finish;
 	end
 
@@ -498,8 +528,7 @@ module print_table_test;
 
 endmodule
 
-//it prints us the following table:
-/*
+/*  it prints us the following table:
 time    clk    enable    counter
    0     0       0          0
    3     0       1          0
@@ -523,36 +552,29 @@ time    clk    enable    counter
   90     0       1          9
   95     1       1         10
  100     0       1         10
-
 */
 
 
 /* 9.3) ----------- example of a module and its tb ----------- */
-
 //module arbiter_2inpt_lowprior - an arbiter with 2 inputs and low id priority
-module arbiter_2inpt_lowprior(
+
+module arbiter_2in_lowprior(
 	input  logic clk,
-	input  logic rstn,
+	input  logic arstn,
 	input  logic req0,
 	input  logic req1,
 	output logic grant0,
 	output logic grant1
 );
 
-always_ff @(posedge clk or negedge rstn) begin
-	if(!rstn) begin
-		grant0 <= 0;
-		grant1 <= 0;
-	end else begin 
-		// PREVENT STICKY MEMORY (Default assignments)
-		grant0 <= 0; 
-		grant1 <= 0;
-	end
+always_ff @(posedge clk or negedge arstn) begin
+	// default assignments
+	grant0 <= 0; 
+	grant1 <= 0;
 
 	//------ logics ------
 	/*  give the grant by lowest id priority, so if both req0 and req1 are high 
-		grant0 will be high and grant1 will be low */
-
+		grant0==1 & grant1==0 */
 	if(req0) begin
 		grant0 <= 1;
 	end else if(req1) begin
@@ -565,7 +587,7 @@ endmodule
 //another file - arbiter_2inpt_lowprior_tb.sv
 module arbiter_2inpt_lowprior_tb;
 
-	logic clk=0, rstn=1, req0=0, req1=0;
+	logic clk=0, arstn=1, req0=0, req1=0;
 	logic grant0, grant1;
 
 	//instantiation of the module under test (UUT)
@@ -617,7 +639,7 @@ time  req0  req1   grant0   grant1
 /* ---------------------- Other Syntax Keywords in SV ---------------------- */
 
 
-/*	10)  --------------- typedef: [Design & Verification] ---------------
+/*	10) --------------- typedef: [Design & Verification] ---------------
 		- "typedef" is used to create new data types in SV. 
 		- It can be used to create structs, enums, unions, etc...
 */
@@ -626,22 +648,24 @@ myint_t a=0;
 
 
 
-/*	11)  --------------- enum: [Design & Verification] ---------------
+
+
+/*	11) --------------- enum: [Design & Verification] ---------------
 		- The absolute best way to build physical FSM states in a readable and safe way
 		- "enum" is used to create a new variable that can take a finite set of values.
-		- SV enums are "strongly typed. Once we declare a variable as an enum, 
+		- SV enums are "strongly typed". Once we declare a variable as an enum, 
 		  the compiler builds a protective wall around it. We are no longer allowed 
 		  to assign raw binary numbers to it, and we can only assign it 
 		  the specific names we defined in the list.
 */
-enum {red, green, yellow} color;
+enum {red, green, yellow} color; // note: not explicitly defined how many bits
 
 /* 11.1) When the compiler sees this, it does two things:
 		- It automatically assigns values: red = 0, green = 1, yellow = 2 by order.
-		- The Trap: Because we didn't tell it how many bits to use, SV defaults 
+	 	- The Trap: Because we didn't tell it how many bits to use, SV defaults 
 		  to making color a 32-bit signed integer (int).
-		- To represent 3 color we can use 2 bits, so we can specify the size 
-		  of the enum as follows:
+	    - To represent 3 color we can use 2 bits, so we can specify the size 
+	      of the enum as follows:
 */
 enum logic [1:0] {red, green, yellow} color; 
 // now "color" is a 2-bit variable that can take the values 00, 01, 10
@@ -654,8 +678,8 @@ enum logic [1:0] {red=2'b00, green=2'b10, yellow=2'b01} color;
 
 /* 11.3) - Unlike in C, we cannot assign raw numbers to an enum variable, 
 		   ***even if those numbers are valid***. WE must use the names defined in 
-		   the enum list.
-		 - This is a safety feature that prevents us from accidentally assigning an 
+		   the enum list - this is "strong typing" in action.
+		 - It's a safety feature that prevents us from accidentally assigning an 
 		   invalid value to the enum variable.
 
 	- ILLEGAL: color <= 2'b11; (Error: Cannot assign a packed type to an enum type)
@@ -674,7 +698,7 @@ typedef enum logic [1:0] {red=0, green=1, yellow=2} colors_t;
 // now we can declare variables of type colors_t by using:
 colors_t traffic_light_color;
 /*  where traffic_light_color can only take the values red, green, or yellow, 
-	and cannot be assigned raw numbers like 00, 01, or 10 directly. */
+    and cannot be assigned raw numbers like 00, 01, or 10 directly. */
 
 
 
@@ -687,15 +711,15 @@ colors_t traffic_light_color;
 		  such as the signals of a bus or the state variables of an FSM.
 		
 		NOTE: Assigning values to a struct variable can be done only within procedural blocks
-			  (initial, always, etc.). We cannot leave them floating in the open space of a module. 
+		      (initial, always, etc.). We cannot leave them floating in the open space of a module. 
 */
 
 // 12.1) definition and declaration of a struct variable
 struct { 
 	int a;
-	int unsigned b; // Note: 'unsigned int' is usually written 'int unsigned' in SV
-	logic c;
-} my_struct_var; //my_struct_var is a new variable of type struct that contains 3 members: a, b, c
+    int unsigned b; // Note: 'unsigned int' is usually written 'int unsigned' in SV
+    logic c;
+} my_struct_var; // my_struct_var is a new variable of type struct that contains 3 members: a, b, c
 
 // 12.2) assigning values to a single var inside the struct
 my_struct_var.c = 1'b0;
@@ -725,41 +749,42 @@ typedef struct {
 	int a;
 	int unsigned b; 
 	logic c;
-} my_struct_t;
+} my_struct_t; // here my_struct_t is a new type that contains 3 members: a, b, c
 
 // now we can declare variables of type my_struct_t by using:
 my_struct_t bus_signals;
-// where bus_signals is a new variable of type my_struct_t with 3 members: a, b, c.
+// where bus_signals is a new instance of type my_struct_t
 
 
 
-/* 13) --------------- Classes (OOP): [Strictly Verification] ---------------
+/* 13) --------------- class (OOP): [Strictly Verification] ---------------
 		- The backbone of modern UVM testbenches. Absolutely zero silicon equivalence
-		- A class is a dynamic blueprint used almost exclusively in Testbenches.
-		- Unlike a struct (which just holds data), a class holds data AND the 
-		  functions/tasks (methods) that operate on that data.
+        - A class is a dynamic blueprint used almost exclusively in Testbenches.
+        - Unlike a struct (which just holds data), a class holds data AND the 
+          functions/tasks (methods) that operate on that data.
 */
 
 // 13.1) definition of a class using PascalCase - Highly Recommended
 class NetworkPacket; 
-	// Properties (Variables)
-	int address;
-	logic [63:0] data;
-	shortint crc;
+    // Properties (Variables)
+    int address;
+    logic [63:0] data;
+    shortint crc;
 endclass : NetworkPacket // Best practice: naming the endclass makes large files readable
 
 // 13.2) creating an instance of the class using lowercase / snake_case
-NetworkPacket pkt_1; // Declares a variable pkt_1 of type NetworkPacket (but it's not an object yet)
+NetworkPacket pkt_1; // Only declares an instance pkt_1 of type NetworkPacket (but it's not an object yet)
 
 initial begin
-	// Construct the object in memory using new(). Must be inside a procedural block!
-	pkt_1 = new(); 
-	// We can now access the properties using the dot (.)
-	pkt_1.address = 32'hA000; 
+    // Construct the object in memory using new(). 
+	// NOTE: Must be inside a procedural block!
+    pkt_1 = new(); 
+    // Now we can access the properties using the dot (.)
+    pkt_1.address = 32'hA000; 
 end
 
 /* 13.3) Pro-Tip (The Shortcut): Modern SystemVerilog does allow you to declare 
-		 and construct the object on the exact same line. 
+         and construct the object on the exact same line. 
 		 If you do it this way, you are allowed to put it outside an initial block:
 */
 NetworkPacket pkt_1 = new(); // Declares and constructs in one line!
@@ -776,30 +801,31 @@ NetworkPacket pkt_1 = new(); // Declares and constructs in one line!
 
 
 
-/* 14) --------------- packages: [Design & Verification] ---------------
-		- The best place to store shared typedefs and enums so both our chip 
+
+/* 14)  --------------- packages: [Design & Verification] ---------------
+        - The best place to store shared typedefs and enums so both our chip 
 		  and our testbench agree on the definitions.
-		- A package is a container for reusable code elements (typedefs, 
-		  constants, functions, tasks, classes).
-		- IMPORTANT: packages cannot contain hardware blocks (like modules or interfaces).
+        - A package is a container for reusable code elements (typedefs, 
+          constants, functions, tasks, classes).
+        - IMPORTANT: packages cannot contain hardware blocks (like modules or interfaces).
 */
 
 // 14.1) Defining the Package
 package my_package;
-	typedef struct {
-		int a;
-		int unsigned b; 
-		logic c;
-	} my_struct_t;
+    typedef struct {
+        int a;
+        int unsigned b; 
+        logic c;
+    } my_struct_t;
 
-	// BEST PRACTICE: Use 'automatic' for functions in packages too!
-	function automatic int add(int x, int y);
-		return x + y;
-	endfunction
+    // BEST PRACTICE: Use 'automatic' for functions in packages too!
+    function automatic int add(int x, int y);
+        return x + y;
+    endfunction
 
-	task automatic print_struct(my_struct_t s);
-		$display("a: %0d, b: %0d, c: %b", s.a, s.b, s.c);
-	endtask : print_struct
+    task automatic print_struct(my_struct_t s);
+        $display("a: %0d, b: %0d, c: %b", s.a, s.b, s.c);
+    endtask : print_struct
 
 endpackage : my_package
 
@@ -807,21 +833,21 @@ endpackage : my_package
 // 14.2) Using the Package (Importing)
 module my_testbench;
 
-	// Method 1: The Wildcard Import (Most Common)
-	// Brings EVERYTHING from the package into this module
-	import my_package::*; 
+    // Method 1: The Wildcard Import (Most Common)
+    // Brings EVERYTHING from the package into this module
+    import my_package::*; 
 
-	// Method 2: Explicit Import (For strict namespaces)
-	// Brings ONLY the specific item you ask for
-	// import my_package::my_struct_t;
+    // Method 2: Explicit Import (For strict namespaces)
+    // Brings ONLY the specific item you ask for
+    import my_package::my_struct_t;
+    my_struct_t test_var;
 
-	my_struct_t test_var;
-
-	initial begin
-		test_var = '{10, 0, 1'b1};
+	// And create the code
+    initial begin
+        test_var = '{10, 0, 1'b1};
 		test_var.b = add(test_var.a, 5); // We can use the function directly because we imported it!
-		print_struct(test_var); // We can use the task directly because we imported it!
-	end
+        print_struct(test_var); // We can use the task directly because we imported it!
+    end
 
 endmodule
 
@@ -831,26 +857,27 @@ endmodule
 /* 15)  --------------- arrays [Design & Verification] ---------------
 		There are 2 types of arrays in SV: 
 		- Packed arrays: arrays of 1 bit variables (like a bus or a vector).
-		  Declaration: the size !!! before !!! the variable name.
-		  Hardware: Built as one single, continuous, fat wire.
+		  Declaration: Size !!! before !!! the variable name.
+		  Hardware:    Built as one single, continuous, fat wire.
 		- Unpacked arrays: used for creating arrays of variables (like an array of structs or classes).
-		  Declaration: the size !!! after !!! the variable name.
-		  Hardware: Built as separate, distinct registers.
+		  Declaration: Size !!! after !!! the variable name.
+		  Hardware:    Built as separate, distinct registers.
 */
 
-// 15.1) Packed array example (a 16-bit bus)
+// 15.1) Packed array example (a bus, total 16 bits)
 logic [15:0] bus = 16'h00AB; // bus[15] is the MSB 
 
-// 15.2) Unpacked array example (an array of 4 integers)
+// 15.2) Unpacked array example (an array of 4 integers, total 4*32 bits)
 int unpacked_array_1 [3:0] = '{3,2,1,0}; // left -> right is last_element -> first_element
 
-/*  Note: The order of elements in the initializer list corresponds to the array indices,
-	So for unpacked arrays we can go as follows: */
-int unpacked_array_2 [0:3] = '{0,1,2,3}; // better practice to declare [lowest:highest] indices
+/*  Note: Better practice to declare [lowest:highest] indices
+	The order of elements in the initializer list corresponds to the array indices,
+	so for unpacked arrays we can go as follows: */
+int unpacked_array_2 [0:3] = '{0,1,2,3}; 
 
 /* 15.3) Multi-dimensional arrays
-		 For example a packed array that creates a single 8-bit bus, 
-		 divided logically into two 4-bit chunks*/ 
+         For example a packed array that creates a single 8-bit bus, 
+         divided logically into two 4-bit chunks*/ 
 logic [1:0][3:0] packed_arr_2D = {4'hB,4'h0}; // 1011 0000
 
 // 15.4) The same for unpacked multi-dimensional arrays
@@ -859,8 +886,8 @@ int unpacked_arr_2D [0:1][0:3] = '{'{0,1,2,4}, '{4,5,6,7}};
 
 /* 15.5) Mixed packed and unpacked arrays.
 		 We can combine packed and unpacked dimensions in the same declaration. 
-		 When building FIFOs or RAM, we combine packed (width) and unpacked (depth).
-		 Rule: Packed dimensions come first, Unpacked dimensions come last.
+         When building FIFOs or RAM, we combine packed (width) and unpacked (depth).
+         Rule: Packed dimensions come first, Unpacked dimensions come last.
 */
 // Creates a memory with 256 slots (unpacked), where each slot is 32 bits wide (packed).
 logic [31:0] memory_buffer [0:255]='{default:0}; // 256 32-bit words initialized to 0
@@ -872,15 +899,16 @@ initial begin
 
 	// 1. Packed Arrays
 	// To print a packed array, we can directly use $display with the %b flag
-	$display("Packed Array (bus) = %b", bus); 
+    $display("Packed Array (bus) = %b", bus); 
 	// prints: Packed Array (bus) = 0000000010101011
 
 	// Printing a multi-dimensional packed array (2D array)
 	$display("2D Packed Array = %b", packed_arr_2D);
 	//prints: 2D Packed Array = 10110000
 
-	// 2. Unpacked Arrays
-	// OLD WAY: To print an unpacked array, we need to loop through its elements
+
+	// 2.  Unpacked Arrays
+	// 2.1 OLD WAY: To print an unpacked array, we need to loop through its elements
 	for(int i=0;i<4;i++) begin
 		$display("unpacked_array_1[%0d]:\tdecimal=%0d\tbinary=%2b", i, unpacked_array_1[i], unpacked_array_1[i]);
 	end
@@ -891,9 +919,10 @@ initial begin
 			unpacked_array_1[3]:	decimal=3	binary=11		
 	*/
 
-	// Modern SV: use the '%p' (pattern) flag to print unpacked array or a struct!
-	$display("unpacked_array_2 = %p", unpacked_array_2);
+	// 2.2 Modern SV: use the '%p' (pattern) flag to print unpacked array or a struct!
+    $display("unpacked_array_2 = %p", unpacked_array_2);
 	// NOTE: it prints:       unpacked_array_2 = '{0, 1, 2, 3} 
+
 
 	// 3. Mixed Packed and Unpacked Arrays
 	memory_buffer[0] = 32'hBEEF0000; // First lets assign a value (only within procedural block)
@@ -906,15 +935,15 @@ end
 
 // Example A: 2D unpacked array of 8-bit packed elements
 logic [7:0] mem1 [0:1][0:3] = '{
-	'{8'h00, 8'h01, 8'h02, 8'h03}, // Unpacked row 0
-	'{8'h04, 8'h05, 8'h06, 8'h07}  // Unpacked row 1
+    '{8'h00, 8'h01, 8'h02, 8'h03}, // Unpacked row 0
+    '{8'h04, 8'h05, 8'h06, 8'h07}  // Unpacked row 1
 }; 
 
 // Example B: 1D unpacked array of 2D packed elements
 // Note: we use standard { } for the inner packed blocks, and '{ } for the outer unpacked array.
 logic [3:0][7:0] mem2 [0:1] = '{
-	{8'h00, 8'h01, 8'h02, 8'h03}, // Packed block 0
-	{8'h04, 8'h05, 8'h06, 8'h07}  // Packed block 1
+    {8'h00, 8'h01, 8'h02, 8'h03}, // Packed block 0
+    {8'h04, 8'h05, 8'h06, 8'h07}  // Packed block 1
 }; 
 
 // Example C: The Ultimate Indexing Rule
@@ -923,9 +952,55 @@ logic [2:0][7:0] mem3[3:0][4:0];
 
 // we can access the single bit by:
 initial begin
-	// RULE: [Unpacked L->R] then [Packed L->R]
-	logic single_bit = mem3[0][0][0][0]; // mem3[1st_unp][2nd_unp][1st_p][2nd_p]
+    // RULE: [Unpacked L->R] then [Packed L->R]
+    logic single_bit = mem3[0][0][0][0]; // mem3[1st_unp][2nd_unp][1st_p][2nd_p]
 end
 
 
 
+
+
+/*  16) --------------- localparam: [Design & Verification] ---------------
+        - A localparam is an internal CONSTANT that CANNOT be overridden from the outside.
+        - Used for FSM states, derived mathematical sizes, or protocol magic numbers.
+        - It is strongly recommended to explicitly give it a type (like 'logic [1:0]').
+*/
+
+module memory_controller #(
+    parameter DEPTH = 256 // The outside world CAN change this
+)(
+    input logic clk,
+    input logic rstn
+);
+
+    // 16.1) Derived Math (Calculated internally)
+    // $clog2 calculates the number of bits needed for the given depth.
+    // If DEPTH is 256, ADDR_WIDTH is locked to 8.
+    localparam ADDR_WIDTH = $clog2(DEPTH); // the outside world cannot change ADDR_WIDTH
+
+    logic [ADDR_WIDTH-1:0] address_bus;
+
+
+    // 16.2) FSM State Encodings (Internal Protocol Rules)
+    // We lock these as localparams so nobody can accidentally change them 
+    // during instantiation.
+    localparam logic [1:0] STATE_IDLE  = 2'b00; // the outside world cannot change STATE_IDLE
+    localparam logic [1:0] STATE_READ  = 2'b01; // the outside world cannot change STATE_READ
+    localparam logic [1:0] STATE_WRITE = 2'b10; // the outside world cannot change STATE_WRITE
+
+    logic [1:0] current_state;
+
+    always_ff @(posedge clk or negedge rstn) begin : fsm_state
+        if (!rstn) begin
+            current_state <= STATE_IDLE;
+            address_bus   <= '{default: 0};
+        end 
+		else begin
+            // Example of using the locked constant in logic
+            if (current_state == STATE_IDLE) begin
+                current_state <= STATE_READ;
+            end
+        end
+    end
+
+endmodule

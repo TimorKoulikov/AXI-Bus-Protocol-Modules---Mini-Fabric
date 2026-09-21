@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
  top block of rounter_ms
  
- TODO: after ROB is implemented we can finish the router
+ TODO: after patcher_w and rob is implemented we can finish the router
  *------------------------------------------------------------------------------*/
 
 module router_ms(
