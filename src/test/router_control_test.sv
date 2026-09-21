@@ -48,8 +48,8 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 
 //-----testbanch -----
 int i = $urandom_range(NUM_OF_CHANNEL - 1, 0);
-int tokens;
-int old_tokens;
+int unsigned tokens;
+int unsigned old_tokens;
 initial
 begin
 		$fsdbDumpvars(0, router_control_test);
@@ -133,7 +133,7 @@ begin
 			old_tokens = router_control_uut.curr_num_tokens[i];
 			ready_for_transaction[i]=1'b0;
 			start_transaction[i]=1'b1;
-			tokens = $random();
+			tokens = $urandom();
 			token_allocation[i] = tokens;
 			#20;
 				assert( router_control_uut.curr_num_tokens[i] == old_tokens + tokens) begin
