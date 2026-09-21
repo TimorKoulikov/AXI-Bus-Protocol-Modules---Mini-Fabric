@@ -3,15 +3,16 @@
  *---------------------------------------------------------------------------------*/
 
 module patcher_ax(
-aclk,		//axi global clock signal
-aresetn,	//global reset signal. active low
-data_in,	//AXI channel that comes from axi component
-ready_out,	//valid signal the patcher sends for the data_in
-data_out,	//data of entering valid and new data
-ready_in,	//ready signal patcher gets foDW_asymfifo_s1_dfr the data_out
-patch_out,	//patched data of the patcher add
-cfg,		//config from the arbiter_engine
-cfg_en		//signal rise when new cfg data is in	
+	aclk,		// axi global clock signal
+	aresetn,	// global reset signal. active low
+	data_in,	// AXI bus (AW/AR) that comes from axi component
+	ready_in,	// ready signal the patcher receives from the downstream ROB (for data_out)
+	cfg,		// slaves addresses config from the arbiter_engine
+	cfg_en,		// signal rise when new cfg data is in	
+	
+	data_out,	// outgoing AXI bus payload (including the valid bit) sent downstream to the ROB/FIFO
+	ready_out,	// ready signal the patcher sends to master (ready for data_in)
+	patch_out,	// patched data the patcher added
 );
 
 
@@ -20,8 +21,9 @@ import axi_datatypes::*;
 import fabric_datatypes::*;
 
 
+// TODO : think we have to move these to external file
 //-----parameters-----
-parameter type BUS_TYPE = aw_bus;
+parameter type BUS_TYPE = aw_bus; // setting the default
 parameter master_id=1;
 parameter NUM_OF_SLAVES=4;
 
@@ -29,7 +31,7 @@ parameter NUM_OF_SLAVES=4;
 //----- Input Ports-----
 input aclk;
 input aresetn;
-input BUS_TYPE data_in;
+input BUS_TYPE data_in; 
 input ready_in;
 input cfg_t cfg;
 input cfg_en;

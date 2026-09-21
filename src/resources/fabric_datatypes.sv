@@ -13,7 +13,6 @@ typedef struct packed {
 		logic [ADDR_WIDTH -1 : 0] high_addr;		
 } cfg_row;
 
-// cfg_t[.] - 
 typedef cfg_row [NUM_OF_SLAVES-1 : 0] cfg_t ;   //usage: cfg_t[0].low_addr = 0x0000000
 
 typedef struct packed {
