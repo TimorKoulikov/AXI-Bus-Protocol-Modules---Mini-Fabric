@@ -47,7 +47,7 @@ begin
 	cfg_en=1'b0;	
 	#10
 	//======================================
-	$display("test_1:config successfull cfg");
+	$display("test_1: config successfull cfg");
 	cfg=rand_cfg.get_random();
 	cfg_en=1'b1;
 	#10
@@ -59,7 +59,7 @@ begin
 		$error("test_1: FAIL");
 	end 
 	//======================================
-	$display("test_2:pass with valid high");
+	$display("test_2: with valid high");
 	data_in=rand_axi.get_random();
 	data_in.valid=1'b1;
 	#10
@@ -70,17 +70,17 @@ begin
 		$error("test_2: FAIL");
 	end
 	//======================================
-	$display("test_3: pass with valid low ");
+	$display("test_3: with valid low ");
 	data_old=data_in;
 	data_in=rand_axi.get_random();
 	#10
 	assert (data_in != data_out && data_out.valid == 1'b0) begin
-		$display("teset_3: PASS");
+		$display("test_3: PASS");
 	end else begin
 		$display("test_3: FAIL");
 	end
 	
-	$display("test_4: pass with urgent bit");
+	$display("test_4: with urgent bit");
 	data_in = rand_axi.get_random();
 	data_in.valid=1'b1;
 	data_in.qos=2'b11;

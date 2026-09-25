@@ -14,7 +14,7 @@
 
 module patcher_w (
 	aclk,        // axi global clock signal
-	arstn,       // global reset signal, active low
+	aresetn,       // global reset signal, active low
 	data_in,     // AXI W bus that comes from axi component
 	ready_in,    // ready signal the patcher receives from the downstream ROB (for data_out)
 	patch_in,    // Routing tag coming from patcher_aw
@@ -38,7 +38,7 @@ localparam PTR_WIDTH = $clog2(QUEUE_DEPTH);
 
 //----- Input Ports-----
 input  logic    aclk;
-input  logic    arstn;
+input  logic    aresetn;
 input  w_bus    data_in;
 input  logic    ready_in;
 input  patch_t  patch_in;
@@ -80,8 +80,8 @@ end
 
 
 //----- AW-to-W dependency queue (synchronous FIFO) -----
-always_ff @(posedge aclk or negedge arstn) begin
-	if (!arstn) begin
+always_ff @(posedge aclk or negedge aresetn) begin
+	if (!aresetn) begin
 		wr_ptr <= '0;
 		rd_ptr <= '0;
 		count  <= '0;
@@ -110,8 +110,8 @@ always_ff @(posedge aclk or negedge arstn) begin
 end
 
 //----- W-Channel Forwarding & Tagging -----
-always_ff @(posedge aclk or negedge arstn) begin
-	if (!arstn) begin
+always_ff @(posedge aclk or negedge aresetn) begin
+	if (!aresetn) begin
 		data_out  <= '0;
 		ready_out <= 1'b0;
 		patch_out <= '0;

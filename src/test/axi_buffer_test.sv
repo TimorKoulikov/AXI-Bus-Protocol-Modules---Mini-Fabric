@@ -54,7 +54,7 @@ begin
 	end else begin
 		$error("test_2: FAIL");
 	end
-	$display("teset_3: check if ready_in is low so ready_out is low");
+	$display("test_3: check if ready_in is low so ready_out is low");
 	ready_in=1'b0;
 	#10
 	assert(ready_out==1'b0) begin
