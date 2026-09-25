@@ -12,7 +12,7 @@
 //./src/main/leaky_bucket.sv 
 src/main/axi_buffer.sv
 src/main/patcher_ax.sv
-src/main/patcher_w.sv	// unimplemented
+src/main/patcher_w.sv
 src/main/rob.sv			// unimplemented 
 src/main/token_counter.sv
 src/main/router_control.sv
