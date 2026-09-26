@@ -113,7 +113,7 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES),.BUS_TYPE(ar_b
 
 patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_w(
 .aclk     (aclk     ),
-.arstn  (aresetn  ),
+.aresetn  (aresetn  ),
 .data_in  (w_data_channel ),
 .ready_out(w_ready_out),
 .data_out (data_out ),
