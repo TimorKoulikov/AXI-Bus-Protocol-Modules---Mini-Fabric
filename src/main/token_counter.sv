@@ -21,16 +21,12 @@ module token_counter #(
 	input [NUM_OF_MODES -1 : 0 ] mode
 	
 );
+// ----- imports -----
+import axi_datatypes::*;
 
 logic [token_width -1 :0] add_token;
 wire [token_width -1 :0] sub_token;
-typedef enum logic [1:0]
-{
-	NO_LEAK,
-	LEAK,
-	EXSTRA_BW
-	
-} mode_token_allocation;
+
 
 
 DW01_add #(token_width)
@@ -52,7 +48,7 @@ always_ff @(posedge aclk or negedge aresetn) begin
 					count <= sub_token;
 			end
 			
-			LEAK , EXSTRA_BW: begin
+			LEAK , EXSTRA_BW,LEAK_EXSTRA_BW: begin
 				if(load)
 					count <=add_token;
 				if(unload)

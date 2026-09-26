@@ -6,7 +6,8 @@
 module router_ms#(
 	parameter master_id=0,
 	parameter NUM_OF_SLAVES=3,
-	parameter token_width=30
+	parameter token_width=30,
+	parameter [token_width -1 : 0] TOKEN_LOW_THRESHOLD = 8
 )
 (
 	aclk,				//axi clk
@@ -36,8 +37,9 @@ module router_ms#(
 	start_transaction,
 	end_transaction,
 	token_allocation,
-	bw,
-	is_urgent
+	num_tokens,
+	is_urgent,
+	needy_level
 );
 
 //-----imports-----
@@ -67,7 +69,12 @@ output ar_bus [NUM_OF_SLAVES -1 : 0]  ar_data_out;
 output w_bus [NUM_OF_SLAVES -1 : 0] w_data_out;
 output [2:0] end_transaction ;
 output [2:0] is_urgent;
-output [2:0][token_width -1 :0]  bw;
+output [2:0][token_width -1 :0]  num_tokens;
+
+//logic
+output logic [2: 0][2:0] needy_level; 	//[num_of_channel:0][needy_num_of_bits] 
+wire [2 : 0] full; 						//[num_of_channel:0]
+wire [2 : 0] empty; 					//[num_of_channel:0]
 
 //router_contorl
 router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
@@ -76,10 +83,18 @@ router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
 	.start_transaction(start_transaction),
 	.end_transaction  (end_transaction  ),
 	.token_allocation (token_allocation ),
-	//.bw               (bw               ),
+	.num_tokens       (num_tokens       ),
 	.pop              (pop              ),
 	.full             (full             ),
-	.empty            (empty            )
+	.empty            (empty            ),
+	.mode			  (needy_level)
+);
+// needy
+needy #(.NUM_OF_CHANNEL(3), .token_width(token_width), .TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)) u_needy (
+	.token_allocation(token_allocation),
+	.full            (full            ),
+	.empty           (empty           ),
+	.needy           (needy_level           )
 );
 //----- AW ------
 patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
@@ -87,7 +102,7 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
 	.aresetn  (aresetn  ),
 	.data_in  (aw_data_channel ),
 	.ready_out(aw_ready_out),
-	.data_out (data_out ),
+	.data_out (aw_data_out ),
 	.ready_in (ready_in ),
 	.patch_out(patch_out),
 	.cfg      (cfg      ),
@@ -101,7 +116,7 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES),.BUS_TYPE(ar_b
 .aresetn  (aresetn  ),
 .data_in  (ar_data_channel),
 .ready_out(ar_ready_out),
-.data_out (data_out ),
+.data_out (ar_data_out ),
 .ready_in (ready_in ),
 .patch_out(patch_out),
 .cfg      (cfg      ),
@@ -116,7 +131,7 @@ patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_w(
 .aresetn  (aresetn  ),
 .data_in  (w_data_channel ),
 .ready_out(w_ready_out),
-.data_out (data_out ),
+.data_out (w_data_out ),
 .ready_in (ready_in ),
 .patch_out(patch_out)
 );

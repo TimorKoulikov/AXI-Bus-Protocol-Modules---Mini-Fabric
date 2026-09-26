@@ -16,9 +16,10 @@ module router_control #(
 	
 	// interface with arbiter_engine
 	input [NUM_OF_CHANNEL -1 : 0] start_transaction,
-	output logic [NUM_OF_CHANNEL -1 : 0] end_transaction,
 	input [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_allocation,
-	input [1:0] mode,
+	input [NUM_OF_CHANNEL -1 : 0][2:0] mode,
+	output logic [NUM_OF_CHANNEL -1 : 0] end_transaction,
+	output logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] num_tokens,
 	
 	// interface with rob
 	output logic [NUM_OF_CHANNEL -1 : 0] 					pop,
@@ -55,7 +56,7 @@ generate
 			.data_unload(token_for_transaction[i]),
 			.unload(pop[i]),
 			.count(curr_num_tokens[i]),
-			.mode(mode)
+			.mode(mode[i])
 			
 		);
 		
@@ -120,5 +121,10 @@ generate
 	end
 	
 endgenerate
+
+always_comb begin
+	num_tokens = curr_num_tokens;
+end
+	
 
 endmodule

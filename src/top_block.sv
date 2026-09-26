@@ -91,7 +91,7 @@ generate
 		r_bus  m_r;
 		
 		// 1. Pack AW channel (Interface -> Struct)
-		assign m_aw.awid    = masters[i].AWID;
+		assign m_aw.id    = masters[i].AWID;
 		assign m_aw.addr    = masters[i].AWADDR;
 		assign m_aw.awlen   = masters[i].AWLEN;
 		assign m_aw.awsize  = masters[i].AWSIZE;
@@ -103,7 +103,7 @@ generate
 		assign m_aw.valid   = masters[i].AWVALID;
 
 		// 2. Pack AR channel (Interface -> Struct)
-		assign m_ar.arid    = masters[i].ARID;
+		assign m_ar.id    = masters[i].ARID;
 		assign m_ar.addr    = masters[i].ARADDR;
 		assign m_ar.arlen   = masters[i].ARLEN;
 		assign m_ar.arsize  = masters[i].ARSIZE;
@@ -121,11 +121,11 @@ generate
 		assign m_w.valid    = masters[i].WVALID;
 
 		// 4. Unpack B & R channels (Struct -> Interface from arbiter_ms)
-		assign masters[i].BID    = m_b.bid;
+		assign masters[i].BID    = m_b.id;
 		assign masters[i].BRESP  = m_b.bresp;
 		assign masters[i].BVALID = m_b.valid;
 
-		assign masters[i].RID    = m_r.rid;
+		assign masters[i].RID    = m_r.id;
 		assign masters[i].RDATA  = m_r.rdata;
 		assign masters[i].RRESP  = m_r.rresp;
 		assign masters[i].RLAST  = m_r.rlast;

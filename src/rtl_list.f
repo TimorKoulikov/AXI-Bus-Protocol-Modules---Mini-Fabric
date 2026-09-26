@@ -18,6 +18,7 @@ src/main/token_counter.sv
 src/main/router_control.sv
 src/main/arbiter_rr.sv
 src/main/arbiter_engine.sv
+src/main/needy.sv
 
 // top block units
 src/main/arbiter_ms.sv

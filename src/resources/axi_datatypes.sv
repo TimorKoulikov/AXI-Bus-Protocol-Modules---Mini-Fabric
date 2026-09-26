@@ -106,5 +106,14 @@ class RAND_AXI #(type BUS_TYPE = aw_bus);
 	endfunction
 endclass
 
+//typedef for needy 
+typedef enum logic [1:0]
+{
+	NO_LEAK,
+	LEAK,
+	EXSTRA_BW,
+	LEAK_EXSTRA_BW
+	
+} mode_token_allocation;
 
 endpackage

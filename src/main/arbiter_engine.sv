@@ -20,9 +20,11 @@ module arbiter_engine #(
 	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] grant,
 	
 	//interface for token_allocation
+	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][1:0] needy_level,
 	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][token_width -1 : 0] num_of_tokens
 );
-
+// ----- imports -----
+import axi_datatypes::*;
 
 genvar i;
 genvar j;
@@ -44,7 +46,7 @@ generate
 		//generation token allocation for each channel
 			for(i=0;i< NUM_OF_MASTERS;i++) begin: gen_block_token_allocation_per_master
 				for(j=0;j<NUM_OF_CHANNEL;j++) begin: gen_block_token_allocation_per_channel
-					assign num_of_tokens[j][i]= 31'd1024;
+					assign num_of_tokens[j][i] = (needy_level[j][i] >= EXSTRA_BW) ? token_width'(2048) : token_width'(1024);
 				end
 			end
 		
