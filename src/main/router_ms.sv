@@ -75,6 +75,9 @@ output [2:0][token_width -1 :0]  num_tokens;
 output logic [2: 0][2:0] needy_level; 	//[num_of_channel:0][needy_num_of_bits] 
 wire [2 : 0] full; 						//[num_of_channel:0]
 wire [2 : 0] empty; 					//[num_of_channel:0]
+wire patch_t aw_patch_out;
+wire patch_t ar_patch_out;
+wire patch_t w_patch_out;
 
 //router_contorl
 router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
@@ -103,8 +106,8 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
 	.data_in  (aw_data_channel ),
 	.ready_out(aw_ready_out),
 	.data_out (aw_data_out ),
-	.ready_in (ready_in ),
-	.patch_out(patch_out),
+	.ready_in (aw_ready_in ),
+	.patch_out(aw_patch_out),
 	.cfg      (cfg      ),
 	.cfg_en   (cfg_en   )
 );
@@ -117,8 +120,8 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES),.BUS_TYPE(ar_b
 .data_in  (ar_data_channel),
 .ready_out(ar_ready_out),
 .data_out (ar_data_out ),
-.ready_in (ready_in ),
-.patch_out(patch_out),
+.ready_in (ar_ready_in ),
+.patch_out(ar_patch_out),
 .cfg      (cfg      ),
 .cfg_en   (cfg_en   )
 );
@@ -132,8 +135,8 @@ patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_w(
 .data_in  (w_data_channel ),
 .ready_out(w_ready_out),
 .data_out (w_data_out ),
-.ready_in (ready_in ),
-.patch_out(patch_out)
+.ready_in (w_ready_in ),
+.patch_out(w_patch_out)
 );
 
 // rob #() rob_w

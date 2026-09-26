@@ -10,7 +10,7 @@ module router_control_test ();
 
 //----- parameter
 parameter NUM_OF_CHANNEL=3;
-
+parameter NUM_OF_MODES = 3;
 localparam token_width = 31;
 //-----inputs-----
 logic aclk;
@@ -18,15 +18,16 @@ logic aresetn;
 logic [NUM_OF_CHANNEL -1 : 0] start_transaction;
 logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_allocation;
 logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_for_transaction;
-logic [NUM_OF_CHANNEL -1 : 0] ready_for_transaction;
+logic [NUM_OF_CHANNEL -1 : 0] token_enable;
 
 //----- inputs from ROB
 logic [NUM_OF_CHANNEL -1 : 0] empty;
 logic [NUM_OF_CHANNEL -1 : 0] full;
-logic [1:0] mode;
+logic [NUM_OF_CHANNEL -1 : 0][2:0] mode;
 //-----output-----
 logic [NUM_OF_CHANNEL -1 : 0] end_transaction;
 logic [NUM_OF_CHANNEL -1 : 0] pop;
+logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] num_tokens;
 
 router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 (
@@ -39,9 +40,10 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 	.full(full),
 	.empty(empty),
 	.token_for_transaction(token_for_transaction),
-	.ready_for_transaction(ready_for_transaction),
-	.mode(mode)
-	);
+	.token_enable(token_enable),
+	.mode(mode),
+	.num_tokens(num_tokens)
+);
 
 
 
@@ -60,7 +62,7 @@ begin
 		token_allocation='0;
 		empty='0;
 		full='0;
-		mode=2'b0;
+		mode[i]=2'b0;
 		#10
 		aresetn=1'b1;
 		//----------------------------------------------------
@@ -108,7 +110,7 @@ begin
 			token_for_transaction[i] = tokens / 3;
 			$display("token_for_transaction =%d",token_for_transaction[i]);
 			#10;
-			ready_for_transaction[i]=1'b1;
+			token_enable[i]=1'b1;
 			#10;
 			assert(router_control_uut.curr_num_tokens[i] == tokens - token_for_transaction[i]) begin
 				$display("test_3: PASS [1/2]");
@@ -131,7 +133,7 @@ begin
 					break;
 			end
 			old_tokens = router_control_uut.curr_num_tokens[i];
-			ready_for_transaction[i]=1'b0;
+			token_enable[i]=1'b0;
 			start_transaction[i]=1'b1;
 			tokens = $urandom();
 			token_allocation[i] = tokens;

@@ -236,7 +236,7 @@ generate
 		r_bus  s_r;
 
 		// 1. Unpack AW channel (Struct from arbiter_sl -> Slave Interface)
-		assign slaves[j].AWID    = s_aw.awid;
+		assign slaves[j].AWID    = s_aw.id;
 		assign slaves[j].AWADDR  = s_aw.addr;
 		assign slaves[j].AWLEN   = s_aw.awlen;
 		assign slaves[j].AWSIZE  = s_aw.awsize;
@@ -248,7 +248,7 @@ generate
 		assign slaves[j].AWVALID = s_aw.valid;
 
 		// 2. Unpack AR channel (Struct from arbiter_sl -> Slave Interface)
-		assign slaves[j].ARID    = s_ar.arid;
+		assign slaves[j].ARID    = s_ar.id;
 		assign slaves[j].ARADDR  = s_ar.addr;
 		assign slaves[j].ARLEN   = s_ar.arlen;
 		assign slaves[j].ARSIZE  = s_ar.arsize;
