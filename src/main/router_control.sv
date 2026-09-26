@@ -21,16 +21,16 @@ module router_control #(
 	input [1:0] mode,
 	
 	// interface with rob
-	output logic [NUM_OF_CHANNEL -1 : 0] pop,
-	input logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0] token_for_transaction,
-	input logic [NUM_OF_CHANNEL -1 : 0] ready_for_transaction,
-	input [NUM_OF_CHANNEL -1 : 0] full,
-	input [NUM_OF_CHANNEL -1 : 0] empty
+	output logic [NUM_OF_CHANNEL -1 : 0] 					pop,
+	input  logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0] token_for_transaction,
+	input  logic [NUM_OF_CHANNEL -1 : 0] 					token_enable,
+	input  logic [NUM_OF_CHANNEL -1 : 0] 					full,
+	input  logic [NUM_OF_CHANNEL -1 : 0] 					empty
 );
 //-----logic-----
-logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] curr_num_tokens;
-logic [NUM_OF_CHANNEL -1 : 0] stop_transaction;
-logic [NUM_OF_CHANNEL - 1 : 0 ] insert_tokens;
+logic [NUM_OF_CHANNEL -1 : 0][token_width -1 : 0] curr_num_tokens;
+logic [NUM_OF_CHANNEL -1 : 0]                     stop_transaction;
+logic [NUM_OF_CHANNEL -1 : 0]                     insert_tokens;
 
 typedef enum logic [1:0] {
 	IDLE,
@@ -76,7 +76,7 @@ generate
 				TRANSACTION_POP_TOKENS: begin	
 					if( curr_num_tokens[i] < token_for_transaction[i]) begin
 						stop_transaction[i]=1'b1;
-					end else if(ready_for_transaction[i]) begin
+					end else if(token_enable[i]) begin
 						pop[i]=1'b1;
 					end
 				end
