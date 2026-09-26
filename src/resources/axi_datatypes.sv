@@ -18,7 +18,7 @@ localparam MAX_LEN = 1024;
 typedef struct packed{
 	logic 			         valid;
 	logic 					 ready;
-	logic [ID_WIDTH-1:0]     arid;
+	logic [ID_WIDTH-1:0]     id;
 	logic [ADDR_WIDTH-1:0]   addr;
 	logic [7:0]              arlen;
 	logic [2:0]              arsize;
@@ -32,7 +32,7 @@ typedef struct packed{
 typedef struct packed{
 	logic 			         valid;
 	logic 					 ready;
-	logic [ID_WIDTH-1:0]     rid;
+	logic [ID_WIDTH-1:0]     id;     
 	logic [DATA_WIDTH-1:0]   rdata;
 	logic [1:0]              rresp;
 	logic                    rlast;
@@ -41,7 +41,7 @@ typedef struct packed{
 typedef struct packed {
 	logic 			         valid;
 	logic 					 ready;
-	logic [ID_WIDTH-1:0]     awid;
+	logic [ID_WIDTH-1:0]     id;
 	logic [ADDR_WIDTH-1:0]   addr;
 	logic [7:0]              awlen;
 	logic [2:0]              awsize;
@@ -61,9 +61,9 @@ typedef struct packed{
 } w_bus;
 
 typedef struct packed {
-	logic valid;
-	logic ready;
-	logic [ID_WIDTH-1:0]     bid;
+	logic                    valid;
+	logic                    ready;
+	logic [ID_WIDTH-1:0]     id;
 	logic [1:0]              bresp; // for slave --> master, to show by the end the status (00==okay)
 } b_bus;
 
