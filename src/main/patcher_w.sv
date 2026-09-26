@@ -22,7 +22,7 @@ module patcher_w (
 		
 	ready_out,   // ready signal sent to master (ready for data_in)
 	data_out,    // outgoing AXI bus payload (including the valid bit) sent downstream to the ROB
-	patch_out,   // routing tag(patch_t) sent downstream to the ROB
+	patch_out   // routing tag(patch_t) sent downstream to the ROB
 );
 
 //----- imports -----

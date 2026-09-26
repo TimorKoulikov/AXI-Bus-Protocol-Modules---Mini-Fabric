@@ -24,7 +24,6 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	// ======================================================
 	// Write Data Channel
 	// ======================================================
-	logic [ID_WIDTH -1 : 0]     WID;
 	logic [DATA_WIDTH-1:0] 		WDATA;
 	logic [(DATA_WIDTH/8)-1:0] 	WSTRB;
 	logic                  		WLAST;
@@ -69,12 +68,12 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	// ======================================================
 
 	// APB2AXI DUT drives: *READY*, *RDATA*, *BRESP*, etc.
-	modport slave_if (
+	modport master_if (
 		input  ACLK, ARESETn,
 		input  AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWLOCK, AWCACHE, AWPROT, AWQOS,
 		output AWREADY,
 
-		input  WDATA, WSTRB, WLAST, WVALID,WID,
+		input  WDATA, WSTRB, WLAST, WVALID,
 		output WREADY,
 
 		output BRESP, BID, BVALID,
@@ -88,12 +87,12 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	);
 
 	// UVM driver drives VALID signals, DUT responds READY
-	modport master_if (
+	modport slave_if (
 		input  ACLK, ARESETn,
 		output AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWLOCK, AWCACHE, AWPROT, AWQOS,
 		input  AWREADY,
 
-		output WDATA, WSTRB, WLAST, WVALID,WID,
+		output WDATA, WSTRB, WLAST, WVALID,
 		input  WREADY,
 
 		input  BRESP, BID, BVALID,

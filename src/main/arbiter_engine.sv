@@ -8,7 +8,8 @@
 
 module arbiter_engine #(
 	parameter NUM_OF_MASTERS = 4,
-	localparam NUM_OF_CHANNEL = 5
+	parameter NUM_OF_CHANNEL = 5,
+	parameter token_width = 30 
 ) 
 (
 	input aclk,
@@ -19,7 +20,7 @@ module arbiter_engine #(
 	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] grant,
 	
 	//interface for token_allocation
-	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][31:0] num_of_tokens
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][token_width -1 : 0] num_of_tokens
 );
 
 

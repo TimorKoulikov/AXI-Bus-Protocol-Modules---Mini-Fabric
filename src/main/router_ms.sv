@@ -1,37 +1,49 @@
 /*------------------------------------------------------------------------------
  top block of rounter_ms
- 
- TODO: after patcher_w and rob is implemented we can finish the router
  *------------------------------------------------------------------------------*/
 
-module router_ms(
-aclk,				//axi clk
-aresetn,			//axi resetn
-aw_data_channel,	//axi aw data channel
-aw_ready_out,		//axi awready signal to master
-ar_ready_out,		//axi arready signal to master
-w_ready_out,		//axi wready signal to master
-ar_data_channel,	//axi ar data channel
-w_data_channel,		//axi w data channel
-cfg,				//cfg to patcher_ax
-cfg_en,				//cfg enable signal
-start_transaction,
-end_transaction,
-token_allocation,
-bw,
-is_urgent,
-aw_data_out,		//aw data channel to slave_arbiter
-ar_data_out,		//ar data channel to slave_arbiter
-w_data_out			//w data channel to slave_arbiter
+
+module router_ms#(
+	parameter master_id=0,
+	parameter NUM_OF_SLAVES=3,
+	parameter token_width=30
+)
+(
+	aclk,				//axi clk
+	aresetn,			//axi resetn
+	
+	// AW channel
+	aw_data_channel,	//axi aw data channel
+	aw_ready_out,		//axi awready signal to master
+	aw_data_out,		//aw data channel to slave_arbiter
+	aw_ready_in,		//aw ready to slave		
+	
+	// AR channel
+	ar_data_channel,	//axi ar data channel
+	ar_ready_out,		//axi arready signal to master
+	ar_data_out,		//ar data channel to slave_arbiter
+	ar_ready_in,		//ar ready to slave	
+	
+	// W channel
+	w_data_channel,		//axi w data channel
+	w_ready_out,		//axi wready signal to master
+	w_data_out,			//w data channel to slave_arbiter
+	w_ready_in,			//w ready to slave	
+
+	// from arbiter_engine
+	cfg,				//cfg to patcher_ax
+	cfg_en,				//cfg enable signal
+	start_transaction,
+	end_transaction,
+	token_allocation,
+	bw,
+	is_urgent
 );
 
 //-----imports-----
 import axi_datatypes::*;
 import fabric_datatypes::*;
-//----- parameters-----
-parameter master_id=0;
-parameter NUM_OF_SLAVES=3;
-parameter token_width=30;
+
 //-----inputs-----
 input aclk;
 input aresetn;
@@ -42,6 +54,9 @@ input cfg_t cfg;
 input cfg_en;
 input [2:0] start_transaction;
 input [2 : 0][token_width -1 :0] token_allocation;
+input aw_ready_in;
+input ar_ready_in;
+input w_ready_in;
 
 //-----outputs-----
 output aw_ready_out;
@@ -61,14 +76,10 @@ router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
 	.start_transaction(start_transaction),
 	.end_transaction  (end_transaction  ),
 	.token_allocation (token_allocation ),
-	.bw               (bw               ),
-	.push             (push             ),
+	//.bw               (bw               ),
 	.pop              (pop              ),
-	.is_urgent_in     (is_urgent_in     ),
 	.full             (full             ),
-	.empty            (empty            ),
-	.is_stream        (is_stream        ),
-	.is_urgent_out    (is_urgent_out    )
+	.empty            (empty            )
 );
 //----- AW ------
 patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
@@ -102,7 +113,7 @@ patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES),.BUS_TYPE(ar_b
 
 patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_w(
 .aclk     (aclk     ),
-.aresetn  (aresetn  ),
+.arstn  (aresetn  ),
 .data_in  (w_data_channel ),
 .ready_out(w_ready_out),
 .data_out (data_out ),
