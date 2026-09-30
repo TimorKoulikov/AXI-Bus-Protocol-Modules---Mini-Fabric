@@ -13,7 +13,7 @@ import fabric_datatypes::*;
 //----- parameters -----
 parameter master_id = 0;
 parameter NUM_OF_SLAVES = 3;
-parameter QUEUE_DEPTH = 16;
+parameter QUEUE_DEPTH = MAX_OUTSTANDING;
 
 //----- signals -----
 logic aclk;

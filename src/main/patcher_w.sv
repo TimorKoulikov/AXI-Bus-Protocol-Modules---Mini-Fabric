@@ -33,7 +33,7 @@ import fabric_datatypes::*;
 //----- parameters -----
 parameter master_id = 0;
 parameter NUM_OF_SLAVES = 3;
-parameter QUEUE_DEPTH = 16;                	// outstanding size
+parameter QUEUE_DEPTH = MAX_OUTSTANDING;
 localparam PTR_WIDTH = $clog2(QUEUE_DEPTH);		   
 
 //----- Input Ports-----

@@ -15,6 +15,8 @@ localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
 
 localparam MAX_LEN = 256;
 localparam LEN_WIDTH = $clog2(MAX_LEN);
+localparam MAX_OUTSTANDING = 16; // maximum number of outstanding transactions (for each channel)
+
 typedef struct packed{
 	logic 			         valid;
 	logic 					 ready;
