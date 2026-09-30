@@ -21,6 +21,7 @@ module rob #(
     parameter CYCLES_S_TO_U = 3,
     parameter TOKEN_WIDTH = 4
 )(
+
     input  logic    aclk,
     input  logic    arstn,
     // --- Ingress (push) ---
@@ -38,7 +39,6 @@ module rob #(
     // --- Token Tracking (to Router Control) ---
     output logic    token_enable,
     output logic [TOKEN_WIDTH-1:0] tokens_used,  // Number of tokens used by the popped transaction
-
     // --- Status Flags (to Control Modules) ---
     output logic    is_empty_out,
     output logic    is_full_out,
