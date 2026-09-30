@@ -11,13 +11,13 @@ module router_control_test ();
 //----- parameter
 parameter NUM_OF_CHANNEL=3;
 parameter NUM_OF_MODES = 3;
-localparam token_width = 31;
+localparam TOKEN_WIDTH = 32;
 //-----inputs-----
 logic aclk;
 logic aresetn;
 logic [NUM_OF_CHANNEL -1 : 0] start_transaction;
-logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_allocation;
-logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_for_transaction;
+logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0]  token_allocation;
+logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0]  token_for_transaction;
 logic [NUM_OF_CHANNEL -1 : 0] token_enable;
 
 //----- inputs from ROB
@@ -26,8 +26,8 @@ logic [NUM_OF_CHANNEL -1 : 0] full;
 logic [NUM_OF_CHANNEL -1 : 0][2:0] mode;
 //-----output-----
 logic [NUM_OF_CHANNEL -1 : 0] end_transaction;
-logic [NUM_OF_CHANNEL -1 : 0] pop;
-logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] num_tokens;
+logic [NUM_OF_CHANNEL -1 : 0] pop_enable;
+logic [NUM_OF_CHANNEL - 1:0][TOKEN_WIDTH -1 : 0] num_tokens;
 
 router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 (
@@ -36,7 +36,7 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
 	.start_transaction(start_transaction),
 	.end_transaction(end_transaction),
 	.token_allocation(token_allocation),
-	.pop(pop),
+	.pop_enable(pop_enable),
 	.full(full),
 	.empty(empty),
 	.token_for_transaction(token_for_transaction),
