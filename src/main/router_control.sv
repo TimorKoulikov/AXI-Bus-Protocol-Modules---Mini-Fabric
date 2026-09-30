@@ -8,7 +8,7 @@
 
 module router_control #(
 	parameter NUM_OF_CHANNEL=3,
-	parameter token_width = 32
+	parameter token_width = 31
 )
 (
 	input aclk,

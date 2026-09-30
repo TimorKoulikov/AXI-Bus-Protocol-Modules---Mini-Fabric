@@ -29,7 +29,7 @@ logic [NUM_OF_CHANNEL -1 : 0] end_transaction;
 logic [NUM_OF_CHANNEL -1 : 0] pop;
 logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] num_tokens;
 
-router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL)) router_control_uut
+router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL), .token_width(token_width)) router_control_uut
 (
 	.aclk(aclk),
 	.aresetn(aresetn),
