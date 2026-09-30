@@ -46,7 +46,7 @@ genvar i;
 generate 
 	
 	for	(i=0;i<NUM_OF_CHANNEL;i++) begin : gen_block	
-		token_counter  #(.token_width(TOKEN_WIDTH))
+		token_counter  #(.TOKEN_WIDTH(TOKEN_WIDTH))
 		u_token_counter 
 		(
 			.aclk(aclk),
@@ -60,7 +60,7 @@ generate
 			
 		);
 		
-		//BW contorl		
+		//BW control		
 		always_comb begin
 			pop_enable[i] = 1'b0;
 			insert_tokens[i]=1'b0;

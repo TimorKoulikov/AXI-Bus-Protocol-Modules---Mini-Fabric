@@ -1,6 +1,6 @@
 /*-----------------------------------------------------------------------------------------
  * module: patcher_w
- * description: 
+ * Description: 
  *   Appends routing metadata (target_slave, QoS) to incoming W-channel data bursts.
  *   
  *   To support high-throughput routing, data beats are NOT stored or delayed. 
@@ -14,7 +14,7 @@
 
 module patcher_w (
 	aclk,        // axi global clock signal
-	aresetn,       // global reset signal, active low
+	aresetn,     // global reset signal, active low
 	data_in,     // AXI W bus that comes from axi component
 	ready_in,    // ready signal the patcher receives from the downstream ROB (for data_out)
 	patch_in,    // Routing tag coming from patcher_aw
@@ -22,7 +22,7 @@ module patcher_w (
 		
 	ready_out,   // ready signal sent to master (ready for data_in)
 	data_out,    // outgoing AXI bus payload (including the valid bit) sent downstream to the ROB
-	patch_out   // routing tag(patch_t) sent downstream to the ROB
+	patch_out    // routing tag(patch_t) sent downstream to the ROB
 );
 
 //----- imports -----

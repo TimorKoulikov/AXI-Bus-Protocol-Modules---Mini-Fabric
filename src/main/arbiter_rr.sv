@@ -3,7 +3,7 @@
  * Project       : Fabric
  * Author        : epagtk
  * Creation date : Mar 28, 2026
- * Description   :
+ * Description   : This is the RR module that arbiter engine uses
  *------------------------------------------------------------------------------*/
 
 module arbiter_rr #(

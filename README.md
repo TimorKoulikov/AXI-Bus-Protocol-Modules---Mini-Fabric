@@ -30,13 +30,20 @@ Go to https://github.com/nirmiller31/Project_A_apb2axi for his AXI project and h
 
 ## Progress
 
-| Module         | Design | Verification | 
-|----------------|--------|--------------|
-| ROB            |  alex  |     alex     | 
-| receiver       |  DONE  |     DONE     |
-| transmitter    |  DONE  |     DONE     | 
-| patcher_ax     |  DONE  |     DONE     |
-| patcher_w      |  DONE  |     DONE     |
-| router_control |  DONE  |     DONE     | 
-| arbiter_engine |  DONE  |     DONE     |
-| router_ms      |  WIP   |     WIP      |
+| Module          | Design | Verification | 
+|-----------------|--------|--------------|
+| arbiter_control |not need|      -       |
+| arbiter_engine  |   V    |      V       | 
+| arbiter_ms      |   X    |      -       | 
+| arbiter_rr      |   V    |      V       | 
+| arbiter_sl      |  WIP   |      -       | 
+| needy           |   V    |      V       | 
+| patcher_ax      |   V    |      V       |
+| patcher_w       |   V    |      V       |
+| rob             |   V    |      V       | 
+| router_control  |   V    |      V       | 
+| router_ms       |  WIP   |      -       |
+| router_sl       |  WIP   |      -       |
+| token_counter   |   V    |      -       |
+
+

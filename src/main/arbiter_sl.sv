@@ -115,7 +115,7 @@ assign w_data_in_sel  = w_data_in[grant[2]];
 assign w_ready_in_sel = w_ready_in[grant[2]];
 
 //ROB
-rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_w_rob (
+rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(MAX_OUTSTANDING*MAX_LEN), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_w_rob (
 	.aclk       (aclk          ),
 	.arstn      (aresetn       ),
 	.data_in    (w_data_in_sel ),

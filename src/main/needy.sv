@@ -9,12 +9,12 @@
 
 module needy #(
 	parameter NUM_OF_CHANNEL = 3,
-	parameter token_width = 31,
-	parameter [token_width -1 : 0] TOKEN_LOW_THRESHOLD = 8
+	parameter TOKEN_WIDTH = 31,
+	parameter [TOKEN_WIDTH -1 : 0] TOKEN_LOW_THRESHOLD = 8
 )
 (
 	// interface with router_control
-	input [NUM_OF_CHANNEL -1 : 0][token_width -1 : 0] token_allocation,
+	input [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 : 0] token_allocation,
 
 	// interface with rob
 	input [NUM_OF_CHANNEL -1 : 0] full,

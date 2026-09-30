@@ -1,4 +1,4 @@
-//testbench for axi_buffer
+
 module patcher_ax_test;
 
 //-----imports-----

@@ -5,8 +5,8 @@ top block of router_sl
 module router_sl #(
 	parameter slave_id       = 0,
 	parameter NUM_OF_MASTERS = 4,
-	parameter token_width    = 31,
-	parameter [token_width -1 : 0] TOKEN_LOW_THRESHOLD = 8,
+	parameter TOKEN_WIDTH    = 31,
+	parameter [TOKEN_WIDTH -1 : 0] TOKEN_LOW_THRESHOLD = 8,
 	parameter QUEUE_DEPTH    = 16,
 	parameter CYCLES_S_TO_U  = 3,
 	
@@ -59,7 +59,7 @@ input [NUM_OF_MASTERS - 1 : 0] r_ready_in;
 input cfg_t cfg;
 input cfg_en;
 input [1:0] start_transaction;
-input [1:0][token_width - 1 : 0] token_allocation;
+input [1:0][TOKEN_WIDTH - 1 : 0] token_allocation;
 input [1:0][2:0] mode;
 
 //-----outputs-----
@@ -71,16 +71,16 @@ output r_bus [NUM_OF_MASTERS - 1 : 0] r_data_out;
 
 output [1:0] end_transaction;
 output [1:0] is_urgent;
-output [1:0][token_width - 1 : 0] num_tokens;
+output [1:0][TOKEN_WIDTH - 1 : 0] num_tokens;
 output logic [1:0][1:0] needy_level; 
 
 //-----logic-----
 // router <-> ROB wires
 wire [NUM_OF_CHANNEL -1 : 0] full; 						
 wire [NUM_OF_CHANNEL -1 : 0] empty; 					
-wire [NUM_OF_CHANNEL -1 : 0] pop;
+wire [NUM_OF_CHANNEL -1 : 0] pop_enable;
 logic [NUM_OF_CHANNEL -1 : 0] token_enable;
-logic [NUM_OF_CHANNEL -1 : 0][token_width -1 : 0] token_for_transaction;
+logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 : 0] token_for_transaction;
 
 // input -> ROB
 patch_t r_patch_in;
@@ -97,7 +97,7 @@ patch_t r_rob_patch_out;
 //router_control
 router_control #(
 	.NUM_OF_CHANNEL(NUM_OF_CHANNEL),
-	.token_width   (token_width   )
+	.TOKEN_WIDTH   (TOKEN_WIDTH   )
 ) u_router_control (
 	.aclk                 (aclk                 ),
 	.aresetn              (aresetn              ),
@@ -105,7 +105,7 @@ router_control #(
 	.end_transaction      (end_transaction      ),
 	.token_allocation     (token_allocation     ),
 	.num_tokens           (num_tokens           ),
-	.pop                  (pop                  ),
+	.pop_enable           (pop_enable           ),
 	.token_for_transaction(token_for_transaction),
 	.token_enable         (token_enable         ),
 	.full                 (full                 ),
@@ -116,7 +116,7 @@ router_control #(
 // needy
 needy #(
 	.NUM_OF_CHANNEL     (NUM_OF_CHANNEL     ), 
-	.token_width        (token_width        ), 
+	.TOKEN_WIDTH        (TOKEN_WIDTH        ), 
 	.TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)
 ) u_needy (
 	.token_allocation(token_allocation),
@@ -142,9 +142,9 @@ rob #(
 	.ready_out  (b_rob_ready_out    ), 
 	.data_out   (b_rob_data_out     ), 
 	.patch_out  (b_rob_patch_out    ),
-	.pop        (pop[0]             ),
-	.empty_out  (empty[0]           ),
-	.full_out   (full[0]            ),
+	.pop_enable (pop_enable[0]      ),
+	.is_empty_out  (empty[0]        ),
+	.is_full_out   (full[0]         ),
 	.got_urgent (is_urgent[0]       )
 );
 
@@ -169,18 +169,18 @@ rob #(
 	.QUEUE_DEPTH  (QUEUE_DEPTH  ),
 	.CYCLES_S_TO_U(CYCLES_S_TO_U)
 ) u_r_rob (
-	.aclk       (aclk               ),
-	.arstn      (aresetn            ),
-	.data_in    (r_data_channel ),
-	.patch_in   (r_patch_in),
-	.push_enable(1'b1               ), 
-	.ready_out  (r_rob_ready_out    ), 
-	.data_out   (r_rob_data_out     ), 
-	.patch_out  (r_rob_patch_out    ),
-	.pop        (pop[1]             ),
-	.empty_out  (empty[1]           ),
-	.full_out   (full[1]            ),
-	.got_urgent (is_urgent[1]       )
+	.aclk        (aclk               ),
+	.arstn       (aresetn            ),
+	.data_in     (r_data_channel ),
+	.patch_in    (r_patch_in),
+	.push_enable (1'b1               ), 
+	.ready_out   (r_rob_ready_out    ), 
+	.data_out    (r_rob_data_out     ), 
+	.patch_out   (r_rob_patch_out    ),
+	.pop_enable  (pop_enable[1]      ),
+	.is_empty_out(empty[1]        ),
+	.is_full_out (full[1]         ),
+	.got_urgent  (is_urgent[1]       )
 );
 
 // Dispatcher: rob -> mux -> output

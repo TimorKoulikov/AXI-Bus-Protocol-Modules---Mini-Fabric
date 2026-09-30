@@ -8,11 +8,11 @@ module needy_test ();
 
 	//----- parameters -----
 	parameter NUM_OF_CHANNEL = 3;
-	parameter token_width = 31;
-	parameter [token_width - 1 : 0] TOKEN_LOW_THRESHOLD = 8;
+	parameter TOKEN_WIDTH = 31;
+	parameter [TOKEN_WIDTH - 1 : 0] TOKEN_LOW_THRESHOLD = 8;
 
 	//----- inputs -----
-	logic [NUM_OF_CHANNEL - 1 : 0][token_width - 1 : 0] token_allocation;
+	logic [NUM_OF_CHANNEL - 1 : 0][TOKEN_WIDTH - 1 : 0] token_allocation;
 	logic [NUM_OF_CHANNEL - 1 : 0] full;
 	logic [NUM_OF_CHANNEL - 1 : 0] empty;
 
@@ -22,7 +22,7 @@ module needy_test ();
 	//----- DUT instantiation -----
 	needy #(
 		.NUM_OF_CHANNEL(NUM_OF_CHANNEL),
-		.token_width(token_width),
+		.TOKEN_WIDTH(TOKEN_WIDTH),
 		.TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)
 	) needy_uut (
 		.token_allocation(token_allocation),

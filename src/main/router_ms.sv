@@ -6,11 +6,10 @@ top block of rounter_ms
 module router_ms#(
 	parameter master_id=0,
 	parameter NUM_OF_SLAVES=3,
-	parameter token_width=30,
-	parameter [token_width -1 : 0] TOKEN_LOW_THRESHOLD = 8,
-	parameter QUEUE_DEPTH = 16,
+	parameter TOKEN_WIDTH=30,
+	parameter [TOKEN_WIDTH -1 : 0] TOKEN_LOW_THRESHOLD = 8,
+	parameter QUEUE_DEPTH = MAX_OUTSTANDING,
 	parameter CYCLES_S_TO_U =3,
-	
 	localparam NUM_OF_CHANNEL=3
 )
 (
@@ -66,7 +65,7 @@ input w_ready_in;
 input cfg_t cfg;
 input cfg_en;
 input [2:0] start_transaction;
-input [2 : 0][token_width -1 :0] token_allocation;
+input [2 : 0][TOKEN_WIDTH -1 :0] token_allocation;
 input [NUM_OF_CHANNEL -1 : 0][2:0] mode;
 
 //-----outputs-----
@@ -80,14 +79,14 @@ output w_bus  [NUM_OF_SLAVES -1 : 0] w_data_out;
 
 output [NUM_OF_CHANNEL -1 : 0] end_transaction ;
 output [NUM_OF_CHANNEL -1 : 0] is_urgent;
-output [NUM_OF_CHANNEL -1 :0][token_width -1 : 0] num_tokens;
+output [NUM_OF_CHANNEL -1 :0][TOKEN_WIDTH -1 : 0] num_tokens;
 output [NUM_OF_CHANNEL -1 : 0][2:0] needy_level; 	//[num_of_channel:0][needy_num_of_bits] 
 
 //-----logic-----
 // router <-> ROB wires
 wire [NUM_OF_CHANNEL -1 : 0] full; 						
 wire [NUM_OF_CHANNEL -1 : 0] empty; 					
-wire [NUM_OF_CHANNEL -1 : 0] pop;
+wire [NUM_OF_CHANNEL -1 : 0] pop_enable;
 
 // patcher -> ROB wires
 wire aw_bus  aw_patcher_data_out;
@@ -128,7 +127,7 @@ router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
 );
 
 // needy
-needy #(.NUM_OF_CHANNEL(3), .token_width(token_width), .TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)) u_needy (
+needy #(.NUM_OF_CHANNEL(3), .TOKEN_WIDTH(TOKEN_WIDTH), .TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)) u_needy (
 	.token_allocation(token_allocation),
 	.full            (full            ),
 	.empty           (empty           ),
@@ -138,7 +137,7 @@ needy #(.NUM_OF_CHANNEL(3), .token_width(token_width), .TOKEN_LOW_THRESHOLD(TOKE
 //----- AW ------
 
 // input -> patcher
-patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
+patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) patcher_aw(
 	.aclk     (aclk                ),
 	.aresetn  (aresetn             ),
 	.data_in  (aw_data_channel     ),
@@ -152,18 +151,18 @@ patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLA
 
 // patcher -> rob
 rob #(.BUS_TYPE(aw_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_aw_rob (
-	.aclk       (aclk                ),
-	.arstn      (aresetn             ),
-	.data_in    (aw_patcher_data_out ),
-	.patch_in   (aw_patcher_patch_out),
-	.push_enable(push_enable         ), // ?
-	.ready_out  (aw_rob_ready_out    ), 
-	.data_out   (aw_rob_data_out     ), 
-	.patch_out  (aw_rob_patch_out    ),
-	.pop_enable        (pop[0]              ),
-	.is_empty_out  (empty[0]            ),
-	.is_full_out   (full[0]             ),
-	.got_urgent (is_urgent[0]        )
+	.aclk        (aclk                ),
+	.arstn       (aresetn             ),
+	.data_in     (aw_patcher_data_out ),
+	.patch_in    (aw_patcher_patch_out),
+	.push_enable (push_enable         ), // ?
+	.ready_out   (aw_rob_ready_out    ), 
+	.data_out    (aw_rob_data_out     ), 
+	.patch_out   (aw_rob_patch_out    ),
+	.pop_enable  (pop_enable[0]              ),
+	.is_empty_out(empty[0]            ),
+	.is_full_out (full[0]             ),
+	.got_urgent  (is_urgent[0]        )
 );
 
 // rob -> mux -> output
@@ -179,7 +178,7 @@ end
 //----- AR -----
 
 // input -> patcher
-patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_ar(
+patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) patcher_ar(
 	.aclk     (aclk                ),
 	.aresetn  (aresetn             ),
 	.data_in  (ar_data_channel     ),
@@ -193,18 +192,18 @@ patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLA
 
 // patcher -> rob
 rob #(.BUS_TYPE(ar_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_ar_rob (
-	.aclk       (aclk                ),
-	.arstn      (aresetn             ),
-	.data_in    (ar_patcher_data_out ),
-	.patch_in   (ar_patcher_patch_out),
-	.push_enable(push_enable         ), // ?
-	.ready_out  (ar_rob_ready_out    ), 
-	.data_out   (ar_rob_data_out     ), 
-	.patch_out  (ar_rob_patch_out    ),
-	.pop_enable        (pop[1]              ),
-	.is_empty_out  (empty[1]            ),
-	.is_full_out   (full[1]             ),
-	.got_urgent (is_urgent[1]        )
+	.aclk        (aclk                ),
+	.arstn       (aresetn             ),
+	.data_in     (ar_patcher_data_out ),
+	.patch_in    (ar_patcher_patch_out),
+	.push_enable (push_enable         ), // ?
+	.ready_out   (ar_rob_ready_out    ), 
+	.data_out    (ar_rob_data_out     ), 
+	.patch_out   (ar_rob_patch_out    ),
+	.pop_enable  (pop_enable[1]              ),
+	.is_empty_out(empty[1]            ),
+	.is_full_out (full[1]             ),
+	.got_urgent  (is_urgent[1]        )
 );
 
 // rob -> mux -> output
@@ -220,7 +219,7 @@ end
 //----- W -----
 
 // input -> patcher
-patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(QUEUE_DEPTH)) pathcer_w(
+patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(MAX_OUTSTANDING*MAX_LEN)) patcher_w(
 	.aclk       (aclk                       ),
 	.aresetn    (aresetn                    ),
 	.data_in    (w_data_channel             ),
@@ -234,18 +233,18 @@ patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(Q
 
 // patcher -> rob
 rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_w_rob (
-	.aclk       (aclk               ),
-	.arstn      (aresetn            ),
-	.data_in    (w_patcher_data_out ),
-	.patch_in   (w_patcher_patch_out),
-	.push_enable(push_enable        ), // ?
-	.ready_out  (w_rob_ready_out    ), 
-	.data_out   (w_rob_data_out     ), 
-	.patch_out  (w_rob_patch_out    ),
-	.pop_enable        (pop[2]             ),
-	.is_empty_out  (empty[2]           ),
-	.is_full_out   (full[2]            ),
-	.got_urgent (is_urgent[2]       )
+	.aclk        (aclk               ),
+	.arstn       (aresetn            ),
+	.data_in     (w_patcher_data_out ),
+	.patch_in    (w_patcher_patch_out),
+	.push_enable (push_enable        ), // ?
+	.ready_out   (w_rob_ready_out    ), 
+	.data_out    (w_rob_data_out     ), 
+	.patch_out   (w_rob_patch_out    ),
+	.pop_enable  (pop_enable[2]             ),
+	.is_empty_out(empty[2]           ),
+	.is_full_out (full[2]            ),
+	.got_urgent  (is_urgent[2]       )
 );
 
 // rob -> mux -> output

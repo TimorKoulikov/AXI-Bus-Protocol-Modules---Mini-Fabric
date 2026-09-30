@@ -12,7 +12,6 @@
 // is only a waveform
 src/test/arbiter_rr_test.sv 
 /* arbiter_sl test*/
-src/test/axi_buffer_test.sv
 /* leacky_bucket_test  -   do we need it???*/ 
 src/test/needy_test.sv
 src/test/patcher_ax_test.sv

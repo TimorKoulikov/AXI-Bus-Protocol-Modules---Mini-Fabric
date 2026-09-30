@@ -13,7 +13,7 @@ import fabric_datatypes::*;
 module top_block #(
 	parameter NUM_OF_MASTERS = 3,
 	parameter NUM_OF_SLAVES  = 4,
-	parameter token_width    = 30
+	parameter TOKEN_WIDTH    = 30
 )
 (
 	input aclk,                             //axi clk
@@ -85,7 +85,7 @@ end
 logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_is_urgent_eng;
 logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_end_transaction_eng;
 logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_grant_eng;
-logic [2:0][NUM_OF_MASTERS - 1 : 0][token_width - 1 : 0] ms_num_of_tokens_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0][TOKEN_WIDTH - 1 : 0] ms_num_of_tokens_eng;
 logic [2:0][NUM_OF_MASTERS - 1 : 0][1:0]                 ms_needy_level_eng;
 logic [2:0][NUM_OF_MASTERS - 1 : 0][1:0]                 ms_mode_eng;
 
@@ -93,7 +93,7 @@ logic [2:0][NUM_OF_MASTERS - 1 : 0][1:0]                 ms_mode_eng;
 logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_is_urgent_eng;
 logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_end_transaction_eng;
 logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_grant_eng;
-logic [1:0][NUM_OF_SLAVES - 1 : 0][token_width - 1 : 0]  sl_num_of_tokens_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0][TOKEN_WIDTH - 1 : 0]  sl_num_of_tokens_eng;
 logic [1:0][NUM_OF_SLAVES - 1 : 0][1:0]                  sl_needy_level_eng;
 logic [1:0][NUM_OF_SLAVES - 1 : 0][1:0]                  sl_mode_eng;
 
@@ -104,7 +104,7 @@ arbiter_engine #(
 	.NUM_OF_SLAVES     (NUM_OF_SLAVES),
 	.NUM_OF_CHANNEL    (3), // 3 Forward Channels
 	.NUM_OF_SLV_CHANNEL(2), // 2 Return Channels
-	.token_width       (token_width)
+	.TOKEN_WIDTH       (TOKEN_WIDTH)
 ) u_arbiter_engine (
 	.aclk               (aclk                  ),
 	.aresetn            (aresetn               ),
@@ -133,8 +133,8 @@ generate
 		logic [2:0]                      ms_is_urgent;
 		logic [2:0]                      ms_end_transaction;
 		logic [2:0]                      ms_start_transaction;
-		logic [2:0][token_width - 1 : 0] ms_token_allocation;
-		logic [2:0][token_width - 1 : 0] ms_curr_tokens;
+		logic [2:0][TOKEN_WIDTH - 1 : 0] ms_token_allocation;
+		logic [2:0][TOKEN_WIDTH - 1 : 0] ms_curr_tokens;
 		logic [2:0][1:0]                 ms_needy_level;
 		logic [2:0][2:0]                 ms_mode; // 3-bit mode input on router
 
@@ -188,7 +188,7 @@ generate
 		router_ms #(
 			.master_id    (i            ),
 			.NUM_OF_SLAVES(NUM_OF_SLAVES),
-			.token_width  (token_width  )
+			.TOKEN_WIDTH  (TOKEN_WIDTH  )
 		) u_router_ms (
 			.aclk             (aclk                   ),
 			.aresetn          (aresetn                ),
@@ -262,8 +262,8 @@ generate
 		logic [1:0]                      sl_start_transaction;
 		logic [1:0]                      sl_end_transaction;
 		logic [1:0]                      sl_is_urgent;
-		logic [1:0][token_width - 1 : 0] sl_token_allocation;
-		logic [1:0][token_width - 1 : 0] sl_curr_tokens;
+		logic [1:0][TOKEN_WIDTH - 1 : 0] sl_token_allocation;
+		logic [1:0][TOKEN_WIDTH - 1 : 0] sl_curr_tokens;
 		logic [1:0][1:0]                 sl_needy_level;
 		logic [1:0][2:0]                 sl_mode;
 
@@ -317,7 +317,7 @@ generate
 		router_sl #(
 			.slave_id      (j             ),
 			.NUM_OF_MASTERS(NUM_OF_MASTERS),
-			.token_width   (token_width   )
+			.TOKEN_WIDTH   (TOKEN_WIDTH   )
 		) u_router_sl (
 			.aclk             (aclk                     ),
 			.aresetn          (aresetn                  ),
