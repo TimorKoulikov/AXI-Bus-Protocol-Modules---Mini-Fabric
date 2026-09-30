@@ -20,12 +20,9 @@ module top_block #(
 	input aresetn,                          //axi resetn
 	input cfg_t cfg,
 	input cfg_en,
-	axi_if.master_if masters[NUM_OF_SLAVES], // Fabric drives AW/AR/W to external slaves
-	axi_if.slave_if  slaves[NUM_OF_MASTERS]// Fabric receives AW/AR/W from external masters
+	axi_if.master_if masters[NUM_OF_SLAVES], // Fabric acts as master to external slaves
+	axi_if.slave_if  slaves[NUM_OF_MASTERS]// Fabric acts as slave to external masters
 );
-
-// parameters
-localparam NUM_OF_CHANNEL = 5;
 
 //----- Crossbar interconnect buses -----
 // Forward path: router_ms [m][s] -> arbiter_sl [s][m]
@@ -84,25 +81,47 @@ always_comb begin
 end
 
 //----- Interconnect logic between arbiter_engine and master/slave -----
-logic [NUM_OF_CHANNEL - 1 : 0][NUM_OF_MASTERS - 1 : 0]                      is_urgent;
-logic [NUM_OF_CHANNEL - 1 : 0][NUM_OF_MASTERS - 1 : 0]                      end_transaction;
-logic [NUM_OF_CHANNEL - 1 : 0][NUM_OF_MASTERS - 1 : 0]                      grant;
-logic [NUM_OF_CHANNEL - 1 : 0][NUM_OF_MASTERS - 1 : 0][token_width - 1 : 0] num_of_tokens;
-logic [NUM_OF_CHANNEL - 1 : 0][NUM_OF_MASTERS - 1 : 0][1:0]                 needy_level;
+// Master Side Channels (AW, AR, W - 3 Channels)
+logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_is_urgent_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_end_transaction_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0]                      ms_grant_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0][token_width - 1 : 0] ms_num_of_tokens_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0][1:0]                 ms_needy_level_eng;
+logic [2:0][NUM_OF_MASTERS - 1 : 0][1:0]                 ms_mode_eng;
+
+// Slave Side Channels (B, R - 2 Channels)
+logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_is_urgent_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_end_transaction_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0]                       sl_grant_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0][token_width - 1 : 0]  sl_num_of_tokens_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0][1:0]                  sl_needy_level_eng;
+logic [1:0][NUM_OF_SLAVES - 1 : 0][1:0]                  sl_mode_eng;
+
 
 //----- Arbiter Engine -----
 arbiter_engine #(
-	.NUM_OF_MASTERS(NUM_OF_MASTERS),
-	.NUM_OF_CHANNEL(NUM_OF_CHANNEL),
-	.token_width   (token_width   )
+	.NUM_OF_MASTERS    (NUM_OF_MASTERS),
+	.NUM_OF_SLAVES     (NUM_OF_SLAVES),
+	.NUM_OF_CHANNEL    (3), // 3 Forward Channels
+	.NUM_OF_SLV_CHANNEL(2), // 2 Return Channels
+	.token_width       (token_width)
 ) u_arbiter_engine (
-	.aclk           (aclk           ),
-	.aresetn        (aresetn        ),
-	.is_urgent      (is_urgent      ),
-	.end_transaction(end_transaction),
-	.grant          (grant          ),
-	.needy_level    (needy_level    ),
-	.num_of_tokens  (num_of_tokens  )
+	.aclk               (aclk                  ),
+	.aresetn            (aresetn               ),
+	// Master side (AW, AR, W)
+	.is_urgent          (ms_is_urgent_eng      ),
+	.end_transaction    (ms_end_transaction_eng),
+	.grant              (ms_grant_eng          ),
+	.needy_level        (ms_needy_level_eng    ),
+	.mode               (ms_mode_eng           ),
+	.num_of_tokens      (ms_num_of_tokens_eng  ),
+	// Slave side (B, R)
+	.sl_is_urgent       (sl_is_urgent_eng      ),
+	.sl_end_transaction (sl_end_transaction_eng),
+	.sl_grant           (sl_grant_eng          ),
+	.sl_needy_level     (sl_needy_level_eng    ),
+	.sl_mode            (sl_mode_eng           ),
+	.sl_num_of_tokens   (sl_num_of_tokens_eng  )
 );
 
 //----- Master Side -----
@@ -110,16 +129,14 @@ genvar i;
 generate
 	for (i = 0; i < NUM_OF_MASTERS; i++) begin : gen_master
 
+		// Local channel vectors for Master[i]
 		logic [2:0]                      ms_is_urgent;
 		logic [2:0]                      ms_end_transaction;
 		logic [2:0]                      ms_start_transaction;
 		logic [2:0][token_width - 1 : 0] ms_token_allocation;
 		logic [2:0][token_width - 1 : 0] ms_curr_tokens;
 		logic [2:0][1:0]                 ms_needy_level;
-		logic [2:0]                      ms_mode;
-
-		// No leak logic connected in top tier for this setup
-		assign ms_mode = '0; 
+		logic [2:0][2:0]                 ms_mode; // 3-bit mode input on router
 
 		aw_bus m_aw;
 		ar_bus m_ar;
@@ -219,23 +236,18 @@ generate
 			.grant      (ms_arb_grant         )
 		);
 
-		// Drive engine requests and extract engine grants without multidimensional slicing
+		// Transpose between [channel][master] and [master][channel]
 		always_comb begin
-			// AW, AR, W Channels (Driven by Router MS)
 			for (int c = 0; c < 3; c++) begin
-				is_urgent[c][i]         = ms_is_urgent[c];
-				end_transaction[c][i]   = ms_end_transaction[c];
-				needy_level[c][i]       = ms_needy_level[c];
-				
-				ms_start_transaction[c] = grant[c][i];
-				ms_token_allocation[c]  = num_of_tokens[c][i];
-			end
-			
-			// B, R Channels (Unused from master perspective to engine here)
-			for (int c = 3; c < NUM_OF_CHANNEL; c++) begin
-				is_urgent[c][i]         = 1'b0;
-				end_transaction[c][i]   = 1'b0;
-				needy_level[c][i]       = 2'b00;
+				// Outputs from Master -> Inputs to Arbiter Engine
+				ms_is_urgent_eng[c][i]       = ms_is_urgent[c];
+				ms_end_transaction_eng[c][i] = ms_end_transaction[c];
+				ms_needy_level_eng[c][i]     = ms_needy_level[c];
+
+				// Outputs from Arbiter Engine -> Inputs to Master
+				ms_start_transaction[c]      = ms_grant_eng[c][i];
+				ms_token_allocation[c]       = ms_num_of_tokens_eng[c][i];
+				ms_mode[c]                   = {1'b0, ms_mode_eng[c][i]}; // Zero-extend 2-bit to 3-bit mode
 			end
 		end
 
@@ -254,8 +266,6 @@ generate
 		logic [1:0][token_width - 1 : 0] sl_curr_tokens;
 		logic [1:0][1:0]                 sl_needy_level;
 		logic [1:0][2:0]                 sl_mode;
-		
-		assign sl_mode = '0;
 
 		aw_bus s_aw;
 		ar_bus s_ar;
@@ -263,7 +273,7 @@ generate
 		b_bus  s_b;
 		r_bus  s_r;
 
-		// 1. Unpack AW channel (Struct -> Slave Interface)
+		// 1. Unpack AW channel (Struct from arbiter_sl -> Slave Interface)
 		assign slaves[j].AWID    = s_aw.id;
 		assign slaves[j].AWADDR  = s_aw.addr;
 		assign slaves[j].AWLEN   = s_aw.len;
@@ -275,7 +285,7 @@ generate
 		assign slaves[j].AWQOS   = s_aw.qos;
 		assign slaves[j].AWVALID = s_aw.valid;
 
-		// 2. Unpack AR channel (Struct -> Slave Interface)
+		// 2. Unpack AR channel (Struct from arbiter_sl -> Slave Interface)
 		assign slaves[j].ARID    = s_ar.id;
 		assign slaves[j].ARADDR  = s_ar.addr;
 		assign slaves[j].ARLEN   = s_ar.len;
@@ -287,13 +297,13 @@ generate
 		assign slaves[j].ARQOS   = s_ar.qos;
 		assign slaves[j].ARVALID = s_ar.valid;
 
-		// 3. Unpack W channel (Struct -> Slave Interface)
+		// 3. Unpack W channel (Struct from arbiter_sl -> Slave Interface)
 		assign slaves[j].WDATA   = s_w.wdata;
 		assign slaves[j].WSTRB   = s_w.wstrb;
 		assign slaves[j].WLAST   = s_w.wlast;
 		assign slaves[j].WVALID  = s_w.valid;
 
-		// 4. Pack B & R channels (Slave Interface -> Struct)
+		// 4. Pack B & R channels (Slave Interface -> Struct into router_sl)
 		assign s_b.id    = slaves[j].BID;
 		assign s_b.bresp = slaves[j].BRESP;
 		assign s_b.valid = slaves[j].BVALID;
@@ -303,10 +313,6 @@ generate
 		assign s_r.rresp = slaves[j].RRESP;
 		assign s_r.rlast = slaves[j].RLAST;
 		assign s_r.valid = slaves[j].RVALID;
-
-		// Safely tie off start transaction locally if Engine is master-driven
-		assign sl_start_transaction = '0;
-		assign sl_token_allocation  = '0;
 
 		router_sl #(
 			.slave_id      (j             ),
@@ -354,6 +360,20 @@ generate
 			.w_data_out  (s_w                    ),
 			.grant       (grant[2:0]             ) 
 		);
+
+		always_comb begin
+			for (int c = 0; c < 2; c++) begin
+				// Outputs from Slave -> Inputs to Arbiter Engine
+				sl_is_urgent_eng[c][j]       = sl_is_urgent[c];
+				sl_end_transaction_eng[c][j] = sl_end_transaction[c];
+				sl_needy_level_eng[c][j]     = sl_needy_level[c];
+
+				// Outputs from Arbiter Engine -> Inputs to Slave
+				sl_start_transaction[c]      = sl_grant_eng[c][j];
+				sl_token_allocation[c]       = sl_num_of_tokens_eng[c][j];
+				sl_mode[c]                   = {1'b0, sl_mode_eng[c][j]}; // Zero-extend 2-bit to 3-bit mode
+			end
+		end
 
 	end
 endgenerate

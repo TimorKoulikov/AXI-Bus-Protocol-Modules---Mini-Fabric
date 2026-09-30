@@ -121,7 +121,7 @@ router_control #(.NUM_OF_CHANNEL(3)) u_router_control (
 	.end_transaction  (end_transaction  ),
 	.token_allocation (token_allocation ),
 	.num_tokens       (num_tokens       ),
-	.pop              (pop              ),
+	.pop_enable       (pop              ),
 	.full             (full             ),
 	.empty            (empty            ),
 	.mode             (mode             )
