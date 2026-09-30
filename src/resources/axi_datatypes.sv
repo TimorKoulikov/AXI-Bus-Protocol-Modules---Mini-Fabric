@@ -13,14 +13,14 @@ localparam B_BUS_SIZE  = 4  + ID_WIDTH;
 localparam AR_BUS_SIZE = 25 + ID_WIDTH + ADDR_WIDTH; // 25 is the sum of all unconfigurable bits (valid, ready, arlen, etc)
 localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
 
-localparam MAX_LEN = 1024;
-
+localparam MAX_LEN = 256;
+localparam LEN_WIDTH = $clog2(MAX_LEN);
 typedef struct packed{
 	logic 			         valid;
 	logic 					 ready;
 	logic [ID_WIDTH-1:0]     id;
 	logic [ADDR_WIDTH-1:0]   addr;
-	logic [7:0]              arlen;
+	logic [LEN_WIDTH -1 :0]  len;
 	logic [2:0]              arsize;
 	logic [1:0]              arburst;
 	logic                    arlock;
@@ -43,7 +43,7 @@ typedef struct packed {
 	logic 					 ready;
 	logic [ID_WIDTH-1:0]     id;
 	logic [ADDR_WIDTH-1:0]   addr;
-	logic [7:0]              awlen;
+	logic [LEN_WIDTH -1 :0]  len;
 	logic [2:0]              awsize;
 	logic [1:0]              awburst;
 	logic                    awlock;

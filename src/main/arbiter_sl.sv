@@ -49,7 +49,7 @@ input w_bus  [NUM_OF_MASTERS - 1 : 0] w_data_in;
 input [NUM_OF_MASTERS - 1 : 0] aw_ready_in;
 input [NUM_OF_MASTERS - 1 : 0] ar_ready_in;
 input [NUM_OF_MASTERS - 1 : 0] w_ready_in;
-input [2:0][NUM_OF_MASTERS - 1 : 0] grant;
+input [2:0][NUM_OF_MASTERS - 1 : 0] grant; 
 
 //-----outputs-----
 output logic aw_ready_out;
@@ -70,6 +70,7 @@ logic  w_ready_in_sel;  // the muxed ready signal from router_ms
 
 //----- AW -----
 //MUX
+// TODO: grant is by index of bit it is not int value.
 assign aw_data_in_sel  = aw_data_in[grant[0]];
 assign aw_ready_in_sel = aw_ready_in[grant[0]];
 
