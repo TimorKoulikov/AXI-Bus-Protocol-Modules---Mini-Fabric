@@ -1004,3 +1004,82 @@ module memory_controller #(
     end
 
 endmodule
+
+
+
+/*  17) --------------- Memory Lifetime (automatic vs static) ---------------
+        - 'static' (Verilog default): Variables exist permanently in one memory location.
+          Unsafe for parallel execution.
+        - 'automatic' (Modern Best Practice): Variables are dynamically created on the 
+          stack per-call. 100% thread-safe.
+*/
+
+module memory_lifetime_example;
+
+    // 1. THE TRAP (Static by default)
+    // If two threads call this at the same time, they will corrupt 'temp_val'.
+    task bad_task(input logic [7:0] in_val);
+        logic [7:0] temp_val; 
+        temp_val = in_val;
+        #10 $display("Bad: %0d", temp_val);
+    endtask
+
+    // 2. THE FIX (Thread-safe)
+    // Every time this is called, a brand new 'temp_val' is created in RAM.
+    task automatic good_task(input logic [7:0] in_val);
+        logic [7:0] temp_val;
+        temp_val = in_val;
+        #10 $display("Good: %0d", temp_val);
+    endtask
+
+endmodule
+
+
+
+
+/*  18) --------------- Data Types: logic vs int ---------------
+        - logic [31:0] : 4-state (0, 1, X, Z) and UNSIGNED. Used for actual hardware.
+        - int          : 2-state (0, 1) and SIGNED. Used for testbench loop counters.
+*/
+module type_differences;
+    logic [31:0] hw_bus;
+    int          sw_counter;
+
+    initial begin
+        // 1. The 4-State vs 2-State Trap
+        hw_bus     = 32'hxxxx_xxxx; // Stays 'X' (You can see the bug in the waveform)
+        sw_counter = 32'hxxxx_xxxx; // Silently converts to 0! (Bug is hidden)
+
+        // 2. The Signed vs Unsigned Trap
+        hw_bus     = 32'hFFFF_FFFF; // Evaluates to 4,294,967,295
+        sw_counter = 32'hFFFF_FFFF; // Evaluates to -1
+        
+        if (hw_bus > 0)     // TRUE 
+        if (sw_counter > 0) // FALSE (-1 is not greater than 0)
+    end
+endmodule
+
+
+
+/*  19) --------------- Data Types: int vs integer ---------------
+        - int     : 2-state (0, 1), 32-bit signed. Use for testbench loops.
+        - integer : 4-state (0, 1, X, Z), 32-bit signed. Legacy Verilog (Do not use).
+*/
+module int_vs_integer;
+
+    int     modern_loop_var;
+    integer legacy_loop_var;
+
+    initial begin
+        // If uninitialized, 'int' defaults to 0. 
+        // If uninitialized, 'integer' defaults to X.
+        $display("int defaults to: %0d", modern_loop_var);      // Prints 0
+        $display("integer defaults to: %0b", legacy_loop_var);  // Prints xxxxx...
+        
+        // BEST PRACTICE: Always use 'int' for testbench loops
+        for (int i = 0; i < 10; i++) begin 
+            // loop logic
+        end
+    end
+
+endmodule
