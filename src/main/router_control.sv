@@ -8,7 +8,9 @@
 
 module router_control #(
 	parameter NUM_OF_CHANNEL=3,
-	parameter token_width = 31
+	parameter TOKEN_WIDTH = 32
+
+
 )
 (
 	input aclk,
@@ -16,20 +18,20 @@ module router_control #(
 	
 	// interface with arbiter_engine
 	input [NUM_OF_CHANNEL -1 : 0] start_transaction,
-	input [NUM_OF_CHANNEL -1 : 0][token_width -1 :0]  token_allocation,
+	input [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0]  token_allocation,
 	input [NUM_OF_CHANNEL -1 : 0][2:0] mode,
 	output logic [NUM_OF_CHANNEL -1 : 0] end_transaction,
-	output logic [NUM_OF_CHANNEL - 1:0][token_width -1 : 0] num_tokens,
+	output logic [NUM_OF_CHANNEL - 1:0][TOKEN_WIDTH -1 : 0] num_tokens,
 	
 	// interface with rob
-	output logic [NUM_OF_CHANNEL -1 : 0] 					pop,
-	input  logic [NUM_OF_CHANNEL -1 : 0][token_width -1 :0] token_for_transaction,
+	output logic [NUM_OF_CHANNEL -1 : 0] 					pop_enable,
+	input  logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0] token_for_transaction,
 	input  logic [NUM_OF_CHANNEL -1 : 0] 					token_enable,
 	input  logic [NUM_OF_CHANNEL -1 : 0] 					full,
 	input  logic [NUM_OF_CHANNEL -1 : 0] 					empty
 );
 //-----logic-----
-logic [NUM_OF_CHANNEL -1 : 0][token_width -1 : 0] curr_num_tokens;
+logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 : 0] curr_num_tokens;
 logic [NUM_OF_CHANNEL -1 : 0]                     stop_transaction;
 logic [NUM_OF_CHANNEL -1 : 0]                     insert_tokens;
 
@@ -46,7 +48,7 @@ genvar i;
 generate 
 	
 	for	(i=0;i<NUM_OF_CHANNEL;i++) begin : gen_block	
-		token_counter  #(.token_width(token_width))
+		token_counter  #(.token_width(TOKEN_WIDTH))
 		u_token_counter 
 		(
 			.aclk(aclk),
@@ -54,7 +56,7 @@ generate
 			.data_load(token_allocation[i]),
 			.load(insert_tokens[i]),
 			.data_unload(token_for_transaction[i]),
-			.unload(pop[i]),
+			.unload(pop_enable[i]),
 			.count(curr_num_tokens[i]),
 			.mode(mode[i])
 			
@@ -62,7 +64,7 @@ generate
 		
 		//BW contorl		
 		always_comb begin
-			pop[i] = 1'b0;
+			pop_enable[i] = 1'b0;
 			insert_tokens[i]=1'b0;
 			end_transaction[i]=1'b0;	
 			stop_transaction[i]=1'b0;
@@ -78,7 +80,7 @@ generate
 					if( curr_num_tokens[i] < token_for_transaction[i]) begin
 						stop_transaction[i]=1'b1;
 					end else if(token_enable[i]) begin
-						pop[i]=1'b1;
+						pop_enable[i]=1'b1;
 					end
 				end
 			endcase
