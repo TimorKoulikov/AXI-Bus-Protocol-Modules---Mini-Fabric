@@ -160,9 +160,9 @@ rob #(.BUS_TYPE(aw_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U
 	.ready_out  (aw_rob_ready_out    ), 
 	.data_out   (aw_rob_data_out     ), 
 	.patch_out  (aw_rob_patch_out    ),
-	.pop        (pop[0]              ),
-	.empty_out  (empty[0]            ),
-	.full_out   (full[0]             ),
+	.pop_enable        (pop[0]              ),
+	.is_empty_out  (empty[0]            ),
+	.is_full_out   (full[0]             ),
 	.got_urgent (is_urgent[0]        )
 );
 
@@ -201,9 +201,9 @@ rob #(.BUS_TYPE(ar_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U
 	.ready_out  (ar_rob_ready_out    ), 
 	.data_out   (ar_rob_data_out     ), 
 	.patch_out  (ar_rob_patch_out    ),
-	.pop        (pop[1]              ),
-	.empty_out  (empty[1]            ),
-	.full_out   (full[1]             ),
+	.pop_enable        (pop[1]              ),
+	.is_empty_out  (empty[1]            ),
+	.is_full_out   (full[1]             ),
 	.got_urgent (is_urgent[1]        )
 );
 
@@ -242,9 +242,9 @@ rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 	.ready_out  (w_rob_ready_out    ), 
 	.data_out   (w_rob_data_out     ), 
 	.patch_out  (w_rob_patch_out    ),
-	.pop        (pop[2]             ),
-	.empty_out  (empty[2]           ),
-	.full_out   (full[2]            ),
+	.pop_enable        (pop[2]             ),
+	.is_empty_out  (empty[2]           ),
+	.is_full_out   (full[2]            ),
 	.got_urgent (is_urgent[2]       )
 );
 

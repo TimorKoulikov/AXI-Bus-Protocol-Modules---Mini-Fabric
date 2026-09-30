@@ -17,6 +17,7 @@ aresetn,            //axi resetn
 // AW channel
 aw_data_in,         //aw data channel from router_ms
 aw_ready_in,        //axi awready signal from slave
+aw_patch_in,
 aw_ready_out,       //awready signal to router_ms
 aw_data_out,        //axi aw data channel to slave
 
@@ -43,12 +44,17 @@ import fabric_datatypes::*;
 //-----inputs-----
 input aclk;
 input aresetn;
+
 input aw_bus [NUM_OF_MASTERS - 1 : 0] aw_data_in;
 input ar_bus [NUM_OF_MASTERS - 1 : 0] ar_data_in;
 input w_bus  [NUM_OF_MASTERS - 1 : 0] w_data_in;
+
+input patch_t [NUM_OF_MASTERS - 1 : 0] aw_patch_in;
+
 input [NUM_OF_MASTERS - 1 : 0] aw_ready_in;
 input [NUM_OF_MASTERS - 1 : 0] ar_ready_in;
 input [NUM_OF_MASTERS - 1 : 0] w_ready_in;
+
 input [2:0][NUM_OF_MASTERS - 1 : 0] grant; 
 
 //-----outputs-----
@@ -82,9 +88,8 @@ rob #(.BUS_TYPE(aw_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U
 	//.patch_in   (patch_in       ),
 	.push_enable(aw_ready_in_sel),
 	.ready_out  (aw_ready_out   ),
-	.data_out   (aw_data_out    ),
+	.data_out   (aw_data_out    )
 	//.patch_out  (patch_out      ),
-	.pop        (pop            )//?
 );
 
 //----- AR -----
@@ -100,9 +105,8 @@ rob #(.BUS_TYPE(ar_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U
 	//.patch_in   (patch_in       ),
 	.push_enable(ar_ready_in_sel),
 	.ready_out  (ar_ready_out   ),
-	.data_out   (ar_data_out    ),
+	.data_out   (ar_data_out    )
 	//.patch_out  (patch_out      ),
-	.pop        (pop            )//?
 );
 
 //----- W -----
@@ -118,9 +122,8 @@ rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 	//.patch_in   (patch_in      ),
 	.push_enable(w_ready_in_sel),
 	.ready_out  (w_ready_out   ),
-	.data_out   (w_data_out    ),
+	.data_out   (w_data_out    )
 	//.patch_out  (patch_out     ),
-	.pop        (pop           )//?
 );
 
 endmodule

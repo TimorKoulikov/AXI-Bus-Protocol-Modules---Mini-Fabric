@@ -59,7 +59,8 @@ do
             -top $TEST_TOP \
             -Mdir=$OUT_DIR/csrc_$TEST_TOP \
             -o $OUT_DIR/simv_$TEST_TOP \
-            -l $OUT_DIR/compile_$TEST_TOP.log
+            -l $OUT_DIR/compile_$TEST_TOP.log \
+	    +lint=TFIPC-L
     else
         # Quiet Mode: Uses -q and silences terminal output
         vcs -q -full64 -sverilog -kdb -debug_access+all \
@@ -80,7 +81,10 @@ do
         # Verbose Simulation
         ./$OUT_DIR/simv_$TEST_TOP \
             -l $OUT_DIR/sim_$TEST_TOP.log \
-            +fsdbfile+$OUT_DIR/$TEST_TOP.fsdb 
+            +fsdbfile+$OUT_DIR/$TEST_TOP.fsdb \
+	    
+		
+ 
     else
         # Quiet Simulation
         ./$OUT_DIR/simv_$TEST_TOP -q \
