@@ -12,24 +12,42 @@ if [ ! -f "$TESTLIST" ]; then
 	exit 1
 fi
 
-TESTS=$(grep -E "_(test|tb)\.sv" $TESTLIST ) 
+# Parse arguments for Verbose (-v) and Specific Test (-t / --test)
+VERBOSE=0
+SPECIFIC_TEST=""
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -v) VERBOSE=1 ;;
+        -t|--test) SPECIFIC_TEST="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+# Filter the test list
+if [ -n "$SPECIFIC_TEST" ]; then
+    # Look for the specific test file in the tb_list.f
+    TESTS=$(grep -E "${SPECIFIC_TEST}\.sv" $TESTLIST )
+    if [ -z "$TESTS" ]; then
+        echo "Error: Test '${SPECIFIC_TEST}.sv' not found in $TESTLIST"
+        exit 1
+    fi
+else
+    # Default behavior: run all tests
+    TESTS=$(grep -E "_(test|tb)\.sv" $TESTLIST ) 
+fi
 
 if [ -z "$TESTS" ]; then
     echo "Error: No testbench files (*_test.sv) found in $CONFIG_FILE"
     exit 1
 fi
 
-# Check for verbose flag
-VERBOSE=0
-if [[ "$1" == "-v" ]]; then
-    VERBOSE=1
-fi
-
 for TEST_TOP in $TESTS
 do
 	TEST_TOP=$(basename "$TEST_TOP" .sv)
 
-    	echo "========================================"
+    echo "========================================"
 	echo " STARTING TEST: $TEST_TOP"
 	echo "========================================"
     
@@ -43,10 +61,10 @@ do
             -o $OUT_DIR/simv_$TEST_TOP \
             -l $OUT_DIR/compile_$TEST_TOP.log
     else
-        # Quiet Mode: Uses -q and silences: terminal output
+        # Quiet Mode: Uses -q and silences terminal output
         vcs -q -full64 -sverilog -kdb -debug_access+all \
             -f $RTLLIST \
-	    -f $TESTLIST \
+	        -f $TESTLIST \
             -top $TEST_TOP \
             -Mdir=$OUT_DIR/csrc_$TEST_TOP \
             -o $OUT_DIR/simv_$TEST_TOP \
@@ -77,5 +95,6 @@ do
     	echo "========================================"
 	fi
 
-    mv ./ucli.key $OUT_DIR/ucli_$TEST_TOP.key
+    # Suppress errors if ucli.key isn't generated
+    mv ./ucli.key $OUT_DIR/ucli_$TEST_TOP.key 2>/dev/null || true
 done

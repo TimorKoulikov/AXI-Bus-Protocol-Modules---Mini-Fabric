@@ -18,3 +18,4 @@ src/test/needy_test.sv
 src/test/patcher_ax_test.sv
 src/test/patcher_w_test.sv 
 src/test/router_control_test.sv
+src/test/top_block_test.sv
