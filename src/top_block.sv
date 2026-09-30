@@ -93,7 +93,7 @@ generate
 		// 1. Pack AW channel (Interface -> Struct)
 		assign m_aw.id    = masters[i].AWID;
 		assign m_aw.addr    = masters[i].AWADDR;
-		assign m_aw.awlen   = masters[i].AWLEN;
+		assign m_aw.len   = masters[i].AWLEN;
 		assign m_aw.awsize  = masters[i].AWSIZE;
 		assign m_aw.awburst = masters[i].AWBURST;
 		assign m_aw.awlock  = masters[i].AWLOCK;
@@ -105,7 +105,7 @@ generate
 		// 2. Pack AR channel (Interface -> Struct)
 		assign m_ar.id    = masters[i].ARID;
 		assign m_ar.addr    = masters[i].ARADDR;
-		assign m_ar.arlen   = masters[i].ARLEN;
+		assign m_ar.len   = masters[i].ARLEN;
 		assign m_ar.arsize  = masters[i].ARSIZE;
 		assign m_ar.arburst = masters[i].ARBURST;
 		assign m_ar.arlock  = masters[i].ARLOCK;
@@ -238,7 +238,7 @@ generate
 		// 1. Unpack AW channel (Struct from arbiter_sl -> Slave Interface)
 		assign slaves[j].AWID    = s_aw.id;
 		assign slaves[j].AWADDR  = s_aw.addr;
-		assign slaves[j].AWLEN   = s_aw.awlen;
+		assign slaves[j].AWLEN   = s_aw.len;
 		assign slaves[j].AWSIZE  = s_aw.awsize;
 		assign slaves[j].AWBURST = s_aw.awburst;
 		assign slaves[j].AWLOCK  = s_aw.awlock;
@@ -250,7 +250,7 @@ generate
 		// 2. Unpack AR channel (Struct from arbiter_sl -> Slave Interface)
 		assign slaves[j].ARID    = s_ar.id;
 		assign slaves[j].ARADDR  = s_ar.addr;
-		assign slaves[j].ARLEN   = s_ar.arlen;
+		assign slaves[j].ARLEN   = s_ar.len;
 		assign slaves[j].ARSIZE  = s_ar.arsize;
 		assign slaves[j].ARBURST = s_ar.arburst;
 		assign slaves[j].ARLOCK  = s_ar.arlock;
@@ -266,11 +266,11 @@ generate
 		assign slaves[j].WVALID  = s_w.valid;
 
 		// 4. Pack B & R channels (Slave Interface -> Struct into router_sl)
-		assign s_b.bid   = slaves[j].BID;
+		assign s_b.id   = slaves[j].BID;
 		assign s_b.bresp = slaves[j].BRESP;
 		assign s_b.valid = slaves[j].BVALID;
 
-		assign s_r.rid   = slaves[j].RID;
+		assign s_r.id   = slaves[j].RID;
 		assign s_r.rdata = slaves[j].RDATA;
 		assign s_r.rresp = slaves[j].RRESP;
 		assign s_r.rlast = slaves[j].RLAST;
