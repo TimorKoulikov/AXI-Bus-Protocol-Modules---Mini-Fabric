@@ -67,7 +67,7 @@ input cfg_t cfg;
 input cfg_en;
 input [2:0] start_transaction;
 input [2 : 0][token_width -1 :0] token_allocation;
-input [2:0] mode;
+input [NUM_OF_CHANNEL -1 : 0][2:0] mode;
 
 //-----outputs-----
 output logic [NUM_OF_SLAVES -1 : 0] aw_ready_out;

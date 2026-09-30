@@ -64,7 +64,7 @@ begin
 	data_in.valid=1'b1;
 	#10
 	assert ( data_in == data_out &&
-			patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos)}) begin
+			patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos),data_in.len}) begin
 		$display("test_2: PASS");
 	end else begin
 		$error("test_2: FAIL");
@@ -85,10 +85,10 @@ begin
 	data_in.valid=1'b1;
 	data_in.qos=2'b11;
 	#10;
-	assert (patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos)}) begin
+	assert (patch_out == {get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos),data_in.len}) begin
 		$display("test_4: PASS");
 	end else begin
-		$display("test_4: FAIL - patch=%d expected= %d|%d|%d|%d",patch_out,get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos));
+		$display("test_4: FAIL - patch=%d expected= %d|%d|%d|%d|%d",patch_out,get_slave(cfg,data_in.addr),master_id,is_urgent(data_in.qos),is_stream(data_in.qos),data_in.len);
 	end
 	$finish;
 end
