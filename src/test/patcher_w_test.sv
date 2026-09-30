@@ -69,7 +69,7 @@ begin
 	#10;
 	
 	//======================================
-	$display("test_1: Queue Empty Backpressure");
+	$display("\nTest_1: Queue Empty Backpressure");
 	// If there is no routing tag in the queue, patcher_w MUST not accept W data
 	data_in = rand_axi.get_random();
 	data_in.valid = 1'b1;
@@ -81,7 +81,7 @@ begin
 	end 
 	
 	//======================================
-	$display("test_2: Push Tag to Queue (AW-W Handshake Simulation)");
+	$display("\nTest_2: Push Tag to Queue (AW-W Handshake Simulation)");
 	// Simulate patcher_aw sending a routing tag for Slave 2
 	patch_in.slave_id = 2;
 	patch_in.master_id = master_id;
@@ -105,7 +105,7 @@ begin
 	end
 	
 	//======================================
-	$display("test_3: Data Beat 1 (wlast = 0)");
+	$display("\nTest_3: Data Beat 1 (wlast = 0)");
 	data_in = rand_axi.get_random();
 	data_in.valid = 1'b1;
 	data_in.wlast = 1'b0; // not the last
@@ -119,7 +119,7 @@ begin
 	end
 	
 	//======================================
-	$display("test_4: Data Beat 2 (wlast = 1) -> Queue Pop");
+	$display("\nTest_4: Data Beat 2 (wlast = 1) -> Queue Pop");
 	data_in = rand_axi.get_random();
 	data_in.valid = 1'b1;
 	data_in.wlast = 1'b1; // Final beat of the burst
@@ -132,7 +132,7 @@ begin
 	end
 	
 	//======================================
-	$display("test_5: Verify Queue successfully Popped");
+	$display("\nTest_5: Verify Queue successfully Popped");
 	// Clear data inputs
 	data_in.valid = 1'b0;
 	#10;

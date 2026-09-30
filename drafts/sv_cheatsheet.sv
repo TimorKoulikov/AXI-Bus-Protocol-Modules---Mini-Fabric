@@ -854,6 +854,7 @@ endmodule
 
 
 
+
 /* 15)  --------------- arrays [Design & Verification] ---------------
 		There are 2 types of arrays in SV: 
 		- Packed arrays: arrays of 1 bit variables (like a bus or a vector).
@@ -1007,6 +1008,8 @@ endmodule
 
 
 
+
+
 /*  17) --------------- Memory Lifetime (automatic vs static) ---------------
         - 'static' (Verilog default): Variables exist permanently in one memory location.
           Unsafe for parallel execution.
@@ -1037,6 +1040,7 @@ endmodule
 
 
 
+
 /*  18) --------------- Data Types: logic vs int ---------------
         - logic [31:0] : 4-state (0, 1, X, Z) and UNSIGNED. Used for actual hardware.
         - int          : 2-state (0, 1) and SIGNED. Used for testbench loop counters.
@@ -1061,6 +1065,8 @@ endmodule
 
 
 
+
+
 /*  19) --------------- Data Types: int vs integer ---------------
         - int     : 2-state (0, 1), 32-bit signed. Use for testbench loops.
         - integer : 4-state (0, 1, X, Z), 32-bit signed. Legacy Verilog (Do not use).
@@ -1079,6 +1085,63 @@ module int_vs_integer;
         // BEST PRACTICE: Always use 'int' for testbench loops
         for (int i = 0; i < 10; i++) begin 
             // loop logic
+        end
+    end
+
+endmodule
+
+
+
+
+
+/*  20) --------------- for loops in Design (always_comb) ---------------
+        - Does NOT run over time. It executes instantly (combinational).
+        - Tells the synthesizer to physically unroll/replicate hardware gates.
+        - Loop bounds MUST be compile-time constants (like parameters).
+*/
+module bit_reverser #(
+    parameter WIDTH = 8
+)(
+    input  logic [WIDTH-1:0] data_in,
+    output logic [WIDTH-1:0] data_out
+);
+
+    always_comb begin
+        // The compiler physically unrolls this loop into 8 parallel wires:
+        // data_out[7] = data_in[0];
+        // data_out[6] = data_in[1]; 
+        // ... and so on.
+        
+        for (int i = 0; i < WIDTH; i++) begin
+            data_out[(WIDTH-1) - i] = data_in[i];
+        end
+    end
+
+endmodule
+
+
+
+
+
+/*  21) --------------- Part-Select (Bit-Slicing) on Integers ---------------
+        - You can extract a specific range of bits from a 32-bit 'int'.
+        - Syntax: variable_name[MSB:LSB]
+        - Primarily used in 'for' loops to safely assign a 32-bit loop counter 
+          to a smaller hardware bus without generating compiler truncation warnings.
+*/
+module integer_slicing #(
+    parameter ID_WIDTH = 4,
+    parameter QUEUE_DEPTH = 16
+)(
+    output logic [ID_WIDTH-1:0] default_ids [0:QUEUE_DEPTH-1]
+);
+
+    always_comb begin
+        for (int i = 0; i < QUEUE_DEPTH; i++) begin
+            // 'i' is a 32-bit integer.
+            //  i[ID_WIDTH-1:0] physically extracts only the bottom 4 bits.
+            //  This prevents the compiler warning: "Assigning 32-bit int to 4-bit logic"
+            default_ids[i] = i[ID_WIDTH-1:0]; 
         end
     end
 

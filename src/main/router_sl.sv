@@ -135,7 +135,7 @@ rob #(
 	.CYCLES_S_TO_U(CYCLES_S_TO_U)
 ) u_b_rob (
 	.aclk       (aclk               ),
-	.arstn      (aresetn            ),
+	.aresetn    (aresetn            ),
 	.data_in    (b_data_channel ),
 	.patch_in   (b_patch_in),
 	.push_enable(1'b1               ), 
@@ -170,7 +170,7 @@ rob #(
 	.CYCLES_S_TO_U(CYCLES_S_TO_U)
 ) u_r_rob (
 	.aclk        (aclk               ),
-	.arstn       (aresetn            ),
+	.aresetn     (aresetn            ),
 	.data_in     (r_data_channel ),
 	.patch_in    (r_patch_in),
 	.push_enable (1'b1               ), 

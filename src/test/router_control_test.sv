@@ -67,7 +67,7 @@ begin
 		#10
 		aresetn=1'b1;
 		//----------------------------------------------------
-		$display("test_1: fsm");
+		$display("\nTest_1: fsm");
 		start_transaction[i]=1'b1;
 		#10
 		assert( router_control_uut.curr_state[i] == router_control_uut.TRANSACTION_ADD_TOKENS) begin
@@ -94,7 +94,7 @@ begin
 		#10
 			aresetn=1'b1;
 		//----------------------------------------------------------
-		$display("test_2: adding token");
+		$display("\nTest_2: adding token");
 			start_transaction[i]=1'b1;
 			tokens = $random();
 			token_allocation[i] = tokens;
@@ -106,7 +106,7 @@ begin
 				end
 			//--------------------------------------------------
 			
-			$display("test_3: twice remove tokens");
+			$display("\nTest_3: twice remove tokens");
 		#20;
 			token_for_transaction[i] = tokens / 3;
 			$display("token_for_transaction =%d",token_for_transaction[i]);
@@ -126,7 +126,7 @@ begin
 				$display("test_3: FAIL [2/2]");
 			end
 			//---------------------------
-			$display("test_4: testing mode=LEAKY");
+			$display("\nTest_4: testing mode=LEAKY");
 			mode=2'b01;
 			while(end_transaction[i] == 1'b0) begin
 			#10;

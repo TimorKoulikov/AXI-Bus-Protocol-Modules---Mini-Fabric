@@ -23,7 +23,7 @@ module rob #(
 )(
 
     input  logic    aclk,
-    input  logic    arstn,
+    input  logic    aresetn,
     // --- Ingress (push) ---
     input  BUS_TYPE data_in,
     input  patch_t  patch_in,
@@ -148,8 +148,8 @@ end
 
 
 //----- Unified Array Updater (Registers) -----
-always_ff @(posedge aclk or negedge arstn) begin
-    if (!arstn) begin
+always_ff @(posedge aclk or negedge aresetn) begin
+    if (!aresetn) begin
         token_enable <= 1'b0;
         tokens_used  <= '0;
         for (int i = 0; i < QUEUE_DEPTH; i++) begin

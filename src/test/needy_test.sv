@@ -48,7 +48,7 @@ module needy_test ();
 		// test_1: Normal state -> NO_LEAK (2'b00)
 		// token_allocation >= TOKEN_LOW_THRESHOLD and full == 0
 		//======================================================================
-		$display("test_1: check NO_LEAK (2'b00) when tokens >= threshold and not full");
+		$display("\nTest_1: check NO_LEAK (2'b00) when tokens >= threshold and not full");
 		token_allocation[i] = TOKEN_LOW_THRESHOLD + $urandom_range(100, 0);
 		full[i]             = 1'b0;
 		empty[i]            = 1'b0;
@@ -63,7 +63,7 @@ module needy_test ();
 		// test_2: Low tokens only -> LEAK (2'b01)
 		// token_allocation < TOKEN_LOW_THRESHOLD and full == 0
 		//======================================================================
-		$display("test_2: check LEAK (2'b01) when tokens < threshold and not full");
+		$display("\nTest_2: check LEAK (2'b01) when tokens < threshold and not full");
 		token_allocation[i] = $urandom_range(TOKEN_LOW_THRESHOLD - 1, 0);
 		full[i]             = 1'b0;
 		#10;
@@ -74,10 +74,10 @@ module needy_test ();
 		end
 
 		//======================================================================
-		// test_3: ROB full only -> EXSTRA_BW (2'b10)
+		// test_3: ROB full only -> EXTRA_BW (2'b10)
 		// token_allocation >= TOKEN_LOW_THRESHOLD and full == 1
 		//======================================================================
-		$display("test_3: check EXSTRA_BW (2'b10) when tokens >= threshold and ROB is full");
+		$display("\nTest_3: check EXTRA_BW (2'b10) when tokens >= threshold and ROB is full");
 		token_allocation[i] = TOKEN_LOW_THRESHOLD; // exact boundary check
 		full[i]             = 1'b1;
 		#10;
@@ -88,10 +88,10 @@ module needy_test ();
 		end
 
 		//======================================================================
-		// test_4: Low tokens AND ROB full -> LEAK_EXSTRA_BW (2'b11)
+		// test_4: Low tokens AND ROB full -> LEAK_EXTRA_BW (2'b11)
 		// token_allocation < TOKEN_LOW_THRESHOLD and full == 1
 		//======================================================================
-		$display("test_4: check LEAK_EXSTRA_BW (2'b11) when tokens < threshold and ROB is full");
+		$display("\nTest_4: check LEAK_EXTRA_BW (2'b11) when tokens < threshold and ROB is full");
 		token_allocation[i] = TOKEN_LOW_THRESHOLD - 1;
 		full[i]             = 1'b1;
 		#10;
@@ -104,7 +104,7 @@ module needy_test ();
 		//======================================================================
 		// test_5: Multi-channel independence check
 		//======================================================================
-		$display("test_5: check all channels simultaneously with different states");
+		$display("\nTest_5: check all channels simultaneously with different states");
 		token_allocation[0] = TOKEN_LOW_THRESHOLD + 5; full[0] = 1'b0; // Expect 2'b00
 		token_allocation[1] = TOKEN_LOW_THRESHOLD - 2; full[1] = 1'b0; // Expect 2'b01
 		token_allocation[2] = TOKEN_LOW_THRESHOLD - 1; full[2] = 1'b1; // Expect 2'b11

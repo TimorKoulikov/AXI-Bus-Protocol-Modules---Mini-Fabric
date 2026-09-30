@@ -152,7 +152,7 @@ patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLA
 // patcher -> rob
 rob #(.BUS_TYPE(aw_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_aw_rob (
 	.aclk        (aclk                ),
-	.arstn       (aresetn             ),
+	.aresetn     (aresetn             ),
 	.data_in     (aw_patcher_data_out ),
 	.patch_in    (aw_patcher_patch_out),
 	.push_enable (push_enable         ), // ?
@@ -193,7 +193,7 @@ patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLA
 // patcher -> rob
 rob #(.BUS_TYPE(ar_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_ar_rob (
 	.aclk        (aclk                ),
-	.arstn       (aresetn             ),
+	.aresetn     (aresetn             ),
 	.data_in     (ar_patcher_data_out ),
 	.patch_in    (ar_patcher_patch_out),
 	.push_enable (push_enable         ), // ?
@@ -234,7 +234,7 @@ patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(M
 // patcher -> rob
 rob #(.BUS_TYPE(w_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_w_rob (
 	.aclk        (aclk               ),
-	.arstn       (aresetn            ),
+	.aresetn     (aresetn            ),
 	.data_in     (w_patcher_data_out ),
 	.patch_in    (w_patcher_patch_out),
 	.push_enable (push_enable        ), // ?
