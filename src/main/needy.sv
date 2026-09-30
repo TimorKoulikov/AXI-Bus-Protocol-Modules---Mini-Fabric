@@ -20,15 +20,14 @@ module needy #(
 	input [NUM_OF_CHANNEL -1 : 0] full,
 	input [NUM_OF_CHANNEL -1 : 0] empty,
 
-	output logic [NUM_OF_CHANNEL -1 : 0][1:0] needy
+	output logic [NUM_OF_CHANNEL -1 : 0][1:0] needy_level
 );
 
 
-// TODO: decide the final logic for needynes
 always_comb begin
 	for (int i = 0; i < NUM_OF_CHANNEL; i++) begin
-		 needy[i][0] = token_allocation[i] < TOKEN_LOW_THRESHOLD;
-		 needy[i][1] = full[i];
+		 needy_level[i][0] = token_allocation[i] < TOKEN_LOW_THRESHOLD;
+		 needy_level[i][1] = full[i];
 	end
 end
 

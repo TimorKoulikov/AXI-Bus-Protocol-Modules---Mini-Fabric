@@ -97,7 +97,7 @@ needy #(.NUM_OF_CHANNEL(3), .token_width(token_width), .TOKEN_LOW_THRESHOLD(TOKE
 	.token_allocation(token_allocation),
 	.full            (full            ),
 	.empty           (empty           ),
-	.needy           (needy_level           )
+	.needy_level           (needy_level           )
 );
 //----- AW ------
 patcher_ax #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
