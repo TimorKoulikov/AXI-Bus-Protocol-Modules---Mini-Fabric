@@ -82,20 +82,17 @@ wire [NUM_OF_CHANNEL -1 : 0] pop;
 logic [NUM_OF_CHANNEL -1 : 0] token_enable;
 logic [NUM_OF_CHANNEL -1 : 0][token_width -1 : 0] token_for_transaction;
 
-// patcher -> ROB wires
-wire b_bus   b_patcher_data_out;
-wire r_bus   r_patcher_data_out;
-wire patch_t b_patcher_patch_out;
-wire patch_t r_patcher_patch_out;
-
+// input -> ROB
+patch_t r_patch_in;
+patch_t b_patch_in;
 // ROB -> output wires
-wire         b_rob_ready_out;
-wire b_bus   b_rob_data_out;
-wire patch_t b_rob_patch_out;
+logic         b_rob_ready_out;
+b_bus   b_rob_data_out;
+patch_t b_rob_patch_out;
 
-wire         r_rob_ready_out;
-wire r_bus   r_rob_data_out;
-wire patch_t r_rob_patch_out;
+logic         r_rob_ready_out;
+r_bus   r_rob_data_out;
+patch_t r_rob_patch_out;
 
 //router_control
 router_control #(
@@ -129,24 +126,9 @@ needy #(
 );
 
 //----- B ------
-// input -> patcher
-patcher_ax #(
-	.BUS_TYPE     (b_bus         ),
-	.master_id    (slave_id      ),
-	.NUM_OF_SLAVES(NUM_OF_MASTERS)
-) patcher_b (
-	.aclk     (aclk               ),
-	.aresetn  (aresetn            ),
-	.data_in  (b_data_channel     ),
-	.ready_out(b_ready_out        ),
-	.data_out (b_patcher_data_out ),
-	.ready_in (b_rob_ready_out    ),
-	.patch_out(b_patcher_patch_out),
-	.cfg      (cfg                ),
-	.cfg_en   (cfg_en             )
-);
 
-// patcher -> rob
+// input -> rob
+assign b_patch_in={b_data_channel.id};
 rob #(
 	.BUS_TYPE     (b_bus        ),
 	.QUEUE_DEPTH  (QUEUE_DEPTH  ),
@@ -154,8 +136,8 @@ rob #(
 ) u_b_rob (
 	.aclk       (aclk               ),
 	.arstn      (aresetn            ),
-	.data_in    (b_patcher_data_out ),
-	.patch_in   (b_patcher_patch_out),
+	.data_in    (b_data_channel ),
+	.patch_in   (b_patch_in),
 	.push_enable(1'b1               ), 
 	.ready_out  (b_rob_ready_out    ), 
 	.data_out   (b_rob_data_out     ), 
@@ -179,22 +161,7 @@ always_comb begin
 end
 
 //----- R -----
-// input -> patcher
-patcher_ax #(
-	.BUS_TYPE     (r_bus         ),
-	.master_id    (slave_id      ),
-	.NUM_OF_SLAVES(NUM_OF_MASTERS)
-) patcher_r (
-	.aclk     (aclk               ),
-	.aresetn  (aresetn            ),
-	.data_in  (r_data_channel     ),
-	.ready_out(r_ready_out        ),
-	.data_out (r_patcher_data_out ),
-	.ready_in (r_rob_ready_out    ),
-	.patch_out(r_patcher_patch_out),
-	.cfg      (cfg                ),
-	.cfg_en   (cfg_en             )
-);
+assign r_patch_in={r_data_channel.id};
 
 // patcher -> rob
 rob #(
@@ -204,8 +171,8 @@ rob #(
 ) u_r_rob (
 	.aclk       (aclk               ),
 	.arstn      (aresetn            ),
-	.data_in    (r_patcher_data_out ),
-	.patch_in   (r_patcher_patch_out),
+	.data_in    (r_data_channel ),
+	.patch_in   (r_patch_in),
 	.push_enable(1'b1               ), 
 	.ready_out  (r_rob_ready_out    ), 
 	.data_out   (r_rob_data_out     ), 

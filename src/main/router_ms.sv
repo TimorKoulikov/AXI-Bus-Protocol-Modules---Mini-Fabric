@@ -78,10 +78,10 @@ output aw_bus [NUM_OF_SLAVES -1 : 0] aw_data_out;
 output ar_bus [NUM_OF_SLAVES -1 : 0] ar_data_out;
 output w_bus  [NUM_OF_SLAVES -1 : 0] w_data_out;
 
-output [2:0] end_transaction ;
-output [2:0] is_urgent;
-output [2:0][token_width -1 :0] num_tokens;
-output [2: 0][2:0] needy_level; 	//[num_of_channel:0][needy_num_of_bits] 
+output [NUM_OF_CHANNEL -1 : 0] end_transaction ;
+output [NUM_OF_CHANNEL -1 : 0] is_urgent;
+output [NUM_OF_CHANNEL -1 :0][token_width -1 : 0] num_tokens;
+output [NUM_OF_CHANNEL -1 : 0][2:0] needy_level; 	//[num_of_channel:0][needy_num_of_bits] 
 
 //-----logic-----
 // router <-> ROB wires
