@@ -51,14 +51,14 @@ assign b_ready_in_sel = b_ready_in[grant[0]];
 //ROB
 rob #(.BUS_TYPE(b_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_b_rob (
 	.aclk       (aclk       		),
-	.arstn      (aresetn      		),
+	.aresetn    (aresetn      		),
 	.data_in    (b_data_in_sel    	),
 	.patch_in   (b_patch_in   		),
 	.push_enable(b_ready_in_sel		),
 	.ready_out  (b_ready_out  		),
 	.data_out   (b_data_out   		),
 	.patch_out  (b_rob_patch_out  	),
-	.pop_enable        ('1        	)
+	.pop_enable ('1		        	)
 );
 
 //output
@@ -73,7 +73,7 @@ assign r_ready_in_sel = r_ready_in[grant[1]];
 //ROB
 rob #(.BUS_TYPE(r_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_r_rob (
 	.aclk       (aclk       		),
-	.arstn      (aresetn      		),
+	.aresetn    (aresetn      		),
 	.data_in    (b_data_in_sel    	),
 	.patch_in   (r_patch_in   		),
 	.push_enable(r_ready_in_sel		),

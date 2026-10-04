@@ -20,62 +20,85 @@ module top_block #(
 	input aresetn,                          //axi resetn
 	input cfg_t cfg,
 	input cfg_en,
-	axi_if.master_if masters[NUM_OF_SLAVES], // Fabric acts as master to external slaves
-	axi_if.slave_if  slaves[NUM_OF_MASTERS]// Fabric acts as slave to external masters
+	axi_if.master_if masters[NUM_OF_MASTERS], // Fabric acts as master to external slaves
+	axi_if.slave_if  slaves[NUM_OF_SLAVES]// Fabric acts as slave to external masters
 );
 
 //----- Crossbar interconnect buses -----
 // Forward path: router_ms [m][s] -> arbiter_sl [s][m]
-aw_bus [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] aw_master_to_slave;
-ar_bus [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] ar_master_to_slave;
-w_bus  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] w_master_to_slave;
+aw_bus  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] aw_master_to_slave;
+ar_bus  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] ar_master_to_slave;
+w_bus   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] w_master_to_slave;
 
-aw_bus [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] aw_slave_from_master;
-ar_bus [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] ar_slave_from_master;
-w_bus  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] w_slave_from_master;
+patch_t [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] aw_patch_master_to_slave;
+patch_t [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] ar_patch_master_to_slave;
+patch_t [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] w_patch_master_to_slave;
 
-logic  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] aw_ready_sl_to_ms;
-logic  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] ar_ready_sl_to_ms;
-logic  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] w_ready_sl_to_ms;
+aw_bus  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] aw_slave_from_master;
+ar_bus  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] ar_slave_from_master;
+w_bus   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] w_slave_from_master;
 
-logic  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] aw_ready_ms_to_sl;
-logic  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] ar_ready_ms_to_sl;
-logic  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] w_ready_ms_to_sl;
+patch_t [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] aw_patch_slave_from_master;
+patch_t [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] ar_patch_slave_from_master;
+patch_t [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] w_patch_slave_from_master;
+
+logic   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] aw_ready_sl_to_ms;
+logic   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] ar_ready_sl_to_ms;
+logic   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] w_ready_sl_to_ms;
+
+logic   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] aw_ready_ms_to_sl;
+logic   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] ar_ready_ms_to_sl;
+logic   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] w_ready_ms_to_sl;
 
 // Return path: router_sl [s][m] -> arbiter_ms [m][s]
-b_bus  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] b_slave_to_master_raw;
-r_bus  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] r_slave_to_master_raw;
+b_bus   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] b_slave_to_master_raw;
+r_bus   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] r_slave_to_master_raw;
 
-b_bus  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] b_slave_to_master;
-r_bus  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] r_slave_to_master;
+patch_t [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] b_patch_slave_to_master_raw;
+patch_t [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] r_patch_slave_to_master_raw;
 
-logic  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] b_ready_ms_to_sl;
-logic  [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] r_ready_ms_to_sl;
+b_bus   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] b_slave_to_master;
+r_bus   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] r_slave_to_master;
 
-logic  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] b_ready_sl_from_ms;
-logic  [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] r_ready_sl_from_ms;
+patch_t [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] b_patch_slave_to_master;
+patch_t [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] r_patch_slave_to_master;
+
+logic   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] b_ready_ms_to_sl;
+logic   [NUM_OF_MASTERS - 1 : 0][NUM_OF_SLAVES  - 1 : 0] r_ready_ms_to_sl;
+
+logic   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] b_ready_sl_from_ms;
+logic   [NUM_OF_SLAVES  - 1 : 0][NUM_OF_MASTERS - 1 : 0] r_ready_sl_from_ms;
 
 // Transpose [master][slave] <-> [slave][master] matrix
 always_comb begin
 	for (int m = 0; m < NUM_OF_MASTERS; m++) begin
 		for (int s = 0; s < NUM_OF_SLAVES; s++) begin
 			// Forward Data: Master -> Slave
-			aw_slave_from_master[s][m] = aw_master_to_slave[m][s];
-			ar_slave_from_master[s][m] = ar_master_to_slave[m][s];
-			w_slave_from_master[s][m]  = w_master_to_slave[m][s];
+			aw_slave_from_master[s][m]       = aw_master_to_slave[m][s];
+			ar_slave_from_master[s][m]       = ar_master_to_slave[m][s];
+			w_slave_from_master[s][m]        = w_master_to_slave[m][s];
+
+			// Forward Patch: Master -> Slave
+			aw_patch_slave_from_master[s][m] = aw_patch_master_to_slave[m][s];
+			ar_patch_slave_from_master[s][m] = ar_patch_master_to_slave[m][s];
+			w_patch_slave_from_master[s][m]  = w_patch_master_to_slave[m][s];
 
 			// Return Data: Slave -> Master
-			b_slave_to_master[m][s]    = b_slave_to_master_raw[s][m];
-			r_slave_to_master[m][s]    = r_slave_to_master_raw[s][m];
+			b_slave_to_master[m][s]          = b_slave_to_master_raw[s][m];
+			r_slave_to_master[m][s]          = r_slave_to_master_raw[s][m];
+
+			// Return Patch: Slave -> Master
+			b_patch_slave_to_master[m][s]    = b_patch_slave_to_master_raw[s][m];
+			r_patch_slave_to_master[m][s]    = r_patch_slave_to_master_raw[s][m];
 
 			// Forward Ready (Slave->Master)
-			aw_ready_ms_to_sl[m][s]    = aw_ready_sl_to_ms[s][m];
-			ar_ready_ms_to_sl[m][s]    = ar_ready_sl_to_ms[s][m];
-			w_ready_ms_to_sl[m][s]     = w_ready_sl_to_ms[s][m];
+			aw_ready_ms_to_sl[m][s]          = aw_ready_sl_to_ms[s][m];
+			ar_ready_ms_to_sl[m][s]          = ar_ready_sl_to_ms[s][m];
+			w_ready_ms_to_sl[m][s]           = w_ready_sl_to_ms[s][m];
 
 			// Return Ready (Master->Slave)
-			b_ready_sl_from_ms[s][m]   = b_ready_ms_to_sl[m][s];
-			r_ready_sl_from_ms[s][m]   = r_ready_ms_to_sl[m][s];
+			b_ready_sl_from_ms[s][m]         = b_ready_ms_to_sl[m][s];
+			r_ready_sl_from_ms[s][m]         = r_ready_ms_to_sl[m][s];
 		end
 	end
 end
@@ -125,6 +148,7 @@ arbiter_engine #(
 );
 
 //----- Master Side -----
+
 genvar i;
 generate
 	for (i = 0; i < NUM_OF_MASTERS; i++) begin : gen_master
@@ -190,29 +214,32 @@ generate
 			.NUM_OF_SLAVES(NUM_OF_SLAVES),
 			.TOKEN_WIDTH  (TOKEN_WIDTH  )
 		) u_router_ms (
-			.aclk             (aclk                   ),
-			.aresetn          (aresetn                ),
-			.aw_data_channel  (m_aw                   ),
-			.aw_ready_out     (masters[i].AWREADY     ),
-			.aw_data_out      (aw_master_to_slave[i]  ),
-			.aw_ready_in      (aw_ready_ms_to_sl[i]   ),
-			.ar_data_channel  (m_ar                   ),
-			.ar_ready_out     (masters[i].ARREADY     ),
-			.ar_data_out      (ar_master_to_slave[i]  ),
-			.ar_ready_in      (ar_ready_ms_to_sl[i]   ),
-			.w_data_channel   (m_w                    ),
-			.w_ready_out      (masters[i].WREADY      ),
-			.w_data_out       (w_master_to_slave[i]   ),
-			.w_ready_in       (w_ready_ms_to_sl[i]    ),
-			.cfg              (cfg                    ),
-			.cfg_en           (cfg_en                 ),
-			.start_transaction(ms_start_transaction   ),
-			.end_transaction  (ms_end_transaction     ),
-			.token_allocation (ms_token_allocation    ),
-			.num_tokens       (ms_curr_tokens         ),
-			.mode             (ms_mode                ),
-			.is_urgent        (ms_is_urgent           ),
-			.needy_level      (ms_needy_level         )
+			.aclk             (aclk                       ),
+			.aresetn          (aresetn                    ),
+			.aw_data_channel  (m_aw                       ),
+			.aw_ready_out     (masters[i].AWREADY         ),
+			.aw_data_out      (aw_master_to_slave[i]      ),
+			.aw_patch_out     (aw_patch_master_to_slave[i]), // New Patch Forward
+			.aw_ready_in      (aw_ready_ms_to_sl[i]       ),
+			.ar_data_channel  (m_ar                       ),
+			.ar_ready_out     (masters[i].ARREADY         ),
+			.ar_data_out      (ar_master_to_slave[i]      ),
+			.ar_patch_out     (ar_patch_master_to_slave[i]), // New Patch Forward
+			.ar_ready_in      (ar_ready_ms_to_sl[i]       ),
+			.w_data_channel   (m_w                        ),
+			.w_ready_out      (masters[i].WREADY          ),
+			.w_data_out       (w_master_to_slave[i]       ),
+			.w_patch_out      (w_patch_master_to_slave[i] ), // New Patch Forward
+			.w_ready_in       (w_ready_ms_to_sl[i]        ),
+			.cfg              (cfg                        ),
+			.cfg_en           (cfg_en                     ),
+			.start_transaction(ms_start_transaction       ),
+			.end_transaction  (ms_end_transaction         ),
+			.token_allocation (ms_token_allocation        ),
+			.num_tokens       (ms_curr_tokens             ),
+			.mode             (ms_mode                    ),
+			.is_urgent        (ms_is_urgent               ),
+			.needy_level      (ms_needy_level             )
 		);
 
 		// Tie-off grant for B/R arbiters, as top-level arbitration handles forward paths
@@ -223,17 +250,19 @@ generate
 			.master_id    (i            ),
 			.NUM_OF_SLAVES(NUM_OF_SLAVES)
 		) u_arbiter_ms (
-			.aclk       (aclk                 ),
-			.aresetn    (aresetn              ),
-			.b_data_in  (b_slave_to_master[i] ),
-			.b_ready_in (masters[i].BREADY    ),
-			.b_ready_out(b_ready_ms_to_sl[i]  ),
-			.b_data_out (m_b                  ),
-			.r_data_in  (r_slave_to_master[i] ),
-			.r_ready_in (masters[i].RREADY    ),
-			.r_ready_out(r_ready_ms_to_sl[i]  ),
-			.r_data_out (m_r                  ),
-			.grant      (ms_arb_grant         )
+			.aclk       (aclk                       ),
+			.aresetn    (aresetn                    ),
+			.b_data_in  (b_slave_to_master[i]       ),
+			.b_ready_in (masters[i].BREADY          ),
+			.b_patch_in (b_patch_slave_to_master[i] ), // New Patch Return
+			.b_ready_out(b_ready_ms_to_sl[i]        ),
+			.b_data_out (m_b                        ),
+			.r_data_in  (r_slave_to_master[i]       ),
+			.r_ready_in (masters[i].RREADY          ),
+			.r_patch_in (r_patch_slave_to_master[i] ), // New Patch Return
+			.r_ready_out(r_ready_ms_to_sl[i]        ),
+			.r_data_out (m_r                        ),
+			.grant      (ms_arb_grant               )
 		);
 
 		// Transpose between [channel][master] and [master][channel]
@@ -319,46 +348,51 @@ generate
 			.NUM_OF_MASTERS(NUM_OF_MASTERS),
 			.TOKEN_WIDTH   (TOKEN_WIDTH   )
 		) u_router_sl (
-			.aclk             (aclk                     ),
-			.aresetn          (aresetn                  ),
-			.b_data_channel   (s_b                      ),
-			.b_ready_out      (slaves[j].BREADY         ),
-			.b_ready_in       (b_ready_sl_from_ms[j]    ),
-			.b_data_out       (b_slave_to_master_raw[j] ),
-			.r_data_channel   (s_r                      ),
-			.r_ready_out      (slaves[j].RREADY         ),
-			.r_ready_in       (r_ready_sl_from_ms[j]    ),
-			.r_data_out       (r_slave_to_master_raw[j] ),
-			.cfg              (cfg                      ),
-			.cfg_en           (cfg_en                   ),
-			.start_transaction(sl_start_transaction     ),
-			.end_transaction  (sl_end_transaction       ),
-			.token_allocation (sl_token_allocation      ),
-			.num_tokens       (sl_curr_tokens           ),
-			.is_urgent        (sl_is_urgent             ),
-			.needy_level      (sl_needy_level           ),
-			.mode             (sl_mode                  )
+			.aclk             (aclk                          ),
+			.aresetn          (aresetn                       ),
+			.b_data_channel   (s_b                           ),
+			.b_ready_out      (slaves[j].BREADY              ),
+			.b_ready_in       (b_ready_sl_from_ms[j]         ),
+			.b_data_out       (b_slave_to_master_raw[j]      ),
+			.b_patch_out      (b_patch_slave_to_master_raw[j]), // New Patch Return
+			.r_data_channel   (s_r                           ),
+			.r_ready_out      (slaves[j].RREADY              ),
+			.r_ready_in       (r_ready_sl_from_ms[j]         ),
+			.r_data_out       (r_slave_to_master_raw[j]      ),
+			.r_patch_out      (r_patch_slave_to_master_raw[j]), // New Patch Return
+			.cfg              (cfg                           ),
+			.cfg_en           (cfg_en                        ),
+			.start_transaction(sl_start_transaction          ),
+			.end_transaction  (sl_end_transaction            ),
+			.token_allocation (sl_token_allocation           ),
+			.num_tokens       (sl_curr_tokens                ),
+			.is_urgent        (sl_is_urgent                  ),
+			.needy_level      (sl_needy_level                ),
+			.mode             (sl_mode                       )
 		);
 
 		arbiter_sl #(
 			.slave_id      (j             ),
 			.NUM_OF_MASTERS(NUM_OF_MASTERS)
 		) u_arbiter_sl (
-			.aclk        (aclk                   ),
-			.aresetn     (aresetn                ),
-			.aw_data_in  (aw_slave_from_master[j]),
-			.aw_ready_in (slaves[j].AWREADY      ),
-			.aw_ready_out(aw_ready_sl_to_ms[j]   ),
-			.aw_data_out (s_aw                   ),
-			.ar_data_in  (ar_slave_from_master[j]),
-			.ar_ready_in (slaves[j].ARREADY      ),
-			.ar_ready_out(ar_ready_sl_to_ms[j]   ),
-			.ar_data_out (s_ar                   ),
-			.w_data_in   (w_slave_from_master[j] ),
-			.w_ready_in  (slaves[j].WREADY       ),
-			.w_ready_out (w_ready_sl_to_ms[j]    ),
-			.w_data_out  (s_w                    ),
-			.grant       (grant[2:0]             ) 
+			.aclk        (aclk                           ),
+			.aresetn     (aresetn                        ),
+			.aw_data_in  (aw_slave_from_master[j]        ),
+			.aw_patch_in (aw_patch_slave_from_master[j]  ), // New Patch Forward
+			.aw_ready_in (slaves[j].AWREADY              ),
+			.aw_ready_out(aw_ready_sl_to_ms[j]           ),
+			.aw_data_out (s_aw                           ),
+			.ar_data_in  (ar_slave_from_master[j]        ),
+			.ar_patch_in (ar_patch_slave_from_master[j]  ), // New Patch Forward
+			.ar_ready_in (slaves[j].ARREADY              ),
+			.ar_ready_out(ar_ready_sl_to_ms[j]           ),
+			.ar_data_out (s_ar                           ),
+			.w_data_in   (w_slave_from_master[j]         ),
+			.w_patch_in  (w_patch_slave_from_master[j]   ), // New Patch Forward
+			.w_ready_in  (slaves[j].WREADY               ),
+			.w_ready_out (w_ready_sl_to_ms[j]            ),
+			.w_data_out  (s_w                            ),
+			.grant       (ms_grant_eng                   ) 
 		);
 
 		always_comb begin

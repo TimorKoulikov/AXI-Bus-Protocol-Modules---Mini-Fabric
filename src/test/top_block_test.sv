@@ -46,7 +46,31 @@ module top_block_test #() ();
 		aclk = 0;
 		forever #5 aclk = ~aclk;
 	end
-
+	
+	generate
+		for (genvar i = 0; i < NUM_OF_MASTERS; i++) begin
+			initial begin
+				masters_if[i].AWVALID = 0;
+				masters_if[i].WVALID  = 0;
+				masters_if[i].BREADY  = 0;
+				masters_if[i].ARVALID = 0;
+				masters_if[i].RREADY  = 0;
+			end
+		end
+	endgenerate
+	
+	generate
+		for(genvar i = 0; i < NUM_OF_SLAVES; i++) begin
+			initial begin
+				slaves_if[i].AWREADY  = 0;
+				slaves_if[i].WREADY   = 0;
+				slaves_if[i].BVALID   = 0;
+				slaves_if[i].ARREADY  = 0;
+				slaves_if[i].RVALID   = 0;
+			end
+		end
+	endgenerate
+	
 	//----- Test Sequence -----
 	initial begin
 		$fsdbDumpvars(0, top_block_test);
@@ -57,21 +81,7 @@ module top_block_test #() ();
 		cfg_en  = 0;
 		cfg     = '0;
 
-		for(int i = 0; i < NUM_OF_MASTERS; i++) begin
-			masters_if[i].AWVALID = 0;
-			masters_if[i].WVALID  = 0;
-			masters_if[i].BREADY  = 0;
-			masters_if[i].ARVALID = 0;
-			masters_if[i].RREADY  = 0;
-		end
-
-		for(int i = 0; i < NUM_OF_SLAVES; i++) begin
-			slaves_if[i].AWREADY  = 0;
-			slaves_if[i].WREADY   = 0;
-			slaves_if[i].BVALID   = 0;
-			slaves_if[i].ARREADY  = 0;
-			slaves_if[i].RVALID   = 0;
-		end
+		
 
 		// 2. Apply Reset
 		#20;

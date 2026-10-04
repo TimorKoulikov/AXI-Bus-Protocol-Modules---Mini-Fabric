@@ -20,12 +20,14 @@ module router_sl #(
 	b_data_channel,     //axi b data channel from slave
 	b_ready_out,        //axi bready signal to slave
 	b_data_out,         //b data channel to arbiter_ms
+	b_patch_out,
 	b_ready_in,         //bready signal from arbiter_ms
 	
 	// R channel
 	r_data_channel,     //axi r data channel from slave
 	r_ready_out,        //axi rready signal to slave
 	r_data_out,         //r data channel to arbiter_ms
+	r_patch_out,
 	r_ready_in,         //rready signal from arbiter_ms
 	
 	// configuration
@@ -68,6 +70,9 @@ output logic r_ready_out;
 
 output b_bus [NUM_OF_MASTERS - 1 : 0] b_data_out;
 output r_bus [NUM_OF_MASTERS - 1 : 0] r_data_out;
+
+output patch_t [NUM_OF_MASTERS - 1 : 0] b_patch_out;
+output patch_t [NUM_OF_MASTERS - 1 : 0] r_patch_out;
 
 output [1:0] end_transaction;
 output [1:0] is_urgent;
@@ -157,6 +162,7 @@ always_comb begin
 	if (!empty[0]) begin
 		b_data_out[b_rob_patch_out.slave_id] = b_rob_data_out;
 		token_enable[0] = b_ready_in[b_rob_patch_out.slave_id];
+		b_patch_out[b_rob_patch_out.slave_id] = b_rob_patch_out;
 	end
 end
 
@@ -192,6 +198,7 @@ always_comb begin
 	if (!empty[1]) begin
 		r_data_out[r_rob_patch_out.slave_id] = r_rob_data_out;
 		token_enable[1] = r_ready_in[r_rob_patch_out.slave_id];
+		r_patch_out[r_rob_patch_out.slave_id] = r_rob_patch_out;
 	end
 end
 

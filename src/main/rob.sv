@@ -192,11 +192,11 @@ always_ff @(posedge aclk or negedge aresetn) begin
                     
                     // 2) intra-queue id-traversal
                     // if the new push is urgent --> we promote all older transactions with the same ID to urgent
-                    if (do_push && patch_in.urgent) begin
+                    /*if (do_push && patch_in.urgent) begin
                         if (slot_data[i].id == data_in.id) begin 
                             slot_patch[i].urgent <= 1'b1;
                         end
-                    end
+                    end*/
                     
                     // 3) stream aging to urgent
                     if (slot_patch[i].stream && !slot_patch[i].urgent) begin

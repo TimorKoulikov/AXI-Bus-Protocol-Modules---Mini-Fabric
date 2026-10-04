@@ -67,7 +67,6 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	// Modports for Different Roles
 	// ======================================================
 
-	// APB2AXI DUT drives: *READY*, *RDATA*, *BRESP*, etc.
 	modport master_if (
 		input  ACLK, ARESETn,
 		input  AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWLOCK, AWCACHE, AWPROT, AWQOS,
