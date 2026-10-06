@@ -16,11 +16,47 @@ fi
 VERBOSE=0
 SPECIFIC_TEST=""
 
+usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "  -v                  Enable verbose compilation/output"
+    echo "  -t, --test NAME     Run a specific test"
+    echo "  -h, --help          Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $0                  Run all tests"
+    echo "  $0 -v               Run all tests with verbose output"
+    echo "  $0 -t axi_test      Run only axi_test"
+}
+
+VERBOSE=0
+SPECIFIC_TEST=""
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        -v) VERBOSE=1 ;;
-        -t|--test) SPECIFIC_TEST="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+        -v)
+            VERBOSE=1
+            ;;
+        -t|--test)
+            if [ -z "$2" ]; then
+                echo "Error: $1 requires a test name."
+                usage
+                exit 1
+            fi
+            SPECIFIC_TEST="$2"
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown parameter: $1"
+            echo
+            usage
+            exit 1
+            ;;
     esac
     shift
 done
@@ -47,7 +83,7 @@ for TEST_TOP in $TESTS
 do
 	TEST_TOP=$(basename "$TEST_TOP" .sv)
 
-    echo "========================================"
+    	echo "========================================"
 	echo " STARTING TEST: $TEST_TOP"
 	echo "========================================"
     
@@ -94,9 +130,13 @@ do
     
     grep -qEi "ERROR| FAIL" $OUT_DIR/sim_$TEST_TOP.log
 	if [ $? -eq 0 ]; then
-    	echo "========================================"
-    	echo " TEST FAILED"
-    	echo "========================================"
+    		echo "========================================"
+    		echo " TEST FAILED"
+    		echo "========================================"
+	else
+    		echo "========================================"
+    		echo " TEST PASSED"
+    		echo "========================================"
 	fi
 
     # Suppress errors if ucli.key isn't generated
