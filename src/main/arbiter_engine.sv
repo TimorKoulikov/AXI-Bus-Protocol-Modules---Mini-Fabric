@@ -20,14 +20,14 @@ module arbiter_engine #(
 	// ==========================================================
 	// interface for arbitration (router_ms)
 	// ==========================================================
-	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] is_urgent,
-	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] end_transaction,
-	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] grant,
+	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] ms_is_urgent,
+	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] ms_end_transaction,
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0] ms_grant,
 	
 	// interface for token_allocation (router_ms)
-	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][1:0] needy_level,
-	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][1:0] mode,
-	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][TOKEN_WIDTH -1 : 0] num_of_tokens,
+	input  [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][1:0] ms_needy_level,
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][1:0] ms_mode,
+	output [NUM_OF_CHANNEL -1 :0][NUM_OF_MASTERS -1 : 0][TOKEN_WIDTH -1 : 0] ms_num_of_tokens,
 
 	// ==========================================================
 	// interface for arbitration (router_sl)
@@ -57,17 +57,17 @@ generate
 			arbiter_rr_ms_inst (
 				.aclk           (aclk              ),
 				.aresetn        (aresetn           ),
-				.is_urgent      (is_urgent[i]      ),
-				.end_transaction(end_transaction[i]),
-				.grant          (grant[i]          )
+				.is_urgent      (ms_is_urgent[i]      ),
+				.end_transaction(ms_end_transaction[i]),
+				.grant          (ms_grant[i]          )
 			);
 	end
 	
 	// generation token allocation for each master channel
 	for(i = 0; i < NUM_OF_MASTERS; i++) begin: gen_ms_token_alloc_master
 		for(j = 0; j < NUM_OF_CHANNEL; j++) begin: gen_ms_token_alloc_channel
-			assign mode[j][i] = needy_level[j][i];
-			assign num_of_tokens[j][i] = (needy_level[j][i] >= EXSTRA_BW) ? TOKEN_WIDTH'(2048) : TOKEN_WIDTH'(1024);
+			assign ms_mode[j][i] = ms_needy_level[j][i];
+			assign ms_num_of_tokens[j][i] = (ms_needy_level[j][i] >= EXSTRA_BW) ? TOKEN_WIDTH'(2048) : TOKEN_WIDTH'(1024);
 		end
 	end
 

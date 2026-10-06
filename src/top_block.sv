@@ -132,12 +132,12 @@ arbiter_engine #(
 	.aclk               (aclk                  ),
 	.aresetn            (aresetn               ),
 	// Master side (AW, AR, W)
-	.is_urgent          (ms_is_urgent_eng      ),
-	.end_transaction    (ms_end_transaction_eng),
-	.grant              (ms_grant_eng          ),
-	.needy_level        (ms_needy_level_eng    ),
-	.mode               (ms_mode_eng           ),
-	.num_of_tokens      (ms_num_of_tokens_eng  ),
+	.ms_is_urgent          (ms_is_urgent_eng      ),
+	.ms_end_transaction    (ms_end_transaction_eng),
+	.ms_grant              (ms_grant_eng          ),
+	.ms_needy_level        (ms_needy_level_eng    ),
+	.ms_mode               (ms_mode_eng           ),
+	.ms_num_of_tokens      (ms_num_of_tokens_eng  ),
 	// Slave side (B, R)
 	.sl_is_urgent       (sl_is_urgent_eng      ),
 	.sl_end_transaction (sl_end_transaction_eng),
@@ -262,7 +262,7 @@ generate
 			.r_patch_in (r_patch_slave_to_master[i] ), // New Patch Return
 			.r_ready_out(r_ready_ms_to_sl[i]        ),
 			.r_data_out (m_r                        ),
-			.grant      (ms_arb_grant               )
+			.grant      (sl_grant_eng               )
 		);
 
 		// Transpose between [channel][master] and [master][channel]
