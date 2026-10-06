@@ -197,6 +197,7 @@ generate
 		assign m_w.wstrb    = masters[i].WSTRB;
 		assign m_w.wlast    = masters[i].WLAST;
 		assign m_w.valid    = masters[i].WVALID;
+		assign m_w.id		= masters[i].WID;
 
 		// 4. Unpack B & R channels (Struct -> Interface from arbiter_ms)
 		assign masters[i].BID    = m_b.id;

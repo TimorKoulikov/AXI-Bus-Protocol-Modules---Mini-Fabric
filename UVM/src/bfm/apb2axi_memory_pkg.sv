@@ -10,9 +10,9 @@ package apb2axi_memory_pkg;
   parameter int MEM_WORDS       = 2048;
   parameter logic [63:0] MEM_BASE_ADDR = 64'h0000000000001000;
 
-  localparam int BYTES_PER_BEAT = AW_BUS_WIDTH/8;
+  localparam int BYTES_PER_BEAT = AW_BUS_SIZE/8;
 
-  typedef logic [AW_BUS_WIDTH-1:0] mem_word_t;
+  typedef logic [AW_BUS_SIZE-1:0] mem_word_t;
 
   function automatic int unsigned addr2idx (logic [63:0] a);
     addr2idx = (a - MEM_BASE_ADDR) >> $clog2(BYTES_PER_BEAT);

@@ -131,6 +131,7 @@ module top_block_test #() ();
 				masters_if[0].WSTRB  <= 4'hF;
 				masters_if[0].WLAST  <= 1;
 				masters_if[0].WVALID <= 1;
+				masters_if[0].WID <=	4'd5;
 
 				wait(masters_if[0].WREADY);
 				@(posedge aclk);

@@ -8,7 +8,7 @@ localparam DATA_WIDTH = 32;
 localparam STRB_WIDTH = DATA_WIDTH/8;
 
 localparam AW_BUS_SIZE = 25 + ID_WIDTH + ADDR_WIDTH; // 25 is the sum of all unconfigurable bits (valid, ready, arlen, etc)
-localparam W_BUS_SIZE  = 3  + DATA_WIDTH + STRB_WIDTH;
+localparam W_BUS_SIZE  = 3  + DATA_WIDTH + STRB_WIDTH + ID_WIDTH;
 localparam B_BUS_SIZE  = 4  + ID_WIDTH;
 localparam AR_BUS_SIZE = 25 + ID_WIDTH + ADDR_WIDTH; // 25 is the sum of all unconfigurable bits (valid, ready, arlen, etc)
 localparam R_BUS_SIZE  = 5  + ID_WIDTH + DATA_WIDTH;
@@ -57,6 +57,7 @@ typedef struct packed {
 typedef struct packed{
 	logic 			         valid;
 	logic 					 ready;
+	logic [ID_WIDTH-1:0]     id;
 	logic [DATA_WIDTH-1:0]   wdata;
 	logic [STRB_WIDTH-1:0]   wstrb;
 	logic                    wlast;

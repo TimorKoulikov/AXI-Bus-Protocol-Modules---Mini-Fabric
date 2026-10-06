@@ -29,6 +29,7 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	logic                  		WLAST;
 	logic                  		WVALID;
 	logic                  		WREADY;
+	logic [ID_WIDTH-1:0]   		WID;
 
 	// ======================================================
 	// Write Response Channel
@@ -72,7 +73,7 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 		input  AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWLOCK, AWCACHE, AWPROT, AWQOS,
 		output AWREADY,
 
-		input  WDATA, WSTRB, WLAST, WVALID,
+		input  WDATA, WSTRB, WLAST, WVALID,WID,
 		output WREADY,
 
 		output BRESP, BID, BVALID,
@@ -91,7 +92,7 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 		output AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWLOCK, AWCACHE, AWPROT, AWQOS,
 		input  AWREADY,
 
-		output WDATA, WSTRB, WLAST, WVALID,
+		output WDATA, WSTRB, WLAST, WVALID,WID,
 		input  WREADY,
 
 		input  BRESP, BID, BVALID,
@@ -109,7 +110,7 @@ interface axi_if #(parameter ADDR_WIDTH = 32,
 	modport mon_side (
 		input ACLK, ARESETn,
 		input AWADDR, AWLEN, AWSIZE, AWBURST, AWID, AWVALID, AWREADY,
-		input WDATA, WSTRB, WLAST, WVALID, WREADY,
+		input WDATA, WSTRB, WLAST, WVALID, WREADY,WID,
 		input BRESP, BID, BVALID, BREADY,
 		input ARADDR, ARLEN, ARSIZE, ARBURST, ARID, ARVALID, ARREADY,
 		input RDATA, RRESP, RID, RVALID, RREADY, RLAST
