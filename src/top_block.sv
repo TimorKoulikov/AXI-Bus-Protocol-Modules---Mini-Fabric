@@ -13,7 +13,7 @@ import fabric_datatypes::*;
 module top_block #(
 	parameter NUM_OF_MASTERS = 3,
 	parameter NUM_OF_SLAVES  = 4,
-	parameter TOKEN_WIDTH    = 30
+	parameter TOKEN_WIDTH    = 32
 )
 (
 	input aclk,                             //axi clk
@@ -125,8 +125,8 @@ logic [1:0][NUM_OF_SLAVES - 1 : 0][1:0]                  sl_mode_eng;
 arbiter_engine #(
 	.NUM_OF_MASTERS    (NUM_OF_MASTERS),
 	.NUM_OF_SLAVES     (NUM_OF_SLAVES),
-	.NUM_OF_CHANNEL    (3), // 3 Forward Channels
-	.NUM_OF_SLV_CHANNEL(2), // 2 Return Channels
+	.NUM_OF_CHANNEL    (3), // AR, AW, W
+	.NUM_OF_SLV_CHANNEL(2), // R, B
 	.TOKEN_WIDTH       (TOKEN_WIDTH)
 ) u_arbiter_engine (
 	.aclk               (aclk                  ),
@@ -243,10 +243,6 @@ generate
 			.needy_level      (ms_needy_level             )
 		);
 
-		// Tie-off grant for B/R arbiters, as top-level arbitration handles forward paths
-		logic [1:0][NUM_OF_SLAVES - 1 : 0] ms_arb_grant;
-		assign ms_arb_grant = '0; 
-
 		arbiter_ms #(
 			.master_id    (i            ),
 			.NUM_OF_SLAVES(NUM_OF_SLAVES)
@@ -281,7 +277,7 @@ generate
 			end
 		end
 
-	end
+	end //end for
 endgenerate
 
 //----- Slave Side -----

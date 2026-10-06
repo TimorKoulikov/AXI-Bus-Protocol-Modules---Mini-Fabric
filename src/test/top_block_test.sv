@@ -15,7 +15,7 @@ module top_block_test #() ();
 	//----- parameters -----
 	parameter NUM_OF_MASTERS = 3;
 	parameter NUM_OF_SLAVES  = 4;
-	parameter token_width    = 30;
+	parameter TOKEN_WIDTH    = 32;
 
 	//----- signals -----
 	logic aclk;
@@ -31,7 +31,7 @@ module top_block_test #() ();
 	top_block #(
 		.NUM_OF_MASTERS(NUM_OF_MASTERS),
 		.NUM_OF_SLAVES (NUM_OF_SLAVES),
-		.token_width   (token_width)
+		.TOKEN_WIDTH   (TOKEN_WIDTH)
 	) dut (
 		.aclk   (aclk),
 		.aresetn(aresetn),
