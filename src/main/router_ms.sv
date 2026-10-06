@@ -130,7 +130,7 @@ patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLA
 	.data_in  (aw_data_channel     ),
 	.ready_out(aw_ready_out        ), 
 	.data_out (aw_patcher_data_out ),
-	.ready_in (aw_patcher_ready_out),
+	.ready_in (aw_rob_ready_out	   ),
 	.patch_out(aw_patcher_patch_out),
 	.cfg      (cfg                 ),
 	.cfg_en   (cfg_en              )
@@ -238,7 +238,7 @@ patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(Q
 	.data_in    (w_data_channel             ),
 	.ready_out  (w_ready_out                ), 
 	.data_out   (w_patcher_data_out         ),
-	.ready_in   (w_patcher_ready_out        ),
+	.ready_in   (w_rob_ready_out        ),
 	.patch_in   (aw_patcher_patch_out       ),
 	.patch_valid(aw_patcher_data_out.valid  ),
 	.patch_out  (w_patcher_patch_out        )

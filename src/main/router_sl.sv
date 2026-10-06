@@ -90,6 +90,9 @@ logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 : 0] token_for_transaction;
 // input -> ROB
 patch_t r_patch_in;
 patch_t b_patch_in;
+
+logic b_ready_in_sel;
+logic r_ready_in_sel;
 // ROB -> output wires
 logic         b_rob_ready_out;
 b_bus   b_rob_data_out;
@@ -144,13 +147,14 @@ rob #(
 	.data_in    (b_data_channel ),
 	.patch_in   (b_patch_in),
 	.push_enable(1'b1               ), 
-	.ready_out  (b_rob_ready_out    ), 
+	.ready_out  (b_ready_out	    ), 
 	.data_out   (b_rob_data_out     ), 
 	.patch_out  (b_rob_patch_out    ),
 	.pop_enable (pop_enable[0]      ),
 	.is_empty_out  (empty[0]        ),
 	.is_full_out   (full[0]         ),
-	.got_urgent (is_urgent[0]       )
+	.got_urgent (is_urgent[0]       ),
+	.ready_in(b_ready_in_sel)
 );
 
 // Dispatcher: rob -> mux -> output
@@ -161,7 +165,7 @@ always_comb begin
 	
 	if (!empty[0]) begin
 		b_data_out[b_rob_patch_out.slave_id] = b_rob_data_out;
-		token_enable[0] = b_ready_in[b_rob_patch_out.slave_id];
+		b_ready_in_sel = b_ready_in[b_rob_patch_out.slave_id];
 		b_patch_out[b_rob_patch_out.slave_id] = b_rob_patch_out;
 	end
 end
@@ -186,7 +190,8 @@ rob #(
 	.pop_enable  (pop_enable[1]      ),
 	.is_empty_out(empty[1]        ),
 	.is_full_out (full[1]         ),
-	.got_urgent  (is_urgent[1]       )
+	.got_urgent  (is_urgent[1]       ),
+	.ready_in(r_ready_in_sel)
 );
 
 // Dispatcher: rob -> mux -> output
@@ -197,7 +202,7 @@ always_comb begin
 	
 	if (!empty[1]) begin
 		r_data_out[r_rob_patch_out.slave_id] = r_rob_data_out;
-		token_enable[1] = r_ready_in[r_rob_patch_out.slave_id];
+		r_ready_in_sel = r_ready_in[r_rob_patch_out.slave_id];
 		r_patch_out[r_rob_patch_out.slave_id] = r_rob_patch_out;
 	end
 end
