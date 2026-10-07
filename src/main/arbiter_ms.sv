@@ -42,12 +42,23 @@ r_bus r_data_in_sel; // the muxed logic from router_sl
 patch_t b_patch_in_sel;
 patch_t r_patch_in_sel;
 
-
+logic b_rob_ready;
+logic r_rob_ready;
 //----- B -----
 //MUX
-assign b_data_in_sel = b_data_in[grant[0]];
-assign b_patch_in_sel = b_patch_in[grant[0]];
-
+always_comb begin
+    b_data_in_sel  = '0;
+    b_patch_in_sel = '0;
+    b_ready_out    = '0;
+    
+    for (int m = 0; m < NUM_OF_SLAVES; m++) begin
+        if (grant[0][m]) begin
+            b_data_in_sel  = b_data_in[m];
+            b_patch_in_sel = b_patch_in[m];
+            b_ready_out[m] = b_rob_ready;
+        end
+    end
+end
 //ROB
 rob #(.BUS_TYPE(b_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_b_rob (
 	.aclk       (aclk       		),
@@ -55,9 +66,8 @@ rob #(.BUS_TYPE(b_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 	.data_in    (b_data_in_sel    	),
 	.patch_in   (b_patch_in_sel   	),
 	.push_enable(b_ready_in			),
-	.ready_out  (b_ready_out  		),
+	.ready_out  (b_rob_ready  		),
 	.data_out   (b_data_out   		),
-	//.patch_out  (b_rob_patch_out  	),
 	.pop_enable ('1		        	),
 	.ready_in(b_ready_in			)
 );
@@ -68,16 +78,27 @@ rob #(.BUS_TYPE(b_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 //----- R -----
 //MUX
 
-assign r_data_in_sel = r_data_in[grant[1]];
-assign r_patch_in_sel = r_patch_in[grant[1]];
+always_comb begin
+    r_data_in_sel  = '0;
+    r_patch_in_sel = '0;
+    r_ready_out    = '0;
+    
+    for (int m = 0; m < NUM_OF_SLAVES; m++) begin
+        if (grant[1][m]) begin
+            r_data_in_sel  = r_data_in[m];
+            r_patch_in_sel = r_patch_in[m];
+            r_ready_out[m] = r_rob_ready;
+        end
+    end
+end
 //ROB
 rob #(.BUS_TYPE(r_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)) u_r_rob (
 	.aclk       (aclk       		),
 	.aresetn    (aresetn      		),
 	.data_in    (r_data_in_sel    	),
-	.patch_in   (r_patch_in_sel   		),
+	.patch_in   (r_patch_in_sel     ),
 	.push_enable(r_ready_in			),
-	.ready_out  (r_ready_out  		),
+	.ready_out  (r_rob_ready  		),
 	.data_out   (r_data_out   		),
 	//.patch_out  (r_rob_patch_out 	),
 	.pop_enable ('1        			),

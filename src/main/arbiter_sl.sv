@@ -86,7 +86,8 @@ rob #(
 	.push_enable  (|grant[0]                          ), // Push if any master is granted
 	.ready_out    (aw_rob_ready                       ),
 	.data_out     (aw_data_out                        ),
-	.pop_enable   ('1								  )
+	.pop_enable   ('1								  ),
+	.ready_in(aw_ready_in)
 );
 
 
@@ -121,7 +122,8 @@ rob #(
 	.push_enable  (|grant[1]                          ), 
 	.ready_out    (ar_rob_ready                       ),
 	.data_out     (ar_data_out                        ),
-	.pop_enable          ('1  )
+	.pop_enable          ('1  ),
+	.ready_in(ar_ready_in)
 );
 
 
@@ -156,7 +158,8 @@ rob #(
 	.push_enable  (|grant[2]                          ), 
 	.ready_out    (w_rob_ready                        ),
 	.data_out     (w_data_out                         ),
-	.pop_enable   ('1		  						  )
+	.pop_enable   ('1		  						  ),
+	.ready_in(w_ready_in)
 );
 
 endmodule

@@ -84,7 +84,7 @@ output logic [1:0][1:0] needy_level;
 wire [NUM_OF_CHANNEL -1 : 0] full; 						
 wire [NUM_OF_CHANNEL -1 : 0] empty; 					
 wire [NUM_OF_CHANNEL -1 : 0] pop_enable;
-logic [NUM_OF_CHANNEL -1 : 0] token_enable;
+logic [NUM_OF_CHANNEL -1 : 0] active_pop;
 logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 : 0] token_for_transaction;
 
 // input -> ROB
@@ -115,7 +115,7 @@ router_control #(
 	.num_tokens           (num_tokens           ),
 	.pop_enable           (pop_enable           ),
 	.token_for_transaction(token_for_transaction),
-	.token_enable         (token_enable         ),
+	.active_pop         (active_pop         ),
 	.full                 (full                 ),
 	.empty                (empty                ),
 	.mode                 (mode                 )
@@ -160,7 +160,6 @@ rob #(
 // Dispatcher: rob -> mux -> output
 always_comb begin
 	b_data_out = '0;
-	token_enable[0] = 1'b0;
 	token_for_transaction[0] = 1; // B channel payload is always 1 token
 	
 	if (!empty[0]) begin
@@ -197,7 +196,6 @@ rob #(
 // Dispatcher: rob -> mux -> output
 always_comb begin
 	r_data_out = '0;
-	token_enable[1] = 1'b0;
 	token_for_transaction[1] = 1; // Set to burst length cost if tracking beats
 	
 	if (!empty[1]) begin

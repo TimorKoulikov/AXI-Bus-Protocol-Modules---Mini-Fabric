@@ -73,7 +73,7 @@ module top_block_test #() ();
 	
 	//----- Test Sequence -----
 	initial begin
-		$fsdbDumpvars(0, top_block_test);
+		$fsdbDumpvars(0, top_block_test,"+all");
 		$fsdbDumpMDA(0, top_block_test);
 		$display("--- Starting top_block Sanity Test ---");
 

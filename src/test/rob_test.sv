@@ -32,8 +32,8 @@ logic    pop_enable;
 logic    ready_in;
 
 // Token Tracking
-logic    token_enable;
-logic [TOKEN_WIDTH-1:0] tokens_used;
+logic    active_pop;
+logic [TOKEN_WIDTH-1:0] curr_token_cost;
 
 // Status
 logic    is_empty_out;
@@ -57,11 +57,11 @@ rob #(
     .patch_out(patch_out),
     .pop_enable(pop_enable),
     .ready_in(ready_in),
-    .token_enable(token_enable),
-    .tokens_used(tokens_used),
+    .curr_token_cost(curr_token_cost),
     .is_empty_out(is_empty_out),
     .is_full_out(is_full_out),
-    .got_urgent(got_urgent)
+    .got_urgent(got_urgent),
+    .active_pop(active_pop)
 );
 
 //----- clock  -----
@@ -153,8 +153,8 @@ initial begin
     
     if (is_empty_out) $display("test_3: PASS (ROB is empty after pop)");
     else $error("test_3: FAIL (ROB not empty after pop)");
-	if(!data_out.valid) $display("test_3.1: PASS ( ROB valid signal is null");
-	else $error("test_3.1: FAIL ( ROB valid signal is still high)");
+    if(!data_out.valid) $display("test_3.1: PASS ( ROB valid signal is null");
+    else $error("test_3.1: FAIL ( ROB valid signal is still high)");
     //======================================
 
     $display("\nTest 4: Full-Queue Backpressure");
@@ -233,15 +233,38 @@ initial begin
 
     $display("\nTest 10: Token Tracking Output");
     push_tx(.id(10), .urgent(0), .stream(0), .len(5)); // Push with len=5
-    pop_tx(out_id); // This task waits for posedge aclk where pop happens
+    //pop_tx(out_id); // This task waits for posedge aclk where pop happens
     
-    // Check token_enable and tokens_used on the exact cycle of the pop
-    if (token_enable && tokens_used == 5) 
-        $display("test_10: PASS (tokens_used correctly outputted %0d with token_enable asserted.", tokens_used);
+    // Check active_pop and tokens_used on the exact cycle of the pop
+    if ( !active_pop && curr_token_cost == 5) 
+        $display("test_10.1: PASS (tokens are correctly outputted %0d with active_pop asserted)", curr_token_cost);
     else 
-        $error("test_10: FAIL (token output incorrect. enable=%b, used=%0d", token_enable, tokens_used);
+        $error("test_10.1: FAIL (token output are incorrectly outputted. active_pop=%b, used=%0d)", active_pop, curr_token_cost);
+    
+    pop_tx(out_id);
+    
+    if (!active_pop && curr_token_cost == 0 && is_empty_out) 
+        $display("test_10: PASS (tokens_used correctly outputted %0d with active_pop asserted and empty ROB)", curr_token_cost);
+    else 
+        $error("test_10: FAIL (token output are incorrectly outputed. active_pop=%b, used=%0d is_empty_out=%0d)", active_pop, curr_token_cost,is_empty_out);
+	//======================================
 
+	$display("\nTest 11:(Negative test) Invalid Push Ignored");
+	// Attempt to push with push_enable=1 but data_in.valid=0
+	data_in.valid = 1'b0;
+	data_in.id    = 99;
+	push_enable   = 1'b1;
+	
+	@(posedge aclk);
+	@(posedge aclk);
+	
+	#1;
+	push_enable = 1'b0;
+	
+	if (is_empty_out) $display("test_11: PASS (ROB remained empty when data_in.valid=0)");
+	else $error("test_11: FAIL (ROB accepted transaction even though data_in.valid=0)");
     $finish;
+	
 end
 
 endmodule

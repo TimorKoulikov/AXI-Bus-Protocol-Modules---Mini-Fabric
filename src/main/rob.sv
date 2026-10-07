@@ -37,8 +37,8 @@ module rob #(
     input  logic    ready_in,    // Handshake signal from downstream (dispatcher or another rob)
 
     // --- Token Tracking (to Router Control) ---
-    output logic    token_enable,
-    output logic [TOKEN_WIDTH-1:0] tokens_used,  // Number of tokens used by the popped transaction
+    output logic    active_pop,
+    output logic [TOKEN_WIDTH-1:0] curr_token_cost,  // Number of tokens used by the popped transaction
     // --- Status Flags (to Control Modules) ---
     output logic    is_empty_out,
     output logic    is_full_out,
@@ -50,10 +50,10 @@ localparam AGE_WIDTH = $clog2(QUEUE_DEPTH);
 localparam TIMER_WIDTH = $clog2(CYCLES_S_TO_U + 1);
 
 //----- The Register File Array -----
-logic                   slot_valid [0:QUEUE_DEPTH-1];    
+logic                   slot_valid [0:QUEUE_DEPTH-1];
 logic [AGE_WIDTH-1:0]   slot_age   [0:QUEUE_DEPTH-1];  // array of counters tracking how long every transaction has been in the ROB
 logic [TIMER_WIDTH-1:0] slot_timer [0:QUEUE_DEPTH-1];  // array of counters tracking how long a stream transaction has been in the ROB
-BUS_TYPE                slot_data  [0:QUEUE_DEPTH-1];  
+BUS_TYPE                slot_data  [0:QUEUE_DEPTH-1];
 patch_t                 slot_patch [0:QUEUE_DEPTH-1];
 
 //----- Urgent Status & Push Handshake Logic -----
@@ -144,14 +144,25 @@ always_comb begin
     // connect to output ports
     data_out  = slot_data[winner_idx];
     patch_out = slot_patch[winner_idx];
+    
+    if ( is_empty_out || !pop_enable) begin
+        data_out.valid = 1'b0;
+    end
+    
+    if(!is_empty_out) begin
+        curr_token_cost = slot_patch[winner_idx].len;
+    end else begin
+        curr_token_cost = '0;
+    end
+    
+    active_pop = do_pop;
+     
 end
 
 
 //----- Unified Array Updater (Registers) -----
 always_ff @(posedge aclk or negedge aresetn) begin
     if (!aresetn) begin
-        token_enable <= 1'b0;
-        tokens_used  <= '0;
         for (int i = 0; i < QUEUE_DEPTH; i++) begin
             slot_valid[i] <= 1'b0;
             slot_age[i]   <= '0;
@@ -159,14 +170,6 @@ always_ff @(posedge aclk or negedge aresetn) begin
         end
     end 
     else begin
-        // token tracking - sync output on successful pop
-        if (do_pop) begin
-            token_enable <= 1'b1;
-            tokens_used  <= slot_patch[winner_idx].len;
-        end else begin
-            token_enable <= 1'b0;
-            tokens_used  <= '0;
-        end
 
         // Push action - write new data into the empty slot
         if (do_push) begin

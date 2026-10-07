@@ -24,7 +24,7 @@ module router_control #(
 	// interface with rob
 	output logic [NUM_OF_CHANNEL -1 : 0] 					pop_enable,
 	input  logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0] token_for_transaction,
-	input  logic [NUM_OF_CHANNEL -1 : 0] 					token_enable,
+	input  logic [NUM_OF_CHANNEL -1 : 0] 					active_pop,
 	input  logic [NUM_OF_CHANNEL -1 : 0] 					full,
 	input  logic [NUM_OF_CHANNEL -1 : 0] 					empty
 );
@@ -54,7 +54,7 @@ generate
 			.data_load(token_allocation[i]),
 			.load(insert_tokens[i]),
 			.data_unload(token_for_transaction[i]),
-			.unload(pop_enable[i]),
+			.unload(active_pop[i]),
 			.count(curr_num_tokens[i]),
 			.mode(mode[i])
 			
@@ -77,7 +77,7 @@ generate
 				TRANSACTION_POP_TOKENS: begin	
 					if( curr_num_tokens[i] < token_for_transaction[i]) begin
 						stop_transaction[i]=1'b1;
-					end else if(token_enable[i]) begin
+					end else begin
 						pop_enable[i]=1'b1;
 					end
 				end

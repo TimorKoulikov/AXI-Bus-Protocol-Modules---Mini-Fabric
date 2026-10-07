@@ -18,7 +18,7 @@ logic aresetn;
 logic [NUM_OF_CHANNEL -1 : 0] start_transaction;
 logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0]  token_allocation;
 logic [NUM_OF_CHANNEL -1 : 0][TOKEN_WIDTH -1 :0]  token_for_transaction;
-logic [NUM_OF_CHANNEL -1 : 0] token_enable;
+logic [NUM_OF_CHANNEL -1 : 0] active_pop;
 
 //----- inputs from ROB
 logic [NUM_OF_CHANNEL -1 : 0] empty;
@@ -41,7 +41,7 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL), .TOKEN_WIDTH(TOKEN_WIDTH)) rou
 	.full(full),
 	.empty(empty),
 	.token_for_transaction(token_for_transaction),
-	.token_enable(token_enable),
+	.active_pop(active_pop),
 	.mode(mode),
 	.num_tokens(num_tokens)
 );
@@ -111,7 +111,7 @@ begin
 			token_for_transaction[i] = tokens / 3;
 			$display("token_for_transaction =%d",token_for_transaction[i]);
 			#10;
-			token_enable[i]=1'b1;
+            active_pop[i]=1'b1;
 			#10;
 			assert(router_control_uut.curr_num_tokens[i] == tokens - token_for_transaction[i]) begin
 				$display("test_3: PASS [1/2]");
@@ -134,7 +134,7 @@ begin
 					break;
 			end
 			old_tokens = router_control_uut.curr_num_tokens[i];
-			token_enable[i]=1'b0;
+            active_pop[i]=1'b0;
 			start_transaction[i]=1'b1;
 			tokens = $urandom();
 			token_allocation[i] = tokens;

@@ -58,7 +58,7 @@ module router_ms #(
 wire  [NUM_OF_CHANNEL - 1 : 0]                      full; 						
 wire  [NUM_OF_CHANNEL - 1 : 0]                      empty; 					
 wire  [NUM_OF_CHANNEL - 1 : 0]                      pop_enable;
-logic [NUM_OF_CHANNEL - 1 : 0]                      token_enable;
+logic [NUM_OF_CHANNEL - 1 : 0]                      active_pop;
 logic [NUM_OF_CHANNEL - 1 : 0][TOKEN_WIDTH - 1 : 0] token_for_transaction;
 
 // patcher -> ROB wires
@@ -101,7 +101,7 @@ router_control #(
 	.num_tokens           (num_tokens           ),
 	.pop_enable           (pop_enable           ),
 	.token_for_transaction(token_for_transaction),
-	.token_enable         (token_enable         ),
+	.active_pop           (active_pop           ),
 	.full                 (full                 ),
 	.empty                (empty                ),
 	.mode                 (mode                 )
@@ -153,8 +153,8 @@ rob #(
 	.patch_out    (aw_rob_patch_out_internal),
 	.pop_enable   (pop_enable[0]            ),
 	.ready_in     (aw_rob_ready_in          ),
-	.token_enable (token_enable[0]          ),
-	.tokens_used  (token_for_transaction[0] ),
+	.active_pop (active_pop[0]          ),
+	.curr_token_cost  (token_for_transaction[0] ),
 	.is_empty_out (empty[0]                 ),
 	.is_full_out  (full[0]                  ),
 	.got_urgent   (is_urgent[0]             )
@@ -207,8 +207,8 @@ rob #(
 	.patch_out    (ar_rob_patch_out_internal),
 	.pop_enable   (pop_enable[1]            ),
 	.ready_in     (ar_rob_ready_in          ),
-	.token_enable (token_enable[1]          ),
-	.tokens_used  (token_for_transaction[1] ),
+	.active_pop (active_pop[1]          ),
+	.curr_token_cost  (token_for_transaction[1] ),
 	.is_empty_out (empty[1]                 ),
 	.is_full_out  (full[1]                  ),
 	.got_urgent   (is_urgent[1]             )
@@ -261,8 +261,8 @@ rob #(
 	.patch_out    (w_rob_patch_out_internal ),
 	.pop_enable   (pop_enable[2]            ),
 	.ready_in     (w_rob_ready_in           ),
-	.token_enable (token_enable[2]          ),
-	.tokens_used  (token_for_transaction[2] ),
+	.active_pop (active_pop[2]          ),
+	.curr_token_cost  (token_for_transaction[2] ),
 	.is_empty_out (empty[2]                 ),
 	.is_full_out  (full[2]                  ),
 	.got_urgent   (is_urgent[2]             )
