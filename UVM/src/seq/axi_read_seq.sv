@@ -44,8 +44,8 @@ class axi_read_seq extends uvm_sequence;
                // a write-then-read test can verify data integrity.
                if (!req.randomize() with {
                     write == 0;
-                    addr  inside {[`AXI_ADDR_WIDTH'h0000_1000 : `AXI_ADDR_WIDTH'h0000_1FF0]};
-                    addr  % 8 == 0;          // 64-bit aligned
+                    addr  inside {[`AXI_ADDR_WIDTH'('h0000_1000) : `AXI_ADDR_WIDTH'('h0000_1FF0)]};
+                    addr  % 4 == 0;          // 32-bit aligned
                     len   == 0;              // single-beat for now
                     size  == 3'b011;         // 8 bytes (matches DATA_WIDTH=64)
                     burst == 2'b01;          // INCR
@@ -57,7 +57,7 @@ class axi_read_seq extends uvm_sequence;
                `uvm_info("AXI_READ_SEQ",
                     $sformatf("Read %0d: addr=0x%08h data=0x%016h resp=%0d",
                               i, req.addr, req.data, req.resp),
-                    apb2axi_verbosity)
+                    axi_verbosity)
 
           end
 

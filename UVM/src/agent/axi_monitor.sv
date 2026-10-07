@@ -89,7 +89,7 @@ class axi_monitor extends uvm_monitor;
                               "AW handshake: id=%0d addr=0x%0h len=%0d size=%0d burst=%0d",
                               tr.id, tr.addr, tr.len, tr.size, tr.burst
                          ),
-                         apb2axi_verbosity
+                         axi_verbosity
                     )
 
                     // Spawn a per-transaction handler.
@@ -120,7 +120,7 @@ class axi_monitor extends uvm_monitor;
                               "AR handshake: id=%0d addr=0x%0h len=%0d size=%0d burst=%0d",
                               tr.id, tr.addr, tr.len, tr.size, tr.burst
                          ),
-                         apb2axi_verbosity
+                         axi_verbosity
                     )
 
                     // Spawn handler for read data/response.
@@ -162,7 +162,7 @@ class axi_monitor extends uvm_monitor;
                     "WRITE data beat: id=%0d data=0x%0h last=%0b",
                     tr.id, tr.data, vif.WLAST
                ),
-               apb2axi_verbosity
+               axi_verbosity
           )
 
           // FIXME (future):
@@ -176,7 +176,7 @@ class axi_monitor extends uvm_monitor;
           `uvm_info(
                "AXI_MONITOR",
                $sformatf("WRITE resp: id=%0d resp=%0d", tr.id, tr.resp),
-               apb2axi_verbosity
+               axi_verbosity
           )
 
           // Transaction is now complete and can be published.
@@ -208,7 +208,7 @@ class axi_monitor extends uvm_monitor;
                     "READ data beat: id=%0d data=0x%0h resp=%0d last=%0b",
                     tr.id, tr.data, tr.resp, vif.RLAST
                ),
-               apb2axi_verbosity
+               axi_verbosity
           )
 
           // FIXME (future):

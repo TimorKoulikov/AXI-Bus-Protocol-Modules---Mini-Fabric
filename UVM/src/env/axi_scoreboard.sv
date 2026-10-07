@@ -53,7 +53,7 @@ class axi_scoreboard extends uvm_component;
                // Non-blocking poll: avoids deadlock if the bus is temporarily quiet.
                // Replace with blocking get + timeout for a production scoreboard.
                if (axi_fifo.try_get(axi_tr))
-                    `uvm_info("SCOREBOARD", $sformatf("AXI TXN captured: %s", axi_tr.convert2string()), apb2axi_verbosity)
+                    `uvm_info("SCOREBOARD", $sformatf("AXI TXN captured: %s", axi_tr.convert2string()), axi_verbosity)
 
                // Small delay prevents a zero-time busy loop.
                #1ns;

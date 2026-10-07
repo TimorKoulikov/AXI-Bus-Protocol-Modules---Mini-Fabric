@@ -81,7 +81,7 @@ class axi_env extends uvm_env;
 		  end
          
 
-          `uvm_info("ENV", "AXI Environment built successfully.", apb2axi_verbosity);
+          `uvm_info("ENV", "AXI Environment built successfully.", axi_verbosity);
 
      endfunction
 
@@ -93,7 +93,7 @@ class axi_env extends uvm_env;
 		  	axi_ag[i].axi_mon.ap.connect(sb.axi_export);
           	axi_ag[i].axi_mon.ap.connect(axi_mon_fifo.analysis_export);
 		  end
-          `uvm_info("ENV", "Scoreboard connections established.", apb2axi_verbosity)
+          `uvm_info("ENV", "Scoreboard connections established.", axi_verbosity)
 
      endfunction
 

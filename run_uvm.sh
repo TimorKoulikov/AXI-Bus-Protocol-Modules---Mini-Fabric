@@ -16,6 +16,6 @@ vcs -full64 -sverilog -ntb_opts uvm-1.2 -debug_access+all -f build_config.f -l $
 ## running the simulation
 $BUILD_DIR/simv_uvm \
 	-l $OUT_DIR/sim_uvm.log \
-	+fsdbfile+$OUT_DIR/waves_uvm.fsdb 
+	+fsdbfile+$OUT_DIR/waves_uvm.fsdb  +UVM_VERBOSITY=UVM_HIGH
 
 mv ./ucli.key $OUT_DIR/ucli_uvm.key 2>/dev/null || true

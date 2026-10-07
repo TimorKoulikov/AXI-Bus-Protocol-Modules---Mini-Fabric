@@ -33,7 +33,7 @@ class axi_test extends axi_base_test;
 
         phase.raise_objection(this);
 
-        if (!$value$plusargs("AXI_SEQ=%s", seq_sel)) seq_sel = "READ";
+        if (!$value$plusargs("AXI_SEQ=%s", seq_sel)) seq_sel = "WRITE";
 
         `uvm_info("AXI_TEST", $sformatf("Starting test, seq_sel=%s", seq_sel), UVM_NONE)
 		// TODO : add for loop. for know lazy just want to check all work

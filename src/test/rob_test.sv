@@ -153,7 +153,8 @@ initial begin
     
     if (is_empty_out) $display("test_3: PASS (ROB is empty after pop)");
     else $error("test_3: FAIL (ROB not empty after pop)");
-
+	if(!data_out.valid) $display("test_3.1: PASS ( ROB valid signal is null");
+	else $error("test_3.1: FAIL ( ROB valid signal is still high)");
     //======================================
 
     $display("\nTest 4: Full-Queue Backpressure");

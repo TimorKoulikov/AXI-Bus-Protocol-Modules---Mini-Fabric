@@ -13,19 +13,19 @@ package axi_tb_pkg;
      // -------------------------------------------------------------------------
      // Project-wide verbosity control
      // -------------------------------------------------------------------------
-     int unsigned apb2axi_verbosity = UVM_DEBUG;
+     int unsigned axi_verbosity = UVM_DEBUG;
 
      `include "uvm_macros.svh"
      `include "pkg/defines.svh"
 
      function void axi_configure_verbosity();
           if ($test$plusargs("AXI_DEBUG")) begin
-               apb2axi_verbosity = UVM_NONE;
+               axi_verbosity = UVM_NONE;
                `uvm_info("AXI_TB_PKG", "AXI_DEBUG flag detected → quiet mode (UVM_NONE)", UVM_NONE);
           end
           else begin
-               apb2axi_verbosity = UVM_DEBUG;
-               `uvm_info("AXI_TB_PKG", "Defaulting to verbose mode (UVM_DEBUG)", UVM_DEBUG);
+               axi_verbosity = UVM_HIGH;
+               `uvm_info("AXI_TB_PKG", "Defaulting to verbose mode (UVM_DEBUG)", UVM_HIGH);
           end
      endfunction
 
