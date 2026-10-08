@@ -5,3 +5,5 @@ verdiLog
 novas*
 /drafts
 .metadata/
+ucli.key
+*.log
