@@ -1,0 +1,2 @@
+# delay  master  write  address   data
+0        0       1      00001000  ABCD1234

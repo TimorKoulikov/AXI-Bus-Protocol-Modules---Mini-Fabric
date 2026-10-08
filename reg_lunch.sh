@@ -5,15 +5,17 @@
 # ==========================================
 
 # Variables
-SIMV="./simv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SIMV="$SCRIPT_DIR/build/simv_uvm"
 TESTNAME="axi_test" # Change this if you name your test differently
 LOGFILE="sim_trace.log"
+VERBOSITY=UVM_NONE
 
 # Optional: Accept a trace file as an argument (e.g., ./reg_lunch.sh my_trace.txt)
 TRACE_FILE=${1:-"trace.txt"}
 
 echo "==========================================================="
-echo " ?? STARTING UVM TEST"
+echo " STARTING UVM TEST"
 echo "==========================================================="
 echo " Test Name  : $TESTNAME"
 echo " Trace File : $TRACE_FILE"
@@ -28,7 +30,8 @@ fi
 
 # Run the simulation
 # We pass +TRACE_FILE=... so the SystemVerilog code knows which file to read!
-$SIMV +UVM_TESTNAME=$TESTNAME +TRACE_FILE=$TRACE_FILE -l $LOGFILE
+$SIMV +UVM_TESTNAME=$TESTNAME +TRACE_FILE=$TRACE_FILE -l $LOGFILE \
+	+fsdbfile+$SCIPR_DIR/build/waves_uvm.fsdb  +UVM_VERBOSITY=$VERBOSITY
 
 # Check the log file for UVM_ERROR or UVM_FATAL where the count is >= 1
 echo ""
@@ -38,7 +41,7 @@ if grep -qE "UVM_ERROR\s*:\s*[1-9]|UVM_FATAL\s*:\s*[1-9]" "$LOGFILE"; then
     echo "==========================================================="
     exit 1
 else
-    echo " ? TEST PASSED"
+    echo " TEST PASSED"
     echo "==========================================================="
     exit 0
 fi
