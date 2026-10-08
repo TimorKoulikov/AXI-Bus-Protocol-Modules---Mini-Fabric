@@ -53,7 +53,7 @@ generate
 	// =========================================================================
 	for(i = 0; i < NUM_OF_CHANNEL; i++) begin: get_block_rr_ms
 		// generating aribter_rr for each master channel
-		arbiter_rr #(.NUM_OF_MASTERS(NUM_OF_MASTERS))
+		arbiter_rr #(.NUM_OF_CHANNELS(NUM_OF_MASTERS))
 			arbiter_rr_ms_inst (
 				.aclk           (aclk              ),
 				.aresetn        (aresetn           ),
@@ -77,7 +77,7 @@ generate
 	for(i = 0; i < NUM_OF_SLV_CHANNEL; i++) begin: get_block_rr_sl
 		// generating aribter_rr for each slave channel
 		// Note: We use NUM_OF_SLAVES as the parameter since there are NUM_OF_SLAVES competitors
-		arbiter_rr #(.NUM_OF_MASTERS(NUM_OF_SLAVES))
+		arbiter_rr #(.NUM_OF_CHANNELS(NUM_OF_SLAVES))
 			arbiter_rr_sl_inst (
 				.aclk           (aclk                 ),
 				.aresetn        (aresetn              ),

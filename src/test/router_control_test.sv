@@ -138,7 +138,7 @@ begin
 			start_transaction[i]=1'b1;
 			tokens = $urandom();
 			token_allocation[i] = tokens;
-			#20;
+			#30; // must wait 30
 				assert( router_control_uut.curr_num_tokens[i] == old_tokens + tokens) begin
 					$display("test_4: PASS");
 				end else begin

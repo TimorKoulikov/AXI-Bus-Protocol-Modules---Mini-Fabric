@@ -115,7 +115,7 @@ router_control #(
 	.num_tokens           (num_tokens           ),
 	.pop_enable           (pop_enable           ),
 	.token_for_transaction(token_for_transaction),
-	.active_pop         (active_pop         ),
+	.active_pop           (active_pop           ),
 	.full                 (full                 ),
 	.empty                (empty                ),
 	.mode                 (mode                 )
@@ -127,7 +127,7 @@ needy #(
 	.TOKEN_WIDTH        (TOKEN_WIDTH        ), 
 	.TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)
 ) u_needy (
-	.token_allocation(token_allocation),
+	.token_allocation(num_tokens),
 	.full            (full            ),
 	.empty           (empty           ),
 	.needy_level     (needy_level     )
@@ -142,19 +142,20 @@ rob #(
 	.QUEUE_DEPTH  (QUEUE_DEPTH  ),
 	.CYCLES_S_TO_U(CYCLES_S_TO_U)
 ) u_b_rob (
-	.aclk       (aclk               ),
-	.aresetn    (aresetn            ),
-	.data_in    (b_data_channel ),
-	.patch_in   (b_patch_in),
-	.push_enable(1'b1               ), 
-	.ready_out  (b_ready_out	    ), 
-	.data_out   (b_rob_data_out     ), 
-	.patch_out  (b_rob_patch_out    ),
-	.pop_enable (pop_enable[0]      ),
-	.is_empty_out  (empty[0]        ),
-	.is_full_out   (full[0]         ),
-	.got_urgent (is_urgent[0]       ),
-	.ready_in(b_ready_in_sel)
+	.aclk       (aclk                ),
+	.aresetn    (aresetn             ),
+	.data_in    (b_data_channel      ),
+	.patch_in   (b_patch_in          ),
+	.push_enable(1'b1                ), 
+	.ready_out  (b_ready_out	     ), 
+	.data_out   (b_rob_data_out      ), 
+	.patch_out  (b_rob_patch_out     ),
+	.pop_enable (pop_enable[0]       ),
+	.is_empty_out  (empty[0]         ),
+	.is_full_out   (full[0]          ),
+	.got_urgent (is_urgent[0]        ),
+	.ready_in(b_ready_in_sel         ),
+    .active_pop(active_pop[0]        )
 );
 
 // Dispatcher: rob -> mux -> output
@@ -180,17 +181,18 @@ rob #(
 ) u_r_rob (
 	.aclk        (aclk               ),
 	.aresetn     (aresetn            ),
-	.data_in     (r_data_channel ),
-	.patch_in    (r_patch_in),
+	.data_in     (r_data_channel     ),
+	.patch_in    (r_patch_in         ),
 	.push_enable (1'b1               ), 
 	.ready_out   (r_rob_ready_out    ), 
 	.data_out    (r_rob_data_out     ), 
 	.patch_out   (r_rob_patch_out    ),
 	.pop_enable  (pop_enable[1]      ),
-	.is_empty_out(empty[1]        ),
-	.is_full_out (full[1]         ),
+	.is_empty_out(empty[1]           ),
+	.is_full_out (full[1]            ),
 	.got_urgent  (is_urgent[1]       ),
-	.ready_in(r_ready_in_sel)
+	.ready_in(r_ready_in_sel         ),
+    .active_pop(active_pop[1]        )
 );
 
 // Dispatcher: rob -> mux -> output

@@ -7,25 +7,25 @@
  *------------------------------------------------------------------------------*/
 
 module arbiter_rr #(
-parameter NUM_OF_MASTERS=4
+parameter NUM_OF_CHANNELS=4
 )
 (
 input aclk,
 input aresetn,
-input  [NUM_OF_MASTERS -1 : 0] is_urgent,
-input [NUM_OF_MASTERS -1 : 0 ] end_transaction,
-output [NUM_OF_MASTERS -1 : 0] grant
+input  [NUM_OF_CHANNELS -1 : 0] is_urgent,
+input [NUM_OF_CHANNELS -1 : 0 ] end_transaction,
+output [NUM_OF_CHANNELS -1 : 0] grant
 );
 
-localparam grand_index_width = $clog2(NUM_OF_MASTERS);
+localparam grand_index_width = $clog2(NUM_OF_CHANNELS);
 
 logic init_rr;
 logic enable_regular;
 logic enable_urgent;
 logic [grand_index_width -1 : 0 ] grant_index_regular;
 logic [grand_index_width -1 : 0 ] grant_index_urgent;
-logic [NUM_OF_MASTERS -1 : 0] grant_regualr;
-logic [NUM_OF_MASTERS -1 : 0] grant_urgent;
+logic [NUM_OF_CHANNELS -1 : 0] grant_regualr;
+logic [NUM_OF_CHANNELS -1 : 0] grant_urgent;
 
 //logic [NUM_OF_MASTERS-1:0] enable_regular_bus;
 typedef enum logic [1:0] {
@@ -39,7 +39,7 @@ state_t next_state;
 
 assign grant = curr_state == URGENT ? grant_urgent : grant_regualr;
 
-DW_arb_rr #(.n(NUM_OF_MASTERS),
+DW_arb_rr #(.n(NUM_OF_CHANNELS),
 	.output_mode(1),
 	.index_mode(0)
 )regular_rr( 
@@ -47,14 +47,14 @@ DW_arb_rr #(.n(NUM_OF_MASTERS),
 	.rst_n(aresetn),
 	.init_n(init_rr),
 	.enable('1),
-	.request({NUM_OF_MASTERS{enable_regular}}),
+	.request({NUM_OF_CHANNELS{enable_regular}}),
 	.mask('0),
 	.granted(granted_inst),
 	.grant(grant_regualr),
 	.grant_index(grant_index_regular)
 	);
 
-DW_arb_rr #(.n(NUM_OF_MASTERS),
+DW_arb_rr #(.n(NUM_OF_CHANNELS),
 	.output_mode(1),
 	.index_mode(0)
 )urgent_rr( 
@@ -62,7 +62,7 @@ DW_arb_rr #(.n(NUM_OF_MASTERS),
 	.rst_n(aresetn),
 	.init_n(init_rr),
 	.enable('1),
-	.request({NUM_OF_MASTERS{enable_urgent}}),
+	.request({NUM_OF_CHANNELS{enable_urgent}}),
 	.mask(~is_urgent),
 	.granted(granted_inst),
 	.grant(grant_urgent),

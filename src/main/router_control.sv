@@ -3,7 +3,13 @@
  * Project       : Fabric
  * Author        : epagtk
  * Creation date : Mar 26, 2026
- * Description   :
+ * Description   : * Description   :
+ *   Manages bandwidth allocation and transaction coordination across multiple
+ *   AXI channels (e.g., AW/AR/W for Master Router, B/R for Slave Router).
+ *   Maintains an independent FSM for each channel to track token budgets
+ *   via 'token_counter'. When a transaction starts, it adds allocated tokens.
+ *   It then asserts 'pop_enable' to the corresponding Reorder Buffer (ROB) 
+ *   as long as the token budget satisfies the transaction token cost.
  *------------------------------------------------------------------------------*/
 
 module router_control #(
@@ -66,10 +72,10 @@ generate
 			insert_tokens[i]=1'b0;
 			end_transaction[i]=1'b0;	
 			stop_transaction[i]=1'b0;
-			case(curr_state)
-				IDLE: begin
-					end_transaction[i] = 1'b1;
-				end
+			case(curr_state[i])
+				//IDLE: begin
+				//	end_transaction[i] = 1'b1;
+				//end
 				TRANSACTION_ADD_TOKENS: begin
 					insert_tokens[i]=1'b1;
 				end
@@ -81,7 +87,9 @@ generate
 						pop_enable[i]=1'b1;
 					end
 				end
-			endcase
+            endcase
+            
+            end_transaction[i] = curr_state[i] != IDLE && next_state[i] == IDLE;
 		end
 		
 		//FSM
@@ -114,7 +122,7 @@ generate
 					if(stop_transaction[i] || full[i] || empty[i])
 						next_state[i] = IDLE;
 				end
-			endcase
+            endcase
 		end
 		
 		

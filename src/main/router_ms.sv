@@ -113,7 +113,7 @@ needy #(
 	.TOKEN_WIDTH        (TOKEN_WIDTH        ), 
 	.TOKEN_LOW_THRESHOLD(TOKEN_LOW_THRESHOLD)
 ) u_needy (
-	.token_allocation(token_allocation),
+	.token_allocation(num_tokens),
 	.full            (full            ),
 	.empty           (empty           ),
 	.needy_level     (needy_level     )
