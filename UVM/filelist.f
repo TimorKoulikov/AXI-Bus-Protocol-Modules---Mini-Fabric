@@ -39,7 +39,7 @@
 UVM/src/if/axi_if.sv
 
 # === TB Package (includes all TB classes) ===
-UVM/src/bfm/apb2axi_memory_pkg.sv
+UVM/src/bfm/axi_memory_pkg.sv
 $UVM_HOME/src/uvm_pkg.sv
 UVM/src/pkg/axi_tb_pkg.sv
 

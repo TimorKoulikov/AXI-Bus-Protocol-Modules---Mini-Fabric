@@ -9,7 +9,7 @@
 package axi_tb_pkg;
 	
 	import uvm_pkg::*;
-	import apb2axi_memory_pkg::*;
+	import axi_memory_pkg::*;
      // -------------------------------------------------------------------------
      // Project-wide verbosity control
      // -------------------------------------------------------------------------

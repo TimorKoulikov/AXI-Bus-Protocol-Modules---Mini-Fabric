@@ -22,10 +22,10 @@ def main():
     lines = []
     lines.append("// ---------------------------------------------------------------------------------------------------------")
     lines.append("// AUTO-GENERATED FILE, PLEASE KEEP IT THAT WAY")
-    lines.append("// Run Command: (from Project) python3 tb/script/gen_memory_pkg.py > tb/bfm/apb2axi_memory_pkg.sv ")
+    lines.append("// Run Command: (from Project) python3 tb/script/gen_memory_pkg.py > tb/bfm/axi_memory_pkg.sv ")
     lines.append("// ---------------------------------------------------------------------------------------------------------")
     lines.append("")
-    lines.append("package apb2axi_memory_pkg;")
+    lines.append("package axi_memory_pkg;")
     lines.append("")
     lines.append(f"  import apb2axi_pkg::*;")
     lines.append("")
@@ -57,7 +57,7 @@ def main():
         )
 
     lines.append("  };")
-    lines.append("endpackage : apb2axi_memory_pkg")
+    lines.append("endpackage : axi_memory_pkg")
 
     print("\n".join(lines))
 

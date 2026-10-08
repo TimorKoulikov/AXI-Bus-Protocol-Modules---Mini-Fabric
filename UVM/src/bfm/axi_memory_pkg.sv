@@ -1,9 +1,9 @@
 // ---------------------------------------------------------------------------------------------------------
 // AUTO-GENERATED FILE, PLEASE KEEP IT THAT WAY
-// Run Command: (from Project) python3 tb/script/gen_memory_pkg.py > tb/bfm/apb2axi_memory_pkg.sv 
+// Run Command: (from Project) python3 tb/script/gen_memory_pkg.py > tb/bfm/axi_memory_pkg.sv 
 // ---------------------------------------------------------------------------------------------------------
 
-package apb2axi_memory_pkg;
+package axi_memory_pkg;
 	
   import axi_datatypes::*;
 
@@ -2068,4 +2068,4 @@ package apb2axi_memory_pkg;
     64'hBF30F670E7D8350C,   // idx 2046  addr=64'h0000000000004FF0
     64'hBAB73617CFF55BA6   // idx 2047  addr=64'h0000000000004FF8
   };
-endpackage : apb2axi_memory_pkg
+endpackage : axi_memory_pkg
