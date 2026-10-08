@@ -328,6 +328,7 @@ generate
 		assign slaves[j].WSTRB   = s_w.wstrb;
 		assign slaves[j].WLAST   = s_w.wlast;
 		assign slaves[j].WVALID  = s_w.valid;
+        assign slaves[j].WID     = s_w.id;
 
 		// 4. Pack B & R channels (Slave Interface -> Struct into router_sl)
 		assign s_b.id    = slaves[j].BID;

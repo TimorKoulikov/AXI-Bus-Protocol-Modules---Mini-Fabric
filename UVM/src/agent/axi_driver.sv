@@ -112,6 +112,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.WSTRB           <= '1;   // “all bytes valid” assumption
 		vif.WLAST           <= 1;
 		vif.WVALID          <= 1;
+        vif.WID             <= req.id;
 		
 		@(posedge vif.ACLK iff vif.ARESETn);
 		wait (vif.WREADY);
