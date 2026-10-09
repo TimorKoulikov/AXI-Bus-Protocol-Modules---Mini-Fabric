@@ -55,8 +55,8 @@ class axi_test_trace extends axi_base_test;
     endfunction
 
     // Helper: convert hex string to 64-bit value
-    function logic [63:0] hex_to_val(string tok);
-        logic [63:0] val;
+    function logic [`AXI_DATA_WIDTH -1 : 0] hex_to_val(string tok);
+        logic [`AXI_DATA_WIDTH -1 : 0] val;
         void'($sscanf(tok, "%h", val));
         return val;
     endfunction
@@ -71,8 +71,8 @@ class axi_test_trace extends axi_base_test;
         int          delay;
         int          master;
         int          is_write;
-        logic [31:0] addr;
-        logic [63:0] data;
+        logic [`AXI_ADDR_WIDTH -1 : 0] addr;
+        logic [`AXI_DATA_WIDTH -1 : 0] data;
         int          urgent;
         int          stream_flag;
         bit          rw, ra, rd, ru, rs;  // randomize flags
@@ -126,7 +126,7 @@ class axi_test_trace extends axi_base_test;
                 delay, master,
                 rw ? "RAND" : $sformatf("%0d", is_write),
                 ra ? "RAND" : $sformatf("0x%08h", addr),
-                rd ? "RAND" : $sformatf("0x%016h", data),
+                rd ? "RAND" : $sformatf("0x%08h", data),
                 ru ? "RAND" : $sformatf("%0d", urgent),
                 rs ? "RAND" : $sformatf("%0d", stream_flag)
             ), UVM_LOW)
@@ -140,8 +140,8 @@ class axi_test_trace extends axi_base_test;
             fork
                 automatic int          m   = master;
                 automatic int          w   = is_write;
-                automatic logic [31:0] a   = addr;
-                automatic logic [63:0] d   = data;
+                automatic logic [`AXI_ADDR_WIDTH -1 : 0] a   = addr;
+                automatic logic [`AXI_DATA_WIDTH -1 : 0] d   = data;
                 automatic int          u   = urgent;
                 automatic int          s   = stream_flag;
                 automatic bit          fw  = rw;

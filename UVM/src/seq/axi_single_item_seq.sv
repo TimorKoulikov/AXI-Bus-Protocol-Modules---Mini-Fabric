@@ -4,13 +4,14 @@
 // Supports per-field randomization: if a rand_* flag is set, that field
 // is left unconstrained (fully randomized).
 //------------------------------------------------------------------------------
+
 class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
     `uvm_object_utils(axi_single_item_seq)
     
     // Variables configured by the caller
     bit        is_write;
-    bit [31:0] req_addr;
-    bit [63:0] req_data;
+    bit [`AXI_ADDR_WIDTH -1 : 0] req_addr;
+    bit [`AXI_DATA_WIDTH -1 : 0] req_data;
     bit        req_urgent;
     bit        req_stream;
     

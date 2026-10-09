@@ -91,7 +91,8 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		//   - potentially support multiple outstanding writes (IDs, interleaving)
 		// -------------------------------------------------------------------
 		
-		`uvm_info("AXI_DRIVER_START", $sformatf("WRITE: addr=0x%08h data=0x%08h resp=%0d", req.addr, req.data, req.resp), axi_verbosity)
+		`uvm_info("AXI_DRIVER_START", $sformatf("WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",
+                    req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		// --- Address phase ---
 		vif.AWADDR          <= req.addr;
 		vif.AWVALID         <= 1;
@@ -105,7 +106,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		@(posedge vif.ACLK iff vif.ARESETn);
 		wait (vif.AWREADY);
 		vif.AWVALID         <= 0;
-		`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h resp=%0d", req.addr, req.data, req.resp), axi_verbosity)
+		//`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		// --- Data phase ---
 		// NOTE: This drives exactly one beat.
 		// If AWLEN>0 (burst), this is not sufficient and must be extended.
@@ -119,14 +120,14 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		wait (vif.WREADY);
 		vif.WVALID          <= 0;
 		vif.WLAST           <= 0;
-		`uvm_info("AXI_DRIVER", $sformatf("[W Handshake complete] WRITE: addr=0x%08h data=0x%08h resp=%0d", req.addr, req.data, req.resp), axi_verbosity)
+		//`uvm_info("AXI_DRIVER", $sformatf("[W Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		// --- Response phase ---
 		vif.BREADY          <= 1;
 		wait (vif.BVALID);
 		req.resp            = vif.BRESP; // capture observed response
 		vif.BREADY          <= 0;
 		
-		`uvm_info("AXI_DRIVER", $sformatf("[B Handshake complete WRITE: addr=0x%08h data=0x%08h resp=%0d", req.addr, req.data, req.resp), axi_verbosity)
+		//`uvm_info("AXI_DRIVER", $sformatf("[B Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d", req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 	endtask
 	
 	task drive_read(axi_seq_item req);
@@ -162,7 +163,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		req.resp            = vif.RRESP;
 		vif.RREADY          <= 0;
 		
-		`uvm_info("AXI_DRIVER", $sformatf("READ:  addr=0x%08h data=0x%08h resp=%0d", req.addr, req.data, req.resp), axi_verbosity)
+		`uvm_info("AXI_DRIVER", $sformatf("[R Handshake complete] READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 	endtask
 	
 endclass

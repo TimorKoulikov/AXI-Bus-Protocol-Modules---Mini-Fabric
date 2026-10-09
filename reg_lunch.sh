@@ -10,10 +10,10 @@ BUILD_DIR="$SCRIPT_DIR/build"
 SIMV="$SCRIPT_DIR/build/simv_uvm"
 TESTNAME="axi_test_trace" # Change this if you name your test differently
 LOGFILE="$SCRIPT_DIR/build/sim_trace.log"
-VERBOSITY=UVM_NONE
+VERBOSITY=UVM_HIGH
 
 # Optional: Accept a trace file as an argument (e.g., ./reg_lunch.sh my_trace.txt)
-TRACE_FILE=${1:-"trace.txt"}
+TRACE_FILE=${1:-"UVM/traces/sanity_write.txt"}
 
 echo "==========================================================="
 echo " STARTING UVM TEST"

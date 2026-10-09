@@ -37,13 +37,14 @@ class axi3_slave_bfm extends uvm_component;
 	bit [ID_WIDTH-1:0] beat_order_q[$];   // one entry per R beat
 	bit [ID_WIDTH-1:0] burst_order_q[$];  // one entry per completed burst
 	
+	/*
 	// ------------------------------------------------------------
 	// Read mode
 	// ------------------------------------------------------------
 	typedef enum int { MODE_REGULAR = 0,
 		MODE_OUTSTANDING = 1,
 		MODE_EXTREME = 2 } read_mode_e;
-	read_mode_e read_mode = MODE_REGULAR;
+	read_mode_e read_mode = MODE_REGULAR;*/
 	
 	// ------------------------------------------------------------
 	// Error injection tables (DISABLED BY DEFAULT)
@@ -102,7 +103,7 @@ class axi3_slave_bfm extends uvm_component;
 		if (!uvm_config_db#(virtual axi_if)::get(this,"","axi_vif",vif))
 			`uvm_fatal("AXI3_BFM","No virtual interface bound to BFM");
 		
-		if ($test$plusargs("EXTREME_OUTSTANDING")) begin
+		/*if ($test$plusargs("EXTREME_OUTSTANDING")) begin
 			read_mode = MODE_EXTREME;
 			`uvm_info("AXI3_BFM", "Read mode: EXTREME_OUTSTANDING", axi_verbosity)
 		end
@@ -113,7 +114,7 @@ class axi3_slave_bfm extends uvm_component;
 		else begin
 			read_mode = MODE_REGULAR;
 			`uvm_info("AXI3_BFM", "Read mode: LINEAR (default)", axi_verbosity)
-		end
+		end*/
 		
 		// initialize error injection (SAFE DEFAULT)
 		// keep it. but we shouldnt handle errors in fabric.
@@ -183,7 +184,7 @@ class axi3_slave_bfm extends uvm_component;
 	// ------------------------------------------------------------
 	localparam int unsigned     ID_NUM = (1 << ID_WIDTH);
 	task automatic drive_read_queue();
-		int idx;
+		int idx = 0;
 		active_read_t ar;
 		int unsigned nbytes;
 		int unsigned byte_off;
@@ -198,11 +199,11 @@ class axi3_slave_bfm extends uvm_component;
 				continue;
 			
 			// Scheduling policy
-			case (read_mode)
+			/*case (read_mode)
 				MODE_REGULAR:       idx = 0;
 				MODE_OUTSTANDING:  idx = 0;
 				MODE_EXTREME:      idx = $urandom_range(0, active_reads.size()-1);
-			endcase
+			endcase*/
 			
 			// Pick a random outstanding burst
 			// idx = $urandom_range(0, active_reads.size()-1);
@@ -304,10 +305,13 @@ class axi3_slave_bfm extends uvm_component;
 			@(posedge vif.ACLK);
 			
 			// Always ready for address
-			if (read_mode == MODE_REGULAR)
-				vif.ARREADY <= (active_reads.size() == 0);   // only accept when empty
-			else
-				vif.ARREADY <= 1;
+			//if (read_mode == MODE_REGULAR)
+			//	vif.ARREADY <= (active_reads.size() == 0);   // only accept when empty
+			//else
+			//     vif.ARREADY <= 1;
+            
+            //Always ready 
+            vif.ARREADY <= 1;
 			vif.AWREADY <= 1;
 			
 			// Always ready for write data
@@ -325,7 +329,10 @@ class axi3_slave_bfm extends uvm_component;
 				arx.mem_idx    = addr2idx(vif.ARADDR);
 				arx.beat_idx   = 0;
 				
-				case (read_mode)
+                // support Multiple outstaindg. maybe change later. commented below for exmaple
+                active_reads.push_back(arx);
+				
+                /*case (read_mode)
 					MODE_REGULAR: begin
 						// Allow only one outstanding
 						wait (active_reads.size() == 0);
@@ -342,6 +349,7 @@ class axi3_slave_bfm extends uvm_component;
 						active_reads.push_back(arx);
 					end
 				endcase
+				*/
 				
 			end
 			
