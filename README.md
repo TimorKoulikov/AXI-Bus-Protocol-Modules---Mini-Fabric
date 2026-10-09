@@ -28,22 +28,22 @@ Go to https://github.com/nirmiller31/Project_A_apb2axi for his AXI project and h
 [PLACE HOLDER IN THE FUTURE FOR HOW TO RUN SCRIPT]
 
 
-## Progress
+## uArch Progress
 
-| Module          | Design | Verification | 
-|-----------------|--------|--------------|
-| arbiter_control |not need|      -       |
-| arbiter_engine  |   V    |      V       | 
-| arbiter_ms      |   X    |      -       | 
-| arbiter_rr      |   V    |      V       | 
-| arbiter_sl      |  WIP   |      -       | 
-| needy           |   V    |      V       | 
-| patcher_ax      |   V    |      V       |
-| patcher_w       |   V    |      V       |
-| rob             |   V    |      V       | 
-| router_control  |   V    |      V       | 
-| router_ms       |  WIP   |      -       |
-| router_sl       |  WIP   |      -       |
-| token_counter   |   V    |      -       |
+| Module          | Design | Testbench | 
+|-----------------|--------|-----------|
+| arbiter_control |not need|     -     |
+| arbiter_engine  |   V    |     V     | 
+| arbiter_ms      |   V    |     -     | 
+| arbiter_rr      |   V    |     V     | 
+| arbiter_sl      |   V    |     -     | 
+| needy           |   V    |     V     | 
+| patcher_ax      |   V    |     V     |
+| patcher_w       |   V    |     V     |
+| rob             |   V    |     V     | 
+| router_control  |   V    |     V     | 
+| router_ms       |   V    |     -     |
+| router_sl       |   V    |     -     |
+| token_counter   |   V    |     -     |
 
 

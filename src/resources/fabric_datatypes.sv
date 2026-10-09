@@ -6,6 +6,10 @@ import axi_datatypes::*;
 localparam NUM_OF_SLAVES=3;	
 localparam NUM_OF_MASTERS = 4;
 
+// tokens
+localparam MAX_TOKENS=1048576; //(2^20) the number of maximum tokens any master/slave can accumulate
+localparam TOKEN_WIDTH=$clog2(MAX_TOKENS + 1); // +1 is to store the value MAX_TOKENS too
+
 // for every slave we have to define address space it is working on
 // the address space is low_addr - high_addr inclusively 
 typedef struct packed {

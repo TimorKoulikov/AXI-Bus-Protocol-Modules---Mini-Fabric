@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------------------------
- 	module that receives axi data from AW or AR channel and patches additional data
+ 	module that receives axi data from AW, AR, W channels and patches additional data
  *---------------------------------------------------------------------------------*/
 
 module patcher_ax(
@@ -9,10 +9,9 @@ module patcher_ax(
 	ready_in,	// ready signal the patcher receives from the downstream ROB (for data_out)
 	cfg,		// slaves addresses config from the arbiter_engine
 	cfg_en,		// signal rise when new cfg data is in	
-	
 	data_out,	// outgoing AXI bus payload (including the valid bit) sent downstream to the ROB/FIFO
 	ready_out,	// ready signal the patcher sends to master (ready for data_in)
-	patch_out,	// patched data the patcher added
+	patch_out	// patched data the patcher added
 );
 
 
@@ -21,7 +20,6 @@ import axi_datatypes::*;
 import fabric_datatypes::*;
 
 
-// TODO : think we have to move these to external file
 //-----parameters-----
 parameter type BUS_TYPE = aw_bus; // setting the default
 parameter master_id=1;

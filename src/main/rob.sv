@@ -19,7 +19,7 @@ module rob #(
     parameter type BUS_TYPE = aw_bus,
     parameter QUEUE_DEPTH = MAX_OUTSTANDING, // for w_bus we have to define MAX_LEN*MAX_OUTSTANDING,
     parameter CYCLES_S_TO_U = 3,
-    parameter TOKEN_WIDTH = 4
+    parameter TOKEN_WIDTH = TOKEN_WIDTH
 )(
 
     input  logic    aclk,

@@ -12,9 +12,11 @@
  *   as long as the token budget satisfies the transaction token cost.
  *------------------------------------------------------------------------------*/
 
+import fabric_datatypes::*;
+
 module router_control #(
 	parameter NUM_OF_CHANNEL=3,
-	parameter TOKEN_WIDTH = 32
+	parameter TOKEN_WIDTH = TOKEN_WIDTH
 )
 (
 	input aclk,

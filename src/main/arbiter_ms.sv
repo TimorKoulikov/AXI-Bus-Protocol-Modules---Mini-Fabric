@@ -69,7 +69,13 @@ rob #(.BUS_TYPE(b_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 	.ready_out  (b_rob_ready  		),
 	.data_out   (b_data_out   		),
 	.pop_enable ('1		        	),
-	.ready_in(b_ready_in			)
+	.ready_in(b_ready_in			),
+	.patch_out      (), 
+	.active_pop     (),
+	.curr_token_cost(),
+	.is_empty_out   (),
+	.is_full_out    (),
+	.got_urgent     ()
 );
 
 //output
@@ -100,9 +106,14 @@ rob #(.BUS_TYPE(r_bus), .QUEUE_DEPTH(QUEUE_DEPTH), .CYCLES_S_TO_U(CYCLES_S_TO_U)
 	.push_enable(r_ready_in			),
 	.ready_out  (r_rob_ready  		),
 	.data_out   (r_data_out   		),
-	//.patch_out  (r_rob_patch_out 	),
 	.pop_enable ('1        			),
-	.ready_in(r_ready_in)
+	.ready_in(r_ready_in),
+	.patch_out      (), 
+	.active_pop     (),
+	.curr_token_cost(),
+	.is_empty_out   (),
+	.is_full_out    (),
+	.got_urgent     ()
 );
 //output
 //assign r_data_out.id = {id,r_rob_patch_out.slave_id,r_rob_patch_out.master_id};

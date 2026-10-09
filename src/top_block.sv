@@ -13,7 +13,7 @@ import fabric_datatypes::*;
 module top_block #(
 	parameter NUM_OF_MASTERS = 3,
 	parameter NUM_OF_SLAVES  = 4,
-	parameter TOKEN_WIDTH    = 32
+	parameter TOKEN_WIDTH    = TOKEN_WIDTH
 )
 (
 	input aclk,                             //axi clk
@@ -127,6 +127,8 @@ arbiter_engine #(
 	.NUM_OF_SLAVES     (NUM_OF_SLAVES),
 	.NUM_OF_CHANNEL    (3), // AR, AW, W
 	.NUM_OF_SLV_CHANNEL(2), // R, B
+	.TOKENS_REGULAR    (1024),
+	.TOKENS_EXTRA_BW   (4096),
 	.TOKEN_WIDTH       (TOKEN_WIDTH)
 ) u_arbiter_engine (
 	.aclk               (aclk                  ),

@@ -6,12 +6,14 @@
  * Description   :
  *------------------------------------------------------------------------------*/
 
+import fabric_datatypes::*;
+
 module router_control_test ();
 
 //----- parameter
 parameter NUM_OF_CHANNEL=3;
 parameter NUM_OF_MODES = 3;
-localparam TOKEN_WIDTH = 32;
+localparam TOKEN_WIDTH = TOKEN_WIDTH;
 //-----inputs-----
 logic aclk;
 logic aresetn;
@@ -49,7 +51,7 @@ router_control #(.NUM_OF_CHANNEL(NUM_OF_CHANNEL), .TOKEN_WIDTH(TOKEN_WIDTH)) rou
 
 
 
-//-----testbanch -----
+//-----testbench -----
 int i = $urandom_range(NUM_OF_CHANNEL - 1, 0);
 int unsigned tokens;
 int unsigned old_tokens;
@@ -96,7 +98,7 @@ begin
 		//----------------------------------------------------------
 		$display("\nTest_2: adding token");
 			start_transaction[i]=1'b1;
-			tokens = $random();
+			tokens = $urandom() & ((1 << TOKEN_WIDTH) - 1); // with mask to get only X bits
 			token_allocation[i] = tokens;
 		#20
 				assert( router_control_uut.curr_num_tokens[i] == token_allocation[i]) begin
@@ -136,7 +138,7 @@ begin
 			old_tokens = router_control_uut.curr_num_tokens[i];
             active_pop[i]=1'b0;
 			start_transaction[i]=1'b1;
-			tokens = $urandom();
+			tokens = $urandom() & ((1 << TOKEN_WIDTH) - 1); // with mask to get only X bits
 			token_allocation[i] = tokens;
 			#30; // must wait 30
 				assert( router_control_uut.curr_num_tokens[i] == old_tokens + tokens) begin

@@ -7,9 +7,11 @@
  *                  grows with rob fullness and shrinks with token_allocation
  *------------------------------------------------------------------------------*/
 
+import fabric_datatypes::*;
+
 module needy #(
 	parameter NUM_OF_CHANNEL = 3,
-	parameter TOKEN_WIDTH = 31,
+	parameter TOKEN_WIDTH = TOKEN_WIDTH,
 	parameter [TOKEN_WIDTH -1 : 0] TOKEN_LOW_THRESHOLD = 8
 )
 (

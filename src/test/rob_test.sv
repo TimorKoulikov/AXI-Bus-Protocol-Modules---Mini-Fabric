@@ -13,7 +13,7 @@ module rob_test();
 //----- Parameters -----
 localparam QUEUE_DEPTH = MAX_OUTSTANDING;
 localparam CYCLES_S_TO_U = 3;
-localparam TOKEN_WIDTH = 4;
+localparam TOKEN_WIDTH = TOKEN_WIDTH;
 
 //----- Signals -----
 logic    aclk;

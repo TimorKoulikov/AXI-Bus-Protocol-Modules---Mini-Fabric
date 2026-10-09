@@ -98,7 +98,7 @@ endfunction
 //defining a new type (BUS_TYPE) which is an inner parameter
 //default: BUS_TYPE = aw_bus 
 class RAND_AXI #(type BUS_TYPE = aw_bus); 
-	rand BUS_TYPE random_axi_data;        // [remove_basof] rand: declare the random_axi_data is random type
+	rand BUS_TYPE random_axi_data; 
 	
 	// defining constraint that after randomization its valid bit will always 0
 	constraint c_axi_data {random_axi_data.valid == 1'b0;}   
@@ -114,8 +114,8 @@ typedef enum logic [1:0]
 {
 	NO_LEAK,
 	LEAK,
-	EXSTRA_BW,
-	LEAK_EXSTRA_BW
+	EXTRA_BW,
+	LEAK_EXTRA_BW
 	
 } mode_token_allocation;
 

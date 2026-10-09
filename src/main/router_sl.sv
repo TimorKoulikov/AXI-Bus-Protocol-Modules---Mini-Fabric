@@ -2,10 +2,12 @@
 top block of router_sl
 *------------------------------------------------------------------------------*/
 
+import fabric_datatypes::*;
+
 module router_sl #(
 	parameter slave_id       = 0,
 	parameter NUM_OF_MASTERS = 4,
-	parameter TOKEN_WIDTH    = 31,
+	parameter TOKEN_WIDTH    = TOKEN_WIDTH,
 	parameter [TOKEN_WIDTH -1 : 0] TOKEN_LOW_THRESHOLD = 8,
 	parameter QUEUE_DEPTH    = 16,
 	parameter CYCLES_S_TO_U  = 3,
@@ -155,7 +157,8 @@ rob #(
 	.is_full_out   (full[0]          ),
 	.got_urgent (is_urgent[0]        ),
 	.ready_in(b_ready_in_sel         ),
-    .active_pop(active_pop[0]        )
+    .active_pop(active_pop[0]        ),
+	.curr_token_cost()
 );
 
 // Dispatcher: rob -> mux -> output
@@ -192,7 +195,8 @@ rob #(
 	.is_full_out (full[1]            ),
 	.got_urgent  (is_urgent[1]       ),
 	.ready_in(r_ready_in_sel         ),
-    .active_pop(active_pop[1]        )
+    .active_pop(active_pop[1]        ),
+	.curr_token_cost()
 );
 
 // Dispatcher: rob -> mux -> output

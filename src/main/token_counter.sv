@@ -6,8 +6,10 @@
  * Description   :
  *------------------------------------------------------------------------------*/
 
+import fabric_datatypes::*;
+
 module token_counter #(
-	parameter TOKEN_WIDTH=30,
+	parameter TOKEN_WIDTH=TOKEN_WIDTH,
 	localparam NUM_OF_MODES = 3
 ) 
 (
@@ -30,10 +32,10 @@ wire [TOKEN_WIDTH -1 :0] sub_token;
 
 
 DW01_add #(TOKEN_WIDTH)
-token_adder (.A(count), .B(data_load),.CI('0),.SUM(add_token));
+token_adder (.A(count), .B(data_load),.CI('0),.SUM(add_token), .CO());
 
 DW01_sub #(.width(TOKEN_WIDTH)) 
-token_sub (.A(count),.B(data_unload),.CI('0), .DIFF(sub_token) );
+token_sub (.A(count),.B(data_unload),.CI('0), .DIFF(sub_token), .CO());
 
 always_ff @(posedge aclk or negedge aresetn) begin
 	if(!aresetn) begin
@@ -48,9 +50,9 @@ always_ff @(posedge aclk or negedge aresetn) begin
 					count <= sub_token;
 			end
 			
-			LEAK , EXSTRA_BW,LEAK_EXSTRA_BW: begin
+			LEAK,EXTRA_BW,LEAK_EXTRA_BW: begin
 				if(load)
-					count <=add_token;
+					count <=add_token; 
 				if(unload)
 					count <= sub_token;
 			end

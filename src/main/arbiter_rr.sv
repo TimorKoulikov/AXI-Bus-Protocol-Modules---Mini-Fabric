@@ -7,14 +7,14 @@
  *------------------------------------------------------------------------------*/
 
 module arbiter_rr #(
-parameter NUM_OF_CHANNELS=4
+	parameter NUM_OF_CHANNELS=4
 )
 (
-input aclk,
-input aresetn,
-input  [NUM_OF_CHANNELS -1 : 0] is_urgent,
-input [NUM_OF_CHANNELS -1 : 0 ] end_transaction,
-output [NUM_OF_CHANNELS -1 : 0] grant
+	input aclk,
+	input aresetn,
+	input  [NUM_OF_CHANNELS -1 : 0] is_urgent,
+	input [NUM_OF_CHANNELS -1 : 0 ] end_transaction,
+	output [NUM_OF_CHANNELS -1 : 0] grant
 );
 
 localparam grand_index_width = $clog2(NUM_OF_CHANNELS);

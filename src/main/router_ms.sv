@@ -9,7 +9,7 @@ import fabric_datatypes::*;
 module router_ms #(
 	parameter master_id                                    = 0,
 	parameter NUM_OF_SLAVES                                = 3,
-	parameter TOKEN_WIDTH                                  = 30,
+	parameter TOKEN_WIDTH                                  = TOKEN_WIDTH,
 	parameter logic [TOKEN_WIDTH - 1 : 0] TOKEN_LOW_THRESHOLD = 8,
 	parameter QUEUE_DEPTH                                  = 16,
 	parameter CYCLES_S_TO_U                                = 3,
@@ -22,21 +22,21 @@ module router_ms #(
 	
 	// AW channel
 	input  aw_bus                                   aw_data_channel,   // axi aw data channel
-	output logic [NUM_OF_SLAVES - 1 : 0]            aw_ready_out,      // axi awready signal to master
+	output logic                                    aw_ready_out,      // axi awready signal to master
 	output aw_bus  [NUM_OF_SLAVES - 1 : 0]          aw_data_out,       // aw data channel to slave_arbiter
 	output patch_t [NUM_OF_SLAVES - 1 : 0]          aw_patch_out,      // aw patch to slave_arbiter
 	input  logic [NUM_OF_SLAVES - 1 : 0]            aw_ready_in,       // aw ready from slave		
 	
 	// AR channel
 	input  ar_bus                                   ar_data_channel,   // axi ar data channel
-	output logic [NUM_OF_SLAVES - 1 : 0]            ar_ready_out,      // axi arready signal to master
+	output logic                                    ar_ready_out,      // axi arready signal to master
 	output ar_bus  [NUM_OF_SLAVES - 1 : 0]          ar_data_out,       // ar data channel to slave_arbiter
 	output patch_t [NUM_OF_SLAVES - 1 : 0]          ar_patch_out,      // ar patch to slave_arbiter
 	input  logic [NUM_OF_SLAVES - 1 : 0]            ar_ready_in,       // ar ready from slave	
 	
 	// W channel
 	input  w_bus                                    w_data_channel,    // axi w data channel
-	output logic [NUM_OF_SLAVES - 1 : 0]            w_ready_out,       // axi wready signal to master
+	output logic                                    w_ready_out,       // axi wready signal to master
 	output w_bus   [NUM_OF_SLAVES - 1 : 0]          w_data_out,        // w data channel to slave_arbiter
 	output patch_t [NUM_OF_SLAVES - 1 : 0]          w_patch_out,       // w patch to slave_arbiter
 	input  logic [NUM_OF_SLAVES - 1 : 0]            w_ready_in,        // w ready from slave	
@@ -49,7 +49,7 @@ module router_ms #(
 	input  logic [2:0][TOKEN_WIDTH - 1 : 0]         token_allocation,
 	output logic [2:0][TOKEN_WIDTH - 1 : 0]         num_tokens,
 	output logic [2:0]                              is_urgent,
-	output logic [2:0][2:0]                         needy_level,       // [num_of_channel][needy_num_of_bits]
+	output logic [2:0][1:0]                         needy_level,       // [num_of_channel][needy_num_of_bits]
 	input  logic [2:0][2:0]                         mode
 );
 
@@ -124,16 +124,16 @@ needy #(
 //==============================================================================
 
 // input -> patcher
-patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_aw(
+patcher_ax #(.BUS_TYPE(aw_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) patcher_aw(
 	.aclk     (aclk                ),
 	.aresetn  (aresetn             ),
 	.data_in  (aw_data_channel     ),
-	.ready_out(aw_ready_out        ), 
-	.data_out (aw_patcher_data_out ),
 	.ready_in (aw_rob_ready_out	   ),
-	.patch_out(aw_patcher_patch_out),
 	.cfg      (cfg                 ),
-	.cfg_en   (cfg_en              )
+	.cfg_en   (cfg_en              ),
+	.data_out (aw_patcher_data_out ),
+	.ready_out(aw_ready_out        ), 
+	.patch_out(aw_patcher_patch_out)
 );
 
 // patcher -> rob
@@ -164,7 +164,6 @@ rob #(
 always_comb begin
 	aw_data_out     = '0;
 	aw_patch_out    = '0;
-	//aw_ready_out    = '0; 
 	aw_rob_ready_in = 1'b0;
 	if (!empty[0]) begin
 		aw_data_out[aw_rob_patch_out_internal.slave_id]  = aw_rob_data_out;
@@ -178,16 +177,16 @@ end
 //==============================================================================
 
 // input -> patcher
-patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) pathcer_ar(
+patcher_ax #(.BUS_TYPE(ar_bus), .master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES)) patcher_ar(
 	.aclk     (aclk                ),
 	.aresetn  (aresetn             ),
 	.data_in  (ar_data_channel     ),
-	.ready_out(ar_ready_out        ), 
-	.data_out (ar_patcher_data_out ),
 	.ready_in (ar_patcher_ready_out),
-	.patch_out(ar_patcher_patch_out),
 	.cfg      (cfg                 ),
-	.cfg_en   (cfg_en              )
+	.cfg_en   (cfg_en              ),
+	.data_out (ar_patcher_data_out ),
+	.ready_out(ar_ready_out        ), 
+	.patch_out(ar_patcher_patch_out)
 );
 
 // patcher -> rob
@@ -218,7 +217,6 @@ rob #(
 always_comb begin
 	ar_data_out     = '0;
 	ar_patch_out    = '0;
-	//ar_ready_out    = '0;
 	ar_rob_ready_in = 1'b0;
 	if (!empty[1]) begin
 		ar_data_out[ar_rob_patch_out_internal.slave_id]  = ar_rob_data_out;
@@ -232,7 +230,7 @@ end
 //==============================================================================
 
 // input -> patcher
-patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(QUEUE_DEPTH)) pathcer_w(
+patcher_w #(.master_id(master_id), .NUM_OF_SLAVES(NUM_OF_SLAVES), .QUEUE_DEPTH(QUEUE_DEPTH)) patcher_w(
 	.aclk       (aclk                       ),
 	.aresetn    (aresetn                    ),
 	.data_in    (w_data_channel             ),
@@ -272,7 +270,6 @@ rob #(
 always_comb begin
 	w_data_out     = '0;
 	w_patch_out    = '0;
-	//w_ready_out    = '0;
 	w_rob_ready_in = 1'b0;
 	if (!empty[2]) begin
 		w_data_out[w_rob_patch_out_internal.slave_id]  = w_rob_data_out;

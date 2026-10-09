@@ -15,7 +15,7 @@ module top_block_test #() ();
 	//----- parameters -----
 	parameter NUM_OF_MASTERS = 3;
 	parameter NUM_OF_SLAVES  = 4;
-	parameter TOKEN_WIDTH    = 32;
+	parameter TOKEN_WIDTH    = TOKEN_WIDTH;
 
 	//----- signals -----
 	logic aclk;

@@ -5,13 +5,18 @@
  * Creation date : Apr 4, 2026
  * Description   : Central arbitration and token allocation engine
  *------------------------------------------------------------------------------*/
+// ----- imports -----
+import axi_datatypes::*;
+import fabric_datatypes::*;
 
 module arbiter_engine #(
 	parameter NUM_OF_MASTERS     = 4,
 	parameter NUM_OF_SLAVES      = 3,
 	parameter NUM_OF_CHANNEL     = 3, // For router_ms (AW, AR, W)
 	parameter NUM_OF_SLV_CHANNEL = 2, // For router_sl (B, R)
-	parameter TOKEN_WIDTH        = 30 
+	parameter TOKENS_REGULAR     = MAX_TOKENS/2,
+	parameter TOKENS_EXTRA_BW    = MAX_TOKENS,
+	parameter TOKEN_WIDTH        = TOKEN_WIDTH 
 ) 
 (
 	input aclk,
@@ -42,8 +47,7 @@ module arbiter_engine #(
 	output [NUM_OF_SLV_CHANNEL -1 :0][NUM_OF_SLAVES -1 : 0][TOKEN_WIDTH -1 : 0] sl_num_of_tokens
 );
 
-// ----- imports -----
-import axi_datatypes::*;
+
 
 genvar i, j;
 generate 
@@ -67,9 +71,11 @@ generate
 	for(i = 0; i < NUM_OF_MASTERS; i++) begin: gen_ms_token_alloc_master
 		for(j = 0; j < NUM_OF_CHANNEL; j++) begin: gen_ms_token_alloc_channel
 			assign ms_mode[j][i] = ms_needy_level[j][i];
-			assign ms_num_of_tokens[j][i] = (ms_needy_level[j][i] >= EXSTRA_BW) ? TOKEN_WIDTH'(2048) : TOKEN_WIDTH'(1024);
+			assign ms_num_of_tokens[j][i] = (ms_needy_level[j][i] >= EXTRA_BW) ? TOKEN_WIDTH'(TOKENS_EXTRA_BW) : TOKEN_WIDTH'(TOKENS_REGULAR);
 		end
 	end
+
+
 
 	// =========================================================================
 	// Slave Side (router_sl) Channels (B, R)
@@ -91,7 +97,7 @@ generate
 	for(i = 0; i < NUM_OF_SLAVES; i++) begin: gen_sl_token_alloc_slave
 		for(j = 0; j < NUM_OF_SLV_CHANNEL; j++) begin: gen_sl_token_alloc_channel
 			assign sl_mode[j][i] = sl_needy_level[j][i];
-			assign sl_num_of_tokens[j][i] = (sl_needy_level[j][i] >= EXSTRA_BW) ? TOKEN_WIDTH'(2048) : TOKEN_WIDTH'(1024);
+			assign sl_num_of_tokens[j][i] = (sl_needy_level[j][i] >= EXTRA_BW) ? TOKEN_WIDTH'(TOKENS_EXTRA_BW) : TOKEN_WIDTH'(TOKENS_REGULAR);
 		end
 	end
 	
