@@ -99,7 +99,8 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.AWBURST         <= req.burst;
 		vif.AWSIZE          <= req.size;
 		vif.AWID            <= req.id;
-		
+		vif.AWQOS           <= req.qos;
+        
 		// Wait for a clock edge while out of reset, then for handshake.
 		@(posedge vif.ACLK iff vif.ARESETn);
 		wait (vif.AWREADY);
@@ -146,6 +147,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.ARBURST         <= req.burst;
 		vif.ARSIZE          <= req.size;
 		vif.ARID            <= req.id;
+        vif.ARQOS           <= req.qos;
 		
 		@(posedge vif.ACLK iff vif.ARESETn);
 		wait (vif.ARREADY);

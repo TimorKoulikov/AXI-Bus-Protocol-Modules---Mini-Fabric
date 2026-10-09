@@ -49,9 +49,11 @@ class axi_write_seq extends uvm_sequence #(axi_seq_item);
             	write == 1;
                 addr  inside {[`AXI_ADDR_WIDTH'('h0000_1000) : `AXI_ADDR_WIDTH'('h0000_1FF0)]};
                 addr  % 4 == 0;          // 64-bit aligned
-                len   == 0;              // single-beat for now
-                size  == 3'b011;         // 8 bytes (matches DATA_WIDTH=64)
-                burst == 2'b01;          // INCR
+                len     == 0;              // single-beat for now
+                size    == 3'b011;         // 8 bytes (matches DATA_WIDTH=64)
+                burst   == 2'b01;          // INCR
+                urgent  == 0;
+                stream  == 0;
            	})
 			
 			`uvm_fatal("AXI_WRITE_SEQ", "Randomization failed")

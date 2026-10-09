@@ -49,6 +49,8 @@ class axi_read_seq extends uvm_sequence;
                     len   == 0;              // single-beat for now
                     size  == 3'b011;         // 8 bytes (matches DATA_WIDTH=64)
                     burst == 2'b01;          // INCR
+                    urgent  == 0;
+                    stream  == 0;
                })
                     `uvm_fatal("AXI_READ_SEQ", "Randomization failed")
 
