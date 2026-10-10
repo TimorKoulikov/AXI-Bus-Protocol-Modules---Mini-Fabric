@@ -11,7 +11,6 @@ class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
     // Variables configured by the caller
     bit        is_write;
     bit [`AXI_ADDR_WIDTH -1 : 0] req_addr;
-    bit [`AXI_DATA_WIDTH -1 : 0] req_data;
     bit        req_urgent;
     bit        req_stream;
     bit        [7:0]              req_len;
@@ -36,7 +35,6 @@ class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
         if (!req.randomize() with {
             if (!local::rand_write)     write  == local::is_write;
             if (!local::rand_addr)      addr   == local::req_addr;
-            if (!local::rand_data)      data   == local::req_data;
             if (!local::rand_urgent)    urgent == local::req_urgent;
             if (!local::rand_stream)    stream == local::req_stream;
             if (!local::rand_len)       len    == local::req_len;

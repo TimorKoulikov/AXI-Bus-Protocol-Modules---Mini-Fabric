@@ -91,6 +91,11 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		//   - potentially support multiple outstanding writes (IDs, interleaving)
 		// -------------------------------------------------------------------
 		
+        //push valid only after aresetn deasserted
+        do begin
+            @(posedge vif.ACLK);
+        end while (vif.ARESETn == 1'b0);
+        
 		`uvm_info("AXI_DRIVER_START", $sformatf("WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",
                     req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		// --- Address phase ---
@@ -111,17 +116,17 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
         //`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		
         // --- Data phase ---
-		// NOTE: This drives exactly one beat.
-		// If AWLEN>0 (burst), this is not sufficient and must be extended.
-		vif.WDATA           <= req.data;
-		vif.WSTRB           <= '1;   // “all bytes valid” assumption
-		vif.WLAST           <= 1;
-		vif.WVALID          <= 1;
-        vif.WID             <= req.id;
-		
-        do begin
-            @(posedge vif.ACLK iff vif.ARESETn);
-        end while (vif.WREADY !== 1'b1);
+        for(int i=0; i<= req.len; i++) begin
+    		vif.WDATA           <= req.data;
+    		vif.WSTRB           <= '1;   // “all bytes valid” assumption
+    		vif.WLAST           <= 1;
+    		vif.WVALID          <= 1;
+            vif.WID             <= req.id;
+    		
+            do begin
+                @(posedge vif.ACLK iff vif.ARESETn);
+            end while (vif.WREADY !== 1'b1);
+        end
         
 		vif.WVALID          <= 0;
 		vif.WLAST           <= 0;

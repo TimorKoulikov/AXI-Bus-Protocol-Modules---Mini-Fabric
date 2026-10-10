@@ -43,7 +43,7 @@ module tb_top;
 	// TODO : consider maybe to remove
 	initial begin
 		ARESETn = 0;
-    	#50ns;
+    	#10ns;
     	ARESETn = 1;
 	end
 	

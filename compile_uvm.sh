@@ -10,7 +10,7 @@ BUILD_DIR="build"
 OUT_DIR="build"
 
 ## compile the rtl
-vcs -full64 -sverilog -ntb_opts uvm-1.2 -debug_access+all -f build_config.f -l $BUILD_DIR/comp.log -o $BUILD_DIR/simv_uvm \
+vcs -full64 -sverilog -ntb_opts uvm-1.2 -kdb -debug_access+all -f build_config.f -l $BUILD_DIR/comp.log -o $BUILD_DIR/simv_uvm \
 -Mdir=$BUILD_DIR/csrc -l $OUT_DIR/compile_uvm.log \
 
 ## running the simulation
