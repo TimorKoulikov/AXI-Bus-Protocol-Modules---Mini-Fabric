@@ -51,7 +51,9 @@
 class axi_seq_item extends uvm_sequence_item;
 	 
      `uvm_object_utils(axi_seq_item)
-
+    
+     axiChannelTypes                    ch_type=AW;
+     
      rand bit [`AXI_ADDR_WIDTH-1 : 0]   addr;
      rand bit [`AXI_DATA_WIDTH-1 : 0]   data;
      rand bit                           write;         // write=1, read=0
@@ -63,7 +65,7 @@ class axi_seq_item extends uvm_sequence_item;
      rand bit                           urgent;        // Urgent flag (encoded in QoS)
      rand bit                           stream;        // Stream flag (encoded in QoS)
      bit [1:0]                          qos;           // AXI QoS (derived from urgent/stream)
-     
+         
      // urgent=1 ? qos=2'b11, stream=1 ? qos=2'b10, else qos=2'b00
      // (urgent takes priority if both set)
      //constraint c_urgent_stream {
@@ -81,8 +83,8 @@ class axi_seq_item extends uvm_sequence_item;
      endfunction
 
      function string convert2string();
-         return $sformatf("AXI_SEQUENCE_ITEM: axi_id=%0d, addr=0x%0h, data=0x%0h, type=%s, resp=%0b, urgent=%0b, stream=%0b, qos=%0b",
-                 id, addr, data, write ? "WRITE" : "READ", resp, urgent, stream, qos);
+         return $sformatf("AXI_SEQUENCE_ITEM: %s axi_id=%0d, addr=0x%0h, data=0x%0h, type=%s, resp=%0b, urgent=%0b, stream=%0b, qos=%0b",
+                 ch_type,id, addr, data, write ? "WRITE" : "READ", resp, urgent, stream, qos);
      endfunction
 
 endclass

@@ -46,8 +46,10 @@ package axi_tb_pkg;
      //  Environment
      // ======================================================
      `include "bfm/axi3_slave_bfm.sv"
+     `include "axi_reference_model.sv"
      `include "axi_scoreboard.sv"
      `include "axi_env.sv"
+     
 
      // ======================================================
      //  Sequences
