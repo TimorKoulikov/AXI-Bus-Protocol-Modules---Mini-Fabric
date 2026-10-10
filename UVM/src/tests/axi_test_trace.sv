@@ -6,12 +6,12 @@
 //   line, and dispatches AXI transactions to the appropriate master sequencer.
 //
 // Trace format (one transaction per line):
-//   delay  master  write  address   data      urgent  stream
-//   0      0       1      00001000  ABCD1234  0       0
-//   0      1       1      00002000  DEADBEEF  1       0
+//   delay  master  write  address   data      urgent  stream  len
+//   0      0       1      00001000  ABCD1234  0       0       0
+//   0      1       1      00002000  DEADBEEF  1       0       4
 //
-// Use 'X' for any field (write/address/data/urgent/stream) to randomize it:
-//   0      0       X      X         X         X       X
+// Use 'X' for any field (write/address/data/urgent/stream/len) to randomize it:
+//   0      0       X      X         X         X       X       X
 //
 // Lines starting with '#' are comments and are skipped.
 //------------------------------------------------------------------------------
@@ -24,20 +24,20 @@ class axi_test_trace extends axi_base_test;
     endfunction
 
     // Helper: split a string by whitespace into tokens
-    function int tokenize(string line, output string tokens[7]);
+    function int tokenize(string line, output string tokens[8]);
         int idx = 0;
         int i = 0;
-        int len = line.len();
+        int line_len = line.len();
         string tok;
 
-        while (i < len && idx < 7) begin
+        while (i < line_len && idx < 8) begin
             // Skip whitespace
-            while (i < len && (line[i] == " " || line[i] == "\t")) i++;
-            if (i >= len) break;
+            while (i < line_len && (line[i] == " " || line[i] == "\t")) i++;
+            if (i >= line_len) break;
 
             // Collect token
             tok = "";
-            while (i < len && line[i] != " " && line[i] != "\t" && line[i] != "\n" && line[i] != "\r") begin
+            while (i < line_len && line[i] != " " && line[i] != "\t" && line[i] != "\n" && line[i] != "\r") begin
                 tok = {tok, line[i]};
                 i++;
             end
@@ -64,7 +64,7 @@ class axi_test_trace extends axi_base_test;
     task run_phase(uvm_phase phase);
         int    fd;
         string line;
-        string tokens[7];
+        string tokens[8];
         int    num_tokens;
         string filename = "trace.txt";
 
@@ -75,7 +75,8 @@ class axi_test_trace extends axi_base_test;
         logic [`AXI_DATA_WIDTH -1 : 0] data;
         int          urgent;
         int          stream_flag;
-        bit          rw, ra, rd, ru, rs;  // randomize flags
+        int          len;
+        bit          rw, ra, rd, ru, rs, rl;  // randomize flags
 
         phase.raise_objection(this);
 
@@ -95,7 +96,7 @@ class axi_test_trace extends axi_base_test;
             if (line[0] == "#")   continue;
 
             num_tokens = tokenize(line, tokens);
-            if (num_tokens < 7)   continue;
+            if (num_tokens < 8)   continue;
 
             // Delay and master are always required (not randomizable)
             void'($sscanf(tokens[0], "%d", delay));
@@ -120,15 +121,20 @@ class axi_test_trace extends axi_base_test;
             // Stream field
             rs = is_random_token(tokens[6]);
             if (!rs) void'($sscanf(tokens[6], "%d", stream_flag));
-
+            
+            // Len field
+            rl = is_random_token(tokens[7]);
+            if (!rl) void'($sscanf(tokens[7], "%d", len));
+            
             `uvm_info("AXI_TEST_TRACE", $sformatf(
-                "Parsed: delay=%0d master=%0d write=%s addr=%s data=%s urgent=%s stream=%s",
+                "Parsed: delay=%0d master=%0d write=%s addr=%s data=%s urgent=%s stream=%s len=%s",
                 delay, master,
                 rw ? "RAND" : $sformatf("%0d", is_write),
                 ra ? "RAND" : $sformatf("0x%08h", addr),
                 rd ? "RAND" : $sformatf("0x%08h", data),
                 ru ? "RAND" : $sformatf("%0d", urgent),
-                rs ? "RAND" : $sformatf("%0d", stream_flag)
+                rs ? "RAND" : $sformatf("%0d", stream_flag),
+                rl ? "RAND" : $sformatf("%0d", len)
             ), UVM_LOW)
 
             // Wait for the specified delay before dispatching
@@ -144,11 +150,14 @@ class axi_test_trace extends axi_base_test;
                 automatic logic [`AXI_DATA_WIDTH -1 : 0] d   = data;
                 automatic int          u   = urgent;
                 automatic int          s   = stream_flag;
+                automatic int          l   = len - 1;
                 automatic bit          fw  = rw;
                 automatic bit          fa  = ra;
                 automatic bit          fd_flag = rd;
                 automatic bit          fu  = ru;
                 automatic bit          fs  = rs;
+                automatic bit          fl  = rl;
+                
 
                 begin
                     axi_single_item_seq seq = axi_single_item_seq::type_id::create("seq");
@@ -157,11 +166,13 @@ class axi_test_trace extends axi_base_test;
                     seq.req_data    = d;
                     seq.req_urgent  = u;
                     seq.req_stream  = s;
+                    seq.req_len     = l;
                     seq.rand_write  = fw;
                     seq.rand_addr   = fa;
                     seq.rand_data   = fd_flag;
                     seq.rand_urgent = fu;
                     seq.rand_stream = fs;
+                    seq.rand_len    = fl;
 
                     if (m >= 0 && m < `NUM_OF_MASTERS) begin
                         seq.start(env.axi_ag[m].axi_seqr);

@@ -1,2 +1,2 @@
-# delay  master  write  address   data          urgent  stream
-0        0       1      00001000  ABCD1234      0       0
+# delay  master  write  address   data          urgent  stream  len
+0        0       1      00001000  ABCD1234      0       0       1

@@ -14,6 +14,7 @@ class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
     bit [`AXI_DATA_WIDTH -1 : 0] req_data;
     bit        req_urgent;
     bit        req_stream;
+    bit        [7:0]              req_len;
     
     // Randomization control  when set, the corresponding field is randomized
     bit rand_write  = 0;
@@ -21,6 +22,7 @@ class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
     bit rand_data   = 0;
     bit rand_urgent = 0;
     bit rand_stream = 0;
+    bit rand_len    = 0;
     
     function new(string name = "axi_single_item_seq");
         super.new(name);
@@ -37,7 +39,7 @@ class axi_single_item_seq extends uvm_sequence #(axi_seq_item);
             if (!local::rand_data)      data   == local::req_data;
             if (!local::rand_urgent)    urgent == local::req_urgent;
             if (!local::rand_stream)    stream == local::req_stream;
-            len   == 0;      // 1 beat
+            if (!local::rand_len)       len    == local::req_len;
             burst == 2'b01;  // INCR
             size  == 3'b011; // 8 bytes (64-bit)
         }) `uvm_fatal("SEQ", "Randomization failed")
