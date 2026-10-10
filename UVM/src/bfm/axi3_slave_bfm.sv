@@ -379,7 +379,7 @@ class axi3_slave_bfm extends uvm_component;
 						active_writes[i].beats_left--;
 						
 						if (active_writes[i].beats_left==0) begin
-                            `uvm_info("AXI3_BFM",$sformatf("%t W recived: id=%0d",$time,active_writes[i].id), axi_verbosity)
+                            `uvm_info("AXI3_BFM",$sformatf("W recived: id=%0d data=0x%08h",active_writes[i].id,vif.WDATA), axi_verbosity)
 							pending_b_ids.push_back(active_writes[i].id);
 							active_writes.delete(i);
 						end
@@ -403,7 +403,7 @@ class axi3_slave_bfm extends uvm_component;
 				end
 				end
 				 */
-                `uvm_info("AXI3_BFM",$sformatf("%t B sent: id=%0d bresp=%0d ",$time,id,br), axi_verbosity)
+                `uvm_info("AXI3_BFM",$sformatf("B sent: id=%0d bresp=%0d ",id,br), axi_verbosity)
                 
 				vif.BID    <= id;
 				vif.BRESP  <= br;

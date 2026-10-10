@@ -29,6 +29,7 @@ class axi_env extends uvm_env;
      // Core verification components
      axi_agent           axi_ag[`NUM_OF_MASTERS];
      axi3_slave_bfm      axi_bfm[`NUM_OF_SLAVES];
+     axi_monitor         axi_slv_mon[`NUM_OF_SLAVES];
      axi_scoreboard      sb;
 
      // Virtual interfaces owned by the environment
@@ -78,6 +79,10 @@ class axi_env extends uvm_env;
 				uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_bfm_%0d",i), "axi_vif", axi_slv_vif[i]);
 				// Expose BFM handle globally so sequences can call backdoor functions.
 				uvm_config_db#(axi3_slave_bfm)::set(uvm_root::get(), "*", $sformatf("axi_bfm_h_%0d",i), axi_bfm[i]);
+                
+                // create and connect slave monitors
+                axi_slv_mon[i] = axi_monitor::type_id::create($sformatf("axi_slv_mon_%0d", i), this);
+                uvm_config_db#(virtual axi_if)::set(this, $sformatf("axi_slv_mon_%0d", i), "axi_vif", axi_slv_vif[i]);
 		  end
          
 
@@ -90,9 +95,14 @@ class axi_env extends uvm_env;
 
           // AXI monitor (stimulus side) → scoreboard and optional debug FIFO.
           for ( int i=0 ; i < `NUM_OF_MASTERS ; i ++) begin 
-		  	axi_ag[i].axi_mon.ap.connect(sb.axi_export);
+		  	axi_ag[i].axi_mon.ap.connect(sb.axi_mst_export[i]);
           	axi_ag[i].axi_mon.ap.connect(axi_mon_fifo.analysis_export);
-		  end
+          end
+          
+           for ( int i=0 ; i < `NUM_OF_SLAVES ; i ++) begin 
+              axi_slv_mon[i].ap.connect(sb.axi_slv_export[i]);
+           end
+          
           `uvm_info("ENV", "Scoreboard connections established.", axi_verbosity)
 
      endfunction

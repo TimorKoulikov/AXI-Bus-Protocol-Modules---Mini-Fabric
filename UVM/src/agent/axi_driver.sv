@@ -103,11 +103,14 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.AWQOS           <= req.qos;
         
 		// Wait for a clock edge while out of reset, then for handshake.
-		@(posedge vif.ACLK iff vif.ARESETn);
-		wait (vif.AWREADY);
-		vif.AWVALID         <= 0;
-		//`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
-		// --- Data phase ---
+        do begin
+            @(posedge vif.ACLK iff vif.ARESETn);
+        end while (vif.AWREADY !== 1'b1);
+        vif.AWVALID         <= 0;
+		
+        //`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
+		
+        // --- Data phase ---
 		// NOTE: This drives exactly one beat.
 		// If AWLEN>0 (burst), this is not sufficient and must be extended.
 		vif.WDATA           <= req.data;
@@ -116,14 +119,20 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.WVALID          <= 1;
         vif.WID             <= req.id;
 		
-		@(posedge vif.ACLK iff vif.ARESETn);
-		wait (vif.WREADY);
+        do begin
+            @(posedge vif.ACLK iff vif.ARESETn);
+        end while (vif.WREADY !== 1'b1);
+        
 		vif.WVALID          <= 0;
 		vif.WLAST           <= 0;
-		//`uvm_info("AXI_DRIVER", $sformatf("[W Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
-		// --- Response phase ---
+		
+        //`uvm_info("AXI_DRIVER", $sformatf("[W Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
+		
+        // --- Response phase ---
 		vif.BREADY          <= 1;
-		wait (vif.BVALID);
+        do begin
+            @(posedge vif.ACLK iff vif.ARESETn);
+        end while (vif.BVALID !== 1'b1);
 		req.resp            = vif.BRESP; // capture observed response
 		vif.BREADY          <= 0;
 		
@@ -150,20 +159,25 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.ARID            <= req.id;
         vif.ARQOS           <= req.qos;
 		
-		@(posedge vif.ACLK iff vif.ARESETn);
-		wait (vif.ARREADY);
+        do begin
+            @(posedge vif.ACLK iff vif.ARESETn);
+        end while (vif.ARREADY !== 1'b1);
 		vif.ARVALID         <= 0;
 		
 		// --- Data phase ---
 		// NOTE: This assumes a single R beat.
 		// If ARLEN>0, you must loop until RLAST.
 		vif.RREADY          <= 1;
-		wait (vif.RVALID);
+        
+        do begin
+            @(posedge vif.ACLK iff vif.ARESETn);
+        end while (vif.RVALID !== 1'b1);
+        
 		req.data            = vif.RDATA;
 		req.resp            = vif.RRESP;
 		vif.RREADY          <= 0;
 		
-		`uvm_info("AXI_DRIVER", $sformatf("[R Handshake complete] READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
+		`uvm_info("AXI_DRIVER", $sformatf("READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 	endtask
 	
 endclass

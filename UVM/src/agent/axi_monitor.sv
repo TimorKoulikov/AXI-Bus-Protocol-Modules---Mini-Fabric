@@ -70,7 +70,6 @@ class axi_monitor extends uvm_monitor;
 
           forever begin
                @(posedge vif.ACLK);
-
                // -------------------------------------------------------------
                // Detect WRITE address handshake (AW channel)
                // -------------------------------------------------------------
