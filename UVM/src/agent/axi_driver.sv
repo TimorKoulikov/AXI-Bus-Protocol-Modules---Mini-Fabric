@@ -175,16 +175,17 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		vif.ARVALID         <= 0;
 		
 		// --- Data phase ---
-		// NOTE: This assumes a single R beat.
-		// If ARLEN>0, you must loop until RLAST.
 		vif.RREADY          <= 1;
         
-        do begin
+        forever begin
             @(posedge vif.ACLK iff vif.ARESETn);
-        end while (vif.RVALID !== 1'b1);
+            if (vif.RVALID === 1'b1) begin
+                req.data = vif.RDATA;
+                req.resp = vif.RRESP;
+                if (vif.RLAST === 1'b1) break;
+            end
+        end
         
-		req.data            = vif.RDATA;
-		req.resp            = vif.RRESP;
 		vif.RREADY          <= 0;
 		
 		`uvm_info("AXI_DRIVER", $sformatf("READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len - 1,req.qos), axi_verbosity)

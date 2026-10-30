@@ -65,6 +65,7 @@ logic empty;
 logic full;
 logic do_push;
 logic do_pop;
+logic will_be_empty;
 
 always_comb begin
 	empty = (count == 0);
@@ -76,6 +77,8 @@ always_comb begin
 	// explicit queue actions
     do_push = (patch_valid && !full);
     do_pop  = (pop && !empty);
+
+    will_be_empty = (count == 0) || (count == 1 && do_pop && !do_push);
 end
 
 
@@ -121,14 +124,14 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		// We can only accept W data if both are true:
 		// 1) we have a matching AW tag (the tag_queue is not empty)
 		// 2) the downstream module (ROB) is ready to get data (ready_in==1'b1)
-		if (!empty && ready_in == 1'b1) begin
+		if (!will_be_empty && ready_in == 1'b1) begin
 			ready_out <= 1'b1;
 		end else begin
 			ready_out <= 1'b0;
 		end
 		
 		// Payload & Tag Forwarding
-		if (data_in.valid == 1'b1 && !empty) begin
+		if (data_in.valid == 1'b1 && ready_out == 1'b1 && !empty) begin
 			data_out  <= data_in;
 			// Retrieve the target_slave & QoS metadata for this burst from the queue
 			patch_out <= tag_queue[rd_ptr];

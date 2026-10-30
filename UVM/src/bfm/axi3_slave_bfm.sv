@@ -65,7 +65,7 @@ class axi3_slave_bfm extends uvm_component;
 	// ------------------------------------------------------------
 	typedef struct {
 		logic [DATA_WIDTH-1:0] addr;
-		logic [3:0]            beats_left;  // remaining beats
+		int unsigned           beats_left;  // remaining beats
 		logic [2:0]            size;
 		logic [DATA_WIDTH-1:0]   id;
 		logic [1:0]            burst;
@@ -79,7 +79,7 @@ class axi3_slave_bfm extends uvm_component;
 	// ------------------------------------------------------------
 	typedef struct {
 		logic [DATA_WIDTH-1:0] addr;
-		logic [3:0]            beats_left;  // remaining beats
+		int unsigned           beats_left;  // remaining beats
 		logic [2:0]            size;
 		logic [ID_WIDTH-1:0]   id;
 		int unsigned           mem_idx;     // pointer to memory
@@ -422,7 +422,7 @@ class axi3_slave_bfm extends uvm_component;
 	// ------------------------------------------------------------
 	task automatic do_write(
 			logic [ADDR_WIDTH-1:0] awaddr,
-			logic [3:0]            awlen,
+			logic [7:0]            awlen,
 			logic [2:0]            awsize,
 			logic [ID_WIDTH-1:0]   awid
 	);
