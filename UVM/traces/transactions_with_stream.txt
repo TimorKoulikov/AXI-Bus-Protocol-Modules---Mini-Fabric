@@ -1,0 +1,16 @@
+# delay  master  write  address     urgent  stream  len
+# --- Wave 1: Masters 0 & 1 Stream, Masters 2 & 3 Normal ---
+0        0       1      X           0       1       1
+0        1       1      X           0       1       1
+0        2       1      X           0       0       1
+0        3       1      X           0       0       1
+# --- Wave 2: Masters 2 & 3 Stream, Masters 0 & 1 Normal ---
+10       0       1      X           0       0       1
+0        1       1      X           0       0       1
+0        2       1      X           0       1       1
+0        3       1      X           0       1       1
+# --- Wave 3: Masters 1 & 2 Stream, Masters 0 & 3 Normal ---
+10       0       1      X           0       0       1
+0        1       1      X           0       1       1
+0        2       1      X           0       1       1
+0        3       1      X           0       0       1
