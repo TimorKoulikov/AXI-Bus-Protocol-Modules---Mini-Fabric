@@ -116,7 +116,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
         //`uvm_info("AXI_DRIVER", $sformatf("[AW Handshake complete] WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
 		
         // --- Data phase ---
-        for(int i=0; i<= req.len; i++) begin
+        for(int i=0; i < req.len; i++) begin
     		vif.WDATA           <= req.data;
     		vif.WSTRB           <= '1;   // “all bytes valid” assumption
     		vif.WLAST           <= (i==req.len - 1) ? '1: '0;
