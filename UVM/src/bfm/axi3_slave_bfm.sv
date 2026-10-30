@@ -233,7 +233,7 @@ class axi3_slave_bfm extends uvm_component;
 				rdata[8*b +: 8] = a_byte;
 			end
 			
-			`uvm_info("AXI3_BFM", $sformatf("TOOK READ: id=%d, idx=0x%0d rdata=%0h", ar.id, wi, rdata), axi_verbosity)
+			`uvm_info("AXI3_BFM", $sformatf("TOOK READ: id=%0d, idx=0x%0d rdata=%0h", ar.id, wi, rdata), axi_verbosity)
 			
 			vif.RID        <= ar.id;
 			vif.RDATA      <= rdata;

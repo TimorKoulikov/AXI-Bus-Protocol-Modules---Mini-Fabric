@@ -155,6 +155,11 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		//   - capture all beats (array/queue) or stream to a collector
 		// -------------------------------------------------------------------
 		
+        //push valid only after aresetn deasserted
+        do begin
+            @(posedge vif.ACLK);
+        end while (vif.ARESETn == 1'b0);
+        
 		// --- Address phase ---
 		vif.ARADDR          <= req.addr;
 		vif.ARVALID         <= 1;

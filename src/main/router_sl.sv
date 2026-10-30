@@ -187,7 +187,7 @@ rob #(
 	.data_in     (r_data_channel     ),
 	.patch_in    (r_patch_in         ),
 	.push_enable (1'b1               ), 
-	.ready_out   (r_rob_ready_out    ), 
+	.ready_out   (r_ready_out    ), 
 	.data_out    (r_rob_data_out     ), 
 	.patch_out   (r_rob_patch_out    ),
 	.pop_enable  (pop_enable[1]      ),
