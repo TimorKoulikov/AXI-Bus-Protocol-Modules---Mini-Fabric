@@ -132,7 +132,7 @@ class axi_monitor extends uvm_monitor;
                     tr.len = vif.ARLEN; 
                     tr.size = vif.ARSIZE; 
                     tr.burst = vif.ARBURST;
-                    `uvm_info($sformatf("AXI_MONITOR_%s",port_id), $sformatf("AR Beat: id=%0d addr=0x%0h", tr.id, tr.addr), axi_verbosity)
+                    `uvm_info($sformatf("AXI_MONITOR_%s",port_id), $sformatf("AR Beat: id=%0d addr=0x%0h len=%0d", tr.id, tr.addr,tr.len), axi_verbosity)
                     ap.write(tr);
                end
 

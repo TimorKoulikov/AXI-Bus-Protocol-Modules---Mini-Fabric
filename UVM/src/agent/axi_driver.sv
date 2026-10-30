@@ -97,11 +97,11 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
         end while (vif.ARESETn == 1'b0);
         
 		`uvm_info("AXI_DRIVER_START", $sformatf("WRITE: addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",
-                    req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
+                    req.addr, req.data, req.id,req.len - 1,req.qos), axi_verbosity)
 		// --- Address phase ---
 		vif.AWADDR          <= req.addr;
 		vif.AWVALID         <= 1;
-		vif.AWLEN           <= req.len;
+		vif.AWLEN           <= req.len - 1;
 		vif.AWBURST         <= req.burst;
 		vif.AWSIZE          <= req.size;
 		vif.AWID            <= req.id;
@@ -163,7 +163,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		// --- Address phase ---
 		vif.ARADDR          <= req.addr;
 		vif.ARVALID         <= 1;
-		vif.ARLEN           <= req.len;
+		vif.ARLEN           <= req.len - 1;
 		vif.ARBURST         <= req.burst;
 		vif.ARSIZE          <= req.size;
 		vif.ARID            <= req.id;
@@ -187,7 +187,7 @@ class axi_driver extends uvm_driver #(axi_seq_item); // RSP defaults to REQ
 		req.resp            = vif.RRESP;
 		vif.RREADY          <= 0;
 		
-		`uvm_info("AXI_DRIVER", $sformatf("READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len,req.qos), axi_verbosity)
+		`uvm_info("AXI_DRIVER", $sformatf("READ:  addr=0x%08h data=0x%08h id=%0d len=%0d qos=%0d",req.addr, req.data, req.id,req.len - 1,req.qos), axi_verbosity)
 	endtask
 	
 endclass
