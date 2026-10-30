@@ -131,7 +131,8 @@ always_ff @(posedge aclk or negedge aresetn) begin
 		end
 		
 		// Payload & Tag Forwarding
-		if (data_in.valid == 1'b1 && ready_out == 1'b1 && !empty) begin
+
+		if (data_in.valid == 1'b1  && ready_out == 1'b1 && !empty) begin
 			data_out  <= data_in;
 			// Retrieve the target_slave & QoS metadata for this burst from the queue
 			patch_out <= tag_queue[rd_ptr];
