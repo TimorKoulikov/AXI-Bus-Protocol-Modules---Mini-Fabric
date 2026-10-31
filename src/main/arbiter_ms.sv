@@ -55,6 +55,7 @@ always_comb begin
         if (grant[0][m]) begin
             b_data_in_sel  = b_data_in[m];
             b_patch_in_sel = b_patch_in[m];
+            b_data_in_sel.id  = {{(ID_WIDTH - MASTER_ID_WIDTH){1'b0}}, b_data_in[m].id[SLAVE_ID_WIDTH - 1 : $clog2(NUM_OF_MASTERS)]};
             b_ready_out[m] = b_rob_ready;
         end
     end
@@ -93,6 +94,7 @@ always_comb begin
         if (grant[1][m]) begin
             r_data_in_sel  = r_data_in[m];
             r_patch_in_sel = r_patch_in[m];
+            r_data_in_sel.id  = {{(ID_WIDTH - MASTER_ID_WIDTH){1'b0}}, r_data_in[m].id[SLAVE_ID_WIDTH - 1 : $clog2(NUM_OF_MASTERS)]};
             r_ready_out[m] = r_rob_ready;
         end
     end
