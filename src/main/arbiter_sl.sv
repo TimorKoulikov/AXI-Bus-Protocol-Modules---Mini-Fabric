@@ -67,7 +67,8 @@ always_comb begin
 	for (int m = 0; m < NUM_OF_MASTERS; m++) begin
 		if (grant[0][m]) begin
 			aw_data_in_sel  = aw_data_in[m];
-			aw_patch_in_sel = aw_patch_in[m];
+            aw_patch_in_sel = aw_patch_in[m];
+            aw_data_in_sel.id = {{(ID_WIDTH - SLAVE_ID_WIDTH){1'b0}},aw_data_in[m].id[MASTER_ID_WIDTH - 1 : 0],aw_patch_in[m].master_id[1:0]};
 			aw_ready_out[m] = aw_rob_ready;
 		end
 	end
@@ -97,6 +98,7 @@ rob #(
 );
 
 
+
 //==============================================================================
 //----- AR Channel -----
 //==============================================================================
@@ -110,6 +112,7 @@ always_comb begin
 		if (grant[1][m]) begin
 			ar_data_in_sel  = ar_data_in[m];
 			ar_patch_in_sel = ar_patch_in[m];
+            ar_data_in_sel.id = {{(ID_WIDTH - SLAVE_ID_WIDTH){1'b0}},ar_data_in[m].id[MASTER_ID_WIDTH - 1 : 0],ar_patch_in[m].master_id[1:0]};
 			ar_ready_out[m] = ar_rob_ready;
 		end
 	end
@@ -138,7 +141,6 @@ rob #(
 	.got_urgent     ()
 );
 
-
 //==============================================================================
 //----- W Channel -----
 //==============================================================================
@@ -152,6 +154,7 @@ always_comb begin
 		if (grant[2][m]) begin
 			w_data_in_sel  = w_data_in[m];
 			w_patch_in_sel = w_patch_in[m];
+            w_data_in_sel.id = {{(ID_WIDTH - SLAVE_ID_WIDTH){1'b0}},w_data_in[m].id[MASTER_ID_WIDTH - 1 : 0],w_patch_in[m].master_id[1:0]};
 			w_ready_out[m] = w_rob_ready;
 		end
 	end

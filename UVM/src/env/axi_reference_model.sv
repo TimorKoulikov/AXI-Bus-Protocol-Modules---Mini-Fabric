@@ -54,8 +54,12 @@ class axi_reference_model extends uvm_component;
                               mst_fifo[mst_idx].get(tr);
                               if (tr.ch_type == AW || tr.ch_type == W || tr.ch_type == AR) begin
                                    int target_slave = 0; // TODO: Use cfg_t(tr.addr) to calculate real target slave!
-                                   `uvm_info("REF_MODEL", $sformatf("Predicting Master %0d %s beat to emerge from Slave %0d", mst_idx, tr.ch_type.name(), target_slave), UVM_HIGH)
-                                   ref_slv_ap[target_slave].write(tr);
+                                   
+                                   axi_seq_item exp_tr = new tr;
+                                   exp_tr.id = {tr.id[`MASTER_ID_WIDTH-1:0], mst_idx[$clog2(`NUM_OF_MASTERS)-1:0]};
+                                   
+                                   `uvm_info("REF_MODEL", $sformatf("Predicting Master %0d %s beat to emerge from Slave %0d", mst_idx, exp_tr.ch_type.name(), target_slave), UVM_HIGH)
+                                   ref_slv_ap[target_slave].write(exp_tr);
                               end
                          end
                     end
@@ -68,12 +72,17 @@ class axi_reference_model extends uvm_component;
                fork
                     begin
                          axi_seq_item tr;
+                         axi_seq_item exp_tr;
                          forever begin
                               slv_fifo[slv_idx].get(tr);
                               if (tr.ch_type == B || tr.ch_type == R) begin
-                                   int target_master = 0; // TODO: Need tracking logic to know which master requested this ID!
-                                   `uvm_info("REF_MODEL", $sformatf("Predicting Slave %0d %s response to emerge from Master %0d", slv_idx, tr.ch_type.name(), target_master), UVM_HIGH)
-                                   ref_mst_ap[target_master].write(tr);
+                                   int target_master = tr.id[$clog2(`NUM_OF_MASTERS)-1:0];; // TODO: Need tracking logic to know which master requested this ID!
+                                   
+                                   exp_tr = new tr;
+                                   exp_tr.id = tr.id[`SLAVE_ID_WIDTH-1 : $clog2(`NUM_OF_MASTERS)];
+                                   
+                                   `uvm_info("REF_MODEL", $sformatf("Predicting Slave %0d %s response to emerge from Master %0d", slv_idx, exp_tr.ch_type.name(), target_master), UVM_HIGH)
+                                   ref_mst_ap[target_master].write(exp_tr);
                               end
                          end
                     end

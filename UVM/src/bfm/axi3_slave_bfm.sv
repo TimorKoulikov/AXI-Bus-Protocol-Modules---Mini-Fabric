@@ -34,8 +34,8 @@ class axi3_slave_bfm extends uvm_component;
 	data_word_t                   mem [0:MEM_DEPTH-1];
 	bit                           mem_written [0:MEM_DEPTH-1];
 	
-	bit [ID_WIDTH-1:0] beat_order_q[$];   // one entry per R beat
-	bit [ID_WIDTH-1:0] burst_order_q[$];  // one entry per completed burst
+	bit [MASTER_ID_WIDTH-1:0] beat_order_q[$];   // one entry per R beat
+	bit [MASTER_ID_WIDTH-1:0] burst_order_q[$];  // one entry per completed burst
 	
 	/*
 	// ------------------------------------------------------------
@@ -81,12 +81,12 @@ class axi3_slave_bfm extends uvm_component;
 		logic [DATA_WIDTH-1:0] addr;
 		logic [7:0]            beats_left;  // remaining beats
 		logic [2:0]            size;
-		logic [ID_WIDTH-1:0]   id;
+		logic [MASTER_ID_WIDTH-1:0]   id;
 		int unsigned           mem_idx;     // pointer to memory
 	} active_write_t;
 	
 	active_write_t active_writes[$];
-	bit [ID_WIDTH-1:0] pending_b_ids[$];
+	bit [MASTER_ID_WIDTH-1:0] pending_b_ids[$];
 	
 	// ------------------------------------------------------------
 	// Constructor
@@ -182,7 +182,7 @@ class axi3_slave_bfm extends uvm_component;
 	// ------------------------------------------------------------
 	// R-channel driver when using outstanding modes
 	// ------------------------------------------------------------
-	localparam int unsigned     ID_NUM = (1 << ID_WIDTH);
+	localparam int unsigned     ID_NUM = (1 << MASTER_ID_WIDTH);
 	task automatic drive_read_queue();
 		int idx = 0;
 		active_read_t ar;
@@ -390,7 +390,7 @@ class axi3_slave_bfm extends uvm_component;
 			end
 			// ========= WRITE RESPONSE =========
 			if (!vif.BVALID && pending_b_ids.size()!=0) begin
-				logic [ID_WIDTH-1:0] id;
+				logic [MASTER_ID_WIDTH-1:0] id;
 				logic [2:0] br;
 				id = pending_b_ids.pop_front();
 				br = 2'b00;
@@ -425,7 +425,7 @@ class axi3_slave_bfm extends uvm_component;
 			logic [ADDR_WIDTH-1:0] awaddr,
 			logic [7:0]            awlen,
 			logic [2:0]            awsize,
-			logic [ID_WIDTH-1:0]   awid
+			logic [MASTER_ID_WIDTH-1:0]   awid
 	);
 		int beats = awlen + 1;
 		int base_word = awaddr >> $clog2(DATA_WIDTH/8);

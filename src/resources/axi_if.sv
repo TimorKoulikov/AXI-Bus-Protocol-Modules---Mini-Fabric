@@ -1,6 +1,6 @@
 interface axi_if #(parameter ADDR_WIDTH = 32,
 				   parameter DATA_WIDTH = 32,
-				   parameter ID_WIDTH   = 4)
+				   parameter ID_WIDTH   = axi_datatypes::ID_WIDTH)
 (
 	input  logic ACLK,
 	input  logic ARESETn

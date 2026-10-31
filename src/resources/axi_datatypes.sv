@@ -3,7 +3,7 @@ package axi_datatypes;
 typedef enum {AW,AR,W,R,B} axiChannelTypes;
 
 localparam ADDR_WIDTH = 32;  
-localparam ID_WIDTH = 4;              // ID of the transaction
+localparam ID_WIDTH = 8;              // ID of the transaction
 localparam DATA_WIDTH = 32;
 localparam STRB_WIDTH = DATA_WIDTH/8;
 

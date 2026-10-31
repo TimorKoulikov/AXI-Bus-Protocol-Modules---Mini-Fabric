@@ -11,8 +11,8 @@ import axi_datatypes::*;
 import fabric_datatypes::*;
 
 module top_block #(
-	parameter NUM_OF_MASTERS = 3,
-	parameter NUM_OF_SLAVES  = 4,
+	parameter NUM_OF_MASTERS = fabric_datatypes::NUM_OF_MASTERS,
+	parameter NUM_OF_SLAVES  = fabric_datatypes::NUM_OF_SLAVES ,
 	parameter TOKEN_WIDTH    = TOKEN_WIDTH
 )
 (

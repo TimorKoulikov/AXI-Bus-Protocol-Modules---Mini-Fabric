@@ -22,5 +22,7 @@ import fabric_datatypes::*;
 `define AXI_DATA_WIDTH DATA_WIDTH
 `define NUM_OF_MASTERS NUM_OF_MASTERS
 `define NUM_OF_SLAVES NUM_OF_SLAVES
+`define MASTER_ID_WIDTH MASTER_ID_WIDTH
+`define SLAVE_ID_WIDTH SLAVE_ID_WIDTH
 
 `endif

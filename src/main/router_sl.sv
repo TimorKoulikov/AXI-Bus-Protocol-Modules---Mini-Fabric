@@ -138,7 +138,11 @@ needy #(
 //----- B ------
 
 // input -> rob
-assign b_patch_in={b_data_channel.id};
+always_comb begin
+    b_patch_in           = '0;
+    b_patch_in.slave_id  = slave_id;
+    b_patch_in.master_id = b_data_channel.id[$clog2(NUM_OF_MASTERS)-1:0];
+end
 rob #(
 	.BUS_TYPE     (b_bus        ),
 	.QUEUE_DEPTH  (QUEUE_DEPTH  ),
@@ -167,14 +171,18 @@ always_comb begin
 	token_for_transaction[0] = 1; // B channel payload is always 1 token
 	
 	if (!empty[0]) begin
-		b_data_out[b_rob_patch_out.slave_id] = b_rob_data_out;
-		b_ready_in_sel = b_ready_in[b_rob_patch_out.slave_id];
-		b_patch_out[b_rob_patch_out.slave_id] = b_rob_patch_out;
+		b_data_out[b_rob_patch_out.master_id] = b_rob_data_out;
+		b_ready_in_sel = b_ready_in[b_rob_patch_out.master_id];
+		b_patch_out[b_rob_patch_out.master_id] = b_rob_patch_out;
 	end
 end
 
 //----- R -----
-assign r_patch_in={r_data_channel.id};
+always_comb begin
+    r_patch_in           = '0;
+    r_patch_in.slave_id  = slave_id;
+    r_patch_in.master_id = r_data_channel.id[$clog2(NUM_OF_MASTERS)-1:0];
+end
 
 // patcher -> rob
 rob #(
@@ -205,9 +213,9 @@ always_comb begin
 	token_for_transaction[1] = 1; // Set to burst length cost if tracking beats
 	
 	if (!empty[1]) begin
-		r_data_out[r_rob_patch_out.slave_id] = r_rob_data_out;
-		r_ready_in_sel = r_ready_in[r_rob_patch_out.slave_id];
-		r_patch_out[r_rob_patch_out.slave_id] = r_rob_patch_out;
+		r_data_out[r_rob_patch_out.master_id] = r_rob_data_out;
+		r_ready_in_sel = r_ready_in[r_rob_patch_out.master_id];
+		r_patch_out[r_rob_patch_out.master_id] = r_rob_patch_out;
 	end
 end
 

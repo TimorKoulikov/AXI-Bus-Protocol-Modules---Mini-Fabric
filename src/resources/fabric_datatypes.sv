@@ -6,6 +6,10 @@ import axi_datatypes::*;
 localparam NUM_OF_SLAVES=3;	
 localparam NUM_OF_MASTERS = 4;
 
+localparam MASTER_ID_WIDTH = 4;
+localparam SLAVE_ID_WIDTH  = MASTER_ID_WIDTH + $clog2(NUM_OF_MASTERS) ;
+
+
 // tokens
 localparam MAX_TOKENS=1048576; //(2^20) the number of maximum tokens any master/slave can accumulate
 localparam TOKEN_WIDTH=$clog2(MAX_TOKENS + 1); // +1 is to store the value MAX_TOKENS too
@@ -20,8 +24,8 @@ typedef struct packed {
 typedef cfg_row [NUM_OF_SLAVES-1 : 0] cfg_t ;   //usage: cfg_t[0].low_addr = 0x0000000
 
 typedef struct packed {
-	logic [31:0] slave_id;
-	logic [31:0] master_id;
+	logic [$clog2(NUM_OF_SLAVES) - 1 :0] slave_id;
+	logic [$clog2(NUM_OF_MASTERS) - 1 :0] master_id;
 	logic urgent;
 	logic stream;
 	logic [LEN_WIDTH - 1 : 0] len;

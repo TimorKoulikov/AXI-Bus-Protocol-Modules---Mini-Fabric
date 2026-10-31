@@ -58,19 +58,26 @@ class axi_seq_item extends uvm_sequence_item;
      rand bit [`AXI_DATA_WIDTH-1 : 0]   data;
      rand bit                           write;         // write=1, read=0
      bit [1:0]                          resp;          // AXI response (OKAY, EXOKAY, SLVERR, DECERR)
-     rand bit [3:0]                     id;            // AXI ID
+     rand bit [axi_datatypes::ID_WIDTH -1 : 0]     id; // AXI ID
      rand bit [7:0]                     len;           // Burst Length
      rand bit [2:0]                     size;          // Transfer Size
      rand bit [1:0]                     burst;         // Burst Type (FIXED, INCR, WRAP)
      rand bit                           urgent;        // Urgent flag (encoded in QoS)
      rand bit                           stream;        // Stream flag (encoded in QoS)
      bit [1:0]                          qos;           // AXI QoS (derived from urgent/stream)
+       
          
+     // constraints
+     
      // urgent=1 ? qos=2'b11, stream=1 ? qos=2'b10, else qos=2'b00
      // (urgent takes priority if both set)
      //constraint c_urgent_stream {
      //    !(urgent && stream);  // mutually exclusive
      //}
+     
+     constraint c_master_id {
+         id < (1 << `MASTER_ID_WIDTH);                // Master sequence generates 4-bit IDs (0..15)
+     }
      
      function void post_randomize();
          if (urgent)      qos = 2'b11;
