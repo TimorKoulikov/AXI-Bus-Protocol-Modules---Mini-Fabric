@@ -314,8 +314,9 @@ class axi3_slave_bfm extends uvm_component;
             vif.ARREADY <= 1;
 			vif.AWREADY <= 1;
 			
-			// Always ready for write data
-			vif.WREADY  <= 1;
+			// ready only when slave recived write request
+            // ok for lazy approach because Write order transactions
+			vif.WREADY  <= (active_writes.size() != 0);
 			
 			// ========= READ ADDRESS =========
 			if (vif.ARVALID && vif.ARREADY) begin
