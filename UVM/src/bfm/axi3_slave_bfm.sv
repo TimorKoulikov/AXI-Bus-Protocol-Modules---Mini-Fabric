@@ -88,6 +88,14 @@ class axi3_slave_bfm extends uvm_component;
 	active_write_t active_writes[$];
 	bit [ID_WIDTH-1:0] pending_b_ids[$];
 	
+    function bit has_active_write(logic [ID_WIDTH-1:0] id);
+        foreach (active_writes[i]) begin
+            if (active_writes[i].id == id)
+                return 1;
+        end
+        return 0;
+    endfunction
+    
 	// ------------------------------------------------------------
 	// Constructor
 	// ------------------------------------------------------------
@@ -314,10 +322,6 @@ class axi3_slave_bfm extends uvm_component;
             vif.ARREADY <= 1;
 			vif.AWREADY <= 1;
 			
-			// ready only when slave recived write request
-            // ok for lazy approach because Write order transactions
-			vif.WREADY  <= (active_writes.size() != 0);
-			
 			// ========= READ ADDRESS =========
 			if (vif.ARVALID && vif.ARREADY) begin
 				active_read_t arx;
@@ -412,7 +416,13 @@ class axi3_slave_bfm extends uvm_component;
 			end
 			else if (vif.BVALID && vif.BREADY) begin
 				vif.BVALID <= 0;
-			end
+            end
+            
+            // ready only when slave recived write request
+            // ok for lazy approach because Write order transactions
+            vif.WREADY  <= vif.WVALID && (has_active_write(vif.WID) || 
+                    (vif.AWVALID && vif.AWREADY && vif.AWID == vif.WID));
+            
 		end
 		
 	endtask
